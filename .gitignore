@@ -1,0 +1,10 @@
+**/.*
+**/.DS_Store
+**/Icon?
+!.gitignore
+!.github
+**/*.txt
+**/*.wav
+**/_*.bell
+**/*.llll
+!__lib__.bell
