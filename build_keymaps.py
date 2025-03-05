@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 from collections import defaultdict
 from argparse import ArgumentParser
 
@@ -52,7 +53,9 @@ def organize_wav_files(folder_path, output_file):
 
 
 indir = '/Users/felipetovarhenao/Documents/FullSOL2020/'
-
+keymap_dir = './keymaps/'
+if os.path.exists(keymap_dir):
+    shutil.rmtree(keymap_dir)
 for root, dirs, files in os.walk(indir):
     if not files:
         continue
@@ -65,10 +68,14 @@ for root, dirs, files in os.walk(indir):
         continue
 
     instrument = root.split("/")[-2].lower()
-    out_dir = os.path.join('./keymaps/', instrument)
+    extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
+    extra = '_' + \
+        extra[0].replace("sordina", "mute").replace(
+            '_', '-') if len(extra) > 0 else ''
+    instrument = re.match(r'^[A-Za-z]+', instrument)[0]
+    out_dir = os.path.join(keymap_dir, instrument + extra)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
-        print(instrument)
     filename = root.split('/')[-1]
     out_path = os.path.join(out_dir, filename + '.txt')
     organize_wav_files(root, out_path)
