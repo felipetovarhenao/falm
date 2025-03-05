@@ -52,8 +52,122 @@ def organize_wav_files(folder_path, output_file):
             f.write("]\n")
 
 
+BELL_CODE = """
+KEYMAP_CACHE = null;
+sol = (
+    $name = 'guitar', 
+    $type = 'ordinario', 
+    $pitch = 6000, 
+    $duration = 1000, 
+    $velocity = 64, 
+    $resample = 1, 
+    $useseed = 1 -> (
+        $path = $name + '/' + $type;
+        $keymap = KEYMAP_CACHE.$path;
+        if $keymap == null then (
+            $keymap = read(
+                './keymaps/' + $path + '.txt' 
+            );
+            if $keymap != null then KEYMAP_CACHE _= [$name $keymap] 
+        );
+        ezsampler(
+            @pitch $pitch
+            @duration $duration
+            @velocity $velocity
+            @keymap $keymap
+            @resample $resample
+            @useseed $useseed
+        ) 
+    ) 
+)"""
+
+
+def abbreviate(str: str):
+    for swap in [
+        [r'ordinario', 'ord'],
+        [r'pizzicato', 'pizz'],
+        [r'staccato', 'stacc'],
+        [r'sforzato', 'sfz'],
+        [r'flatterzunge', 'flz'],
+        [r'violoncello', 'cello'],
+        [r'crescendo', 'cresc'],
+        [r'^bass$', 'tuba'],
+        [r'contrabass', 'bass'],
+        [r'sul_ponticello', 'pont'],
+        [r'sul_tasto', 'tasto'],
+        [r'trumpet', 'tpt'],
+        [r'sordina', 'mute'],
+        [r'tremolo', 'trem'],
+        [r'mute_piombo', 'piombo'],
+        [r'mute_cup', 'cup'],
+        [r'mute_straight', 'straight'],
+        [r'mute_harmon', 'harmon'],
+        [r'stopped', 'stop'],
+        [r'mute_wah', 'wah'],
+        [r'aeolian', 'air'],
+        [r'battuto', 'bat'],
+        [r'bisbigliando', 'bisb'],
+        [r'maj_seventh', 'M7'],
+        [r'min_second', 'm2'],
+        [r'glissando', 'gliss'],
+        [r'high_register', 'high'],
+        [r'multiphonics', 'multi'],
+        [r'discolored', 'alt'],
+        [r'major_second', 'M2'],
+        [r'accordion', 'acc'],
+        [r'bellowshake', 'shake'],
+        [r'fifth', 'P5'],
+        [r'_unison', ''],
+        [r'minor_second', 'm2'],
+        [r'exploding', 'exp'],
+        [r'play_and_sing', 'sing'],
+        [r'whistle_tones', 'whistle'],
+        [r'combination_of_registers', 'reg'],
+        [r'artificial_harmonic', 'harm'],
+        [r'col_legno', 'legno'],
+        [r'non_vibrato', 'nonvib'],
+        [r'note_lasting', 'ten'],
+        [r'blow_without_reed', 'noreed'],
+        [r'gliss_with_throat', 'gliss'],
+        [r'vibrato', 'vib'],
+        [r'harmonic_fingering', 'harm'],
+        [r'pizz_bartok', 'bartok'],
+        [r'buzzing', 'buzz'],
+        [r'pedal', 'ped'],
+        [r'harmonic', 'harm'],
+        [r'xylophonic', 'xylo'],
+        [r'key_click', 'keyclick'],
+    ]:
+        str = re.sub(swap[0], swap[1], str)
+
+    return str
+
+
+def define_function(name: str, default_type: str):
+    global BELL_CODE
+    BELL_CODE += f""";
+{name} = (
+    $pitch = 6000,
+    $duration = 1000,
+    $velocity = 64,
+    $useseed = 1,
+    $usecache = 1,
+    $type = '{default_type}' -> (
+        sol(
+            @pitch $pitch
+            @duration $duration
+            @velocity $velocity
+            @useseed $useseed
+            @usecache $usecache
+            @type $type
+        )
+    )
+)"""
+
+
 indir = '/Users/felipetovarhenao/Documents/FullSOL2020/'
 keymap_dir = './keymaps/'
+instruments = []
 if os.path.exists(keymap_dir):
     shutil.rmtree(keymap_dir)
 for root, dirs, files in os.walk(indir):
@@ -67,15 +181,23 @@ for root, dirs, files in os.walk(indir):
     if not is_audio_folder:
         continue
 
+    filename = root.split('/')[-1]
+    filename = abbreviate(filename)
     instrument = root.split("/")[-2].lower()
     extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
-    extra = '_' + \
-        extra[0].replace("sordina", "mute").replace(
-            '_', '-') if len(extra) > 0 else ''
-    instrument = re.match(r'^[A-Za-z]+', instrument)[0]
-    out_dir = os.path.join(keymap_dir, instrument + extra)
+    extra = '+' + abbreviate(extra[0]) if len(extra) > 0 else ''
+    technique = filename
+    filename += extra
+    instrument = abbreviate(re.match(r'^[A-Za-z]+', instrument)[0])
+    if instrument not in instruments and filename in ['ord', 'stacc', 'pizz']:
+        instruments.append(instrument)
+        define_function(instrument, filename)
+
+    out_dir = os.path.join(keymap_dir, instrument)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
-    filename = root.split('/')[-1]
     out_path = os.path.join(out_dir, filename + '.txt')
     organize_wav_files(root, out_path)
+
+with open("./sol.bell", 'w') as f:
+    f.write(BELL_CODE)
