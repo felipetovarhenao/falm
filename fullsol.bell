@@ -1,0 +1,20 @@
+KEYMAP_CACHE = null;
+sol = (
+    $name = 'guitar', $type = 'ordinario', $pitch = 6000, $duration = 1000, $velocity = 64, $resample = 1, $useseed = 1 -> (
+        $keymap = KEYMAP_CACHE.$name;
+        if $keymap == null then (
+            $keymap = read(
+                './keymaps/' + $name + '/' + $type + '.txt' 
+            );
+            KEYMAP_CACHE _= [$name $keymap] 
+        );
+        ezsampler(
+            @pitch $pitch
+            @duration $duration
+            @velocity $velocity
+            @keymap $keymap
+            @resample $resample
+            @useseed $useseed
+        ) 
+    ) 
+)
