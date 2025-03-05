@@ -2,7 +2,6 @@ import os
 import re
 import shutil
 from collections import defaultdict
-from argparse import ArgumentParser
 
 
 def organize_wav_files(folder_path, output_file):
@@ -130,6 +129,7 @@ def abbreviate(str: str, hyphen: bool = False):
         [r'play_and_sing', 'sing'],
         [r'whistle_tones', 'whistle'],
         [r'combination_of_registers', 'reg'],
+        ['harmonics', 'harm'],
         [r'artificial_harmonic', 'harm'],
         [r'col_legno', 'legno'],
         [r'non_vibrato', 'nonvib'],
@@ -206,6 +206,7 @@ keymap_dir = './keymaps/'
 instruments = []
 if os.path.exists(keymap_dir):
     shutil.rmtree(keymap_dir)
+instrument_dict = {}
 for root, dirs, files in os.walk(indir):
     if not files:
         continue
@@ -225,15 +226,27 @@ for root, dirs, files in os.walk(indir):
     technique = filename
     filename += extra
     instrument = abbreviate(re.match(r'^[A-Za-z]+', instrument)[0])
-    if instrument not in instruments and filename in ['ord', 'stacc', 'pizz']:
-        instruments.append(instrument)
-        define_function(instrument, filename)
+    if instrument not in instrument_dict:
+        instrument_dict[instrument] = []
+    instrument_dict[instrument].append(filename)
 
     out_dir = os.path.join(keymap_dir, instrument)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, filename + '.txt')
     organize_wav_files(root, out_path)
+
+for instrument in instrument_dict.keys():
+    techniques = instrument_dict[instrument]
+    found = False
+    for technique in ['stacc', 'pizz', 'ord']:
+        if technique in techniques:
+            define_function(instrument, technique)
+            found = True
+            break
+    if not found:
+        define_function(instrument, techniques[0])
+
 
 with open("./sol.bell", 'w') as f:
     f.write(BELL_CODE)
