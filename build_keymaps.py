@@ -197,7 +197,7 @@ def abbreviate(str: str, hyphen: bool = False):
         [r'middle', 'mid'],
         [r'filtered', 'filter'],
         [r'sweeping', 'sweep'],
-        [r'double_bass', 'bass'],
+        [r'double_bass_bow', 'bow'],
         [r'superball', 'ball'],
         [r'scraping', 'scrape'],
         [r'damped', 'damp'],
