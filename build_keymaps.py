@@ -4,6 +4,15 @@ import shutil
 from collections import defaultdict
 
 
+def file_id_to_pitch(file_id: int, num_files: int):
+    center = 6000
+    if num_files == 1:
+        return center
+    n = file_id / max(1, num_files - 1)
+    n -= 0.5
+    return str(int(round(n * 3800 + center)))
+
+
 def organize_wav_files(folder_path, output_file):
     # Dictionary to hold pitch groups and dynamic levels
     pitch_data = defaultdict(lambda: defaultdict(list))
@@ -19,29 +28,32 @@ def organize_wav_files(folder_path, output_file):
     # Iterate over all files in the folder
     for root, _, files in os.walk(folder_path):
         n_count = 0
-        for file in files:
-            if file.endswith(".wav"):
-                file_path = os.path.join(root, file)
-                match = pattern.search(file)
-                if match:
-                    pitch, dynamic = match.groups()
-                    vel = dynamic_map[dynamic] if dynamic in dynamic_map else 64
-                    if pitch != 'N':
-                        # Adjust the pitch to an octave higher
-                        pitch_letter = pitch[:-1]
-                        pitch_octave = int(pitch[-1]) + 1
-                        adjusted_pitch = f"{pitch_letter}{pitch_octave}"
+        files = list(filter(lambda f: f.endswith('.wav'), files))
+        num_files = len(files)
+        for i, file in enumerate(files):
+            file_path = os.path.join(root, file)
+            match = pattern.search(file)
+            if match:
+                pitch, dynamic = match.groups()
+                vel = dynamic_map[dynamic] if dynamic in dynamic_map else 64
+                if pitch != 'N':
+                    # Adjust the pitch to an octave higher
+                    pitch_letter = pitch[:-1]
+                    pitch_octave = int(pitch[-1]) + 1
+                    adjusted_pitch = f"{pitch_letter}{pitch_octave}"
 
-                        # Add file to the appropriate group
-                        pitch_data[adjusted_pitch][vel].append(
-                            file_path)
-                    else:
-                        pitch_data[str((60 + n_count) * 100)][vel].append(
-                            file_path)
-                        n_count += 1
+                    # Add file to the appropriate group
+                    pitch_data[adjusted_pitch][vel].append(
+                        file_path)
                 else:
-                    pitch_data[str((60 + n_count) * 100)][64].append(file_path)
+                    pitch_data[file_id_to_pitch(i, num_files)][vel].append(
+                        file_path)
                     n_count += 1
+            else:
+
+                pitch_data[file_id_to_pitch(
+                    i, num_files)][64].append(file_path)
+                n_count += 1
     # return
     if not pitch_data:
         return
