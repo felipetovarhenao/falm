@@ -13,7 +13,8 @@ def organize_wav_files(folder_path, output_file):
                    "mp": 64, "p": 0, "pp": 0, "N": 64}
 
     # Regex to parse pitch, dynamic level, and other details
-    pattern = re.compile(r"([A-G#b]+\d+|N)-(f{1,2}|mf|mp|p{1,2}|N)-")
+    pattern = re.compile(
+        r"([A-G#bq]+\d+|N)-([mfpN]+)-")
 
     # Iterate over all files in the folder
     for root, _, files in os.walk(folder_path):
@@ -24,6 +25,7 @@ def organize_wav_files(folder_path, output_file):
                 match = pattern.search(file)
                 if match:
                     pitch, dynamic = match.groups()
+                    vel = dynamic_map[dynamic] if dynamic in dynamic_map else 64
                     if pitch != 'N':
                         # Adjust the pitch to an octave higher
                         pitch_letter = pitch[:-1]
@@ -31,12 +33,15 @@ def organize_wav_files(folder_path, output_file):
                         adjusted_pitch = f"{pitch_letter}{pitch_octave}"
 
                         # Add file to the appropriate group
-                        pitch_data[adjusted_pitch][dynamic_map[dynamic]].append(
+                        pitch_data[adjusted_pitch][vel].append(
                             file_path)
                     else:
-                        pitch_data[str((60 + n_count) * 100)][dynamic_map[dynamic]].append(
+                        pitch_data[str((60 + n_count) * 100)][vel].append(
                             file_path)
                         n_count += 1
+                else:
+                    pitch_data[str((60 + n_count) * 100)][64].append(file_path)
+                    n_count += 1
     # return
     if not pitch_data:
         return
@@ -187,6 +192,7 @@ def define_function(name: str, default_type: str):
     $velocity = 64,
     $useseed = 1,
     $usecache = 1,
+    $resample = 1,
     $type = '{default_type}' -> (
         sol(
             @name '{name}'
@@ -195,6 +201,7 @@ def define_function(name: str, default_type: str):
             @velocity $velocity
             @useseed $useseed
             @usecache $usecache
+            @resample $resample
             @type $type
         )
     )
