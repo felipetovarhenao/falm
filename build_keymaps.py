@@ -56,7 +56,7 @@ BELL_CODE = """
 KEYMAP_CACHE = null;
 sol = (
     $name = 'guitar', 
-    $type = 'ordinario', 
+    $type = 'ord', 
     $pitch = 6000, 
     $duration = 1000, 
     $velocity = 64, 
@@ -154,6 +154,7 @@ def define_function(name: str, default_type: str):
     $usecache = 1,
     $type = '{default_type}' -> (
         sol(
+            @name '{name}'
             @pitch $pitch
             @duration $duration
             @velocity $velocity
