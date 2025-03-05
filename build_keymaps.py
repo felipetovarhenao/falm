@@ -82,7 +82,7 @@ sol = (
 )"""
 
 
-def abbreviate(str: str):
+def abbreviate(str: str, hyphen: bool = False):
     for swap in [
         [r'ordinario', 'ord'],
         [r'pizzicato', 'pizz'],
@@ -138,9 +138,14 @@ def abbreviate(str: str):
         [r'xylophonic', 'xylo'],
         [r'key_click', 'keyclick'],
         [r'pizz_l_vib', 'pizz'],
+        [r'clarinet', 'clar'],
+        [r'trombone', 'tromb'],
+        [r'_with_', '_w_'],
+        [r'near_the_', 'near_'],
     ]:
         str = re.sub(swap[0], swap[1], str)
-
+    if hyphen:
+        str = str.replace("_", '-')
     return str
 
 
@@ -184,10 +189,10 @@ for root, dirs, files in os.walk(indir):
         continue
 
     filename = root.split('/')[-1]
-    filename = abbreviate(filename)
+    filename = abbreviate(filename, True)
     instrument = root.split("/")[-2].lower()
     extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
-    extra = '+' + abbreviate(extra[0]) if len(extra) > 0 else ''
+    extra = '+' + abbreviate(extra[0], True) if len(extra) > 0 else ''
     technique = filename
     filename += extra
     instrument = abbreviate(re.match(r'^[A-Za-z]+', instrument)[0])
