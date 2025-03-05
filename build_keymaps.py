@@ -14,24 +14,31 @@ def organize_wav_files(folder_path, output_file):
                    "mp": 64, "p": 0, "pp": 0, "N": 64}
 
     # Regex to parse pitch, dynamic level, and other details
-    pattern = re.compile(r"([A-G#b]+\d+)-(f{1,2}|mf|mp|p{1,2}|N)-")
+    pattern = re.compile(r"([A-G#b]+\d+|N)-(f{1,2}|mf|mp|p{1,2}|N)-")
 
     # Iterate over all files in the folder
     for root, _, files in os.walk(folder_path):
+        n_count = 0
         for file in files:
             if file.endswith(".wav"):
                 file_path = os.path.join(root, file)
                 match = pattern.search(file)
                 if match:
                     pitch, dynamic = match.groups()
-                    # Adjust the pitch to an octave higher
-                    pitch_letter = pitch[:-1]
-                    pitch_octave = int(pitch[-1]) + 1
-                    adjusted_pitch = f"{pitch_letter}{pitch_octave}"
+                    if pitch != 'N':
+                        # Adjust the pitch to an octave higher
+                        pitch_letter = pitch[:-1]
+                        pitch_octave = int(pitch[-1]) + 1
+                        adjusted_pitch = f"{pitch_letter}{pitch_octave}"
 
-                    # Add file to the appropriate group
-                    pitch_data[adjusted_pitch][dynamic_map[dynamic]].append(
-                        file_path)
+                        # Add file to the appropriate group
+                        pitch_data[adjusted_pitch][dynamic_map[dynamic]].append(
+                            file_path)
+                    else:
+                        pitch_data[str((60 + n_count) * 100)][dynamic_map[dynamic]].append(
+                            file_path)
+                        n_count += 1
+    # return
     if not pitch_data:
         return
     # Write the organized data to the output file
@@ -136,12 +143,34 @@ def abbreviate(str: str, hyphen: bool = False):
         [r'pedal', 'ped'],
         [r'harmonic', 'harm'],
         [r'xylophonic', 'xylo'],
-        [r'key_click', 'keyclick'],
+        [r'key_click', 'keys'],
         [r'pizz_l_vib', 'pizz'],
         [r'clarinet', 'clar'],
         [r'trombone', 'tromb'],
         [r'_with_', '_w_'],
         [r'near_the_', 'near_'],
+        [r'difference', 'diff'],
+        [r'tap_on_body', 'tap'],
+        [r'chromatic_scale', 'chrom'],
+        [r'glissandi', 'gliss'],
+        [r'natural', 'nat'],
+        [r'behind_the', 'behind'],
+        [r'on_the', 'on'],
+        [r'tuning_pegs', 'pegs'],
+        [r'tailpiece', 'tail'],
+        [r'rasguado', 'rasg'],
+        [r'drum_effect', 'perc'],
+        [r'fingertips', 'finger'],
+        [r'fingering', 'finger'],
+        [r'fingerboard', 'board'],
+        [r'increasing', 'asc'],
+        [r'vocalize', 'vocal'],
+        [r'closed', 'close'],
+        [r'percussion', 'perc'],
+        [r'embouchure', 'emb'],
+        [r'_into_instrument', ''],
+        [r'legato', 'leg'],
+        [r'pitched', 'pitch'],
     ]:
         str = re.sub(swap[0], swap[1], str)
     if hyphen:
