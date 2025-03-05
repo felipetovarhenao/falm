@@ -127,12 +127,15 @@ def abbreviate(str: str, hyphen: bool = False):
         [r'major_second', 'M2'],
         [r'accordion', 'acc'],
         [r'bellowshake', 'shake'],
+        [r'bottleneck', 'slide'],
         [r'fifth', 'P5'],
+        [r'jet_whistle', 'jet'],
         [r'_unison', ''],
         [r'minor_second', 'm2'],
         [r'exploding', 'exp'],
         [r'play_and_sing', 'sing'],
         [r'whistle_tones', 'whistle'],
+        [r'tonguing', 'tongue'],
         [r'combination_of_registers', 'reg'],
         ['harmonics', 'harm'],
         [r'artificial_harmonic', 'harm'],
@@ -176,6 +179,16 @@ def abbreviate(str: str, hyphen: bool = False):
         [r'_into_instrument', ''],
         [r'legato', 'leg'],
         [r'pitched', 'pitch'],
+        [r'backwards', 'back'],
+        [r'decresc', 'dim'],
+        [r'quartertones', 'micro'],
+        [r'middle', 'mid'],
+        [r'filtered', 'filter'],
+        [r'sweeping', 'sweep'],
+        [r'double_bass', 'bass'],
+        [r'superball', 'ball'],
+        [r'scraping', 'scrape'],
+        [r'damped', 'damp'],
     ]:
         str = re.sub(swap[0], swap[1], str)
     if hyphen:
@@ -228,6 +241,8 @@ for root, dirs, files in os.walk(indir):
     filename = root.split('/')[-1]
     filename = abbreviate(filename, True)
     instrument = root.split("/")[-2].lower()
+    if "Percussion" in root:
+        instrument = 'perc'
     extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
     extra = '+' + abbreviate(extra[0], True) if len(extra) > 0 else ''
     technique = filename
