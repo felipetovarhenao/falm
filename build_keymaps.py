@@ -137,6 +137,7 @@ def abbreviate(str: str):
         [r'harmonic', 'harm'],
         [r'xylophonic', 'xylo'],
         [r'key_click', 'keyclick'],
+        [r'pizz_l_vib', 'pizz'],
     ]:
         str = re.sub(swap[0], swap[1], str)
 
