@@ -1,12 +1,13 @@
 KEYMAP_CACHE = null;
 sol = (
     $name = 'guitar', $type = 'ordinario', $pitch = 6000, $duration = 1000, $velocity = 64, $resample = 1, $useseed = 1 -> (
-        $keymap = KEYMAP_CACHE.$name;
+        $path = $name + '/' + $type;
+        $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
             $keymap = read(
-                './keymaps/' + $name + '/' + $type + '.txt' 
+                './keymaps/' + $path + '.txt' 
             );
-            KEYMAP_CACHE _= [$name $keymap] 
+            if $keymap != null then KEYMAP_CACHE _= [$name $keymap] 
         );
         ezsampler(
             @pitch $pitch
