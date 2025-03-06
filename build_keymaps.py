@@ -81,7 +81,7 @@ sol = (
     $name = 'guitar', 
     $type = 'ord', 
     $pitch = 6000, 
-    $duration = 1000, 
+    $duration = 500, 
     $velocity = 64, 
     $resample = 1, 
     $useseed = 1 -> (
@@ -89,7 +89,7 @@ sol = (
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
             $keymap = read(
-                './keymaps/' + $path + '.txt' 
+                '/Users/felipetovarhenao/Documents/bandcamp album/keymaps/' + $path + '.txt' 
             );
             if $keymap != null then KEYMAP_CACHE _= [$name $keymap] 
         );
@@ -213,7 +213,7 @@ def define_function(name: str, default_type: str):
     BELL_CODE += f""";
 {name} = (
     $pitch = 6000,
-    $duration = 1000,
+    $duration = 500,
     $velocity = 64,
     $useseed = 1,
     $usecache = 1,
@@ -273,7 +273,7 @@ for root, dirs, files in os.walk(indir):
 for instrument in instrument_dict.keys():
     techniques = instrument_dict[instrument]
     found = False
-    for technique in ['stacc', 'pizz', 'ord']:
+    for technique in ['stacc', 'ord', 'pizz']:
         if technique in techniques:
             define_function(instrument, technique)
             found = True
