@@ -91,7 +91,7 @@ sol = (
             $keymap = read(
                 '/Users/felipetovarhenao/Documents/bandcamp album/keymaps/' + $path + '.txt' 
             );
-            if $keymap != null then KEYMAP_CACHE _= [$name $keymap] 
+            if $keymap != null then KEYMAP_CACHE _= [$path $keymap] 
         );
         ezsampler(
             @pitch $pitch
