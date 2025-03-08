@@ -1,0 +1,6 @@
+ezexport = (
+    -> (
+        $filename = thispath(1).getkey('name');
+        export('./' + $filename + '.wav') 
+    ) 
+)
