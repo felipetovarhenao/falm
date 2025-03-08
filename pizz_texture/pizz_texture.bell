@@ -1,8 +1,8 @@
-setseed(2);
+setseed(50);
 $totdur = 60000;
 $t = 0;
 $root = 4800;
-$minvelbpf = [0 0 0] [1 70 0.33];
+$minvelbpf = [0 0 0] [1 90 0.33];
 $gapbpf = [0 2500 0] [1 0 0.35];
 $gapthreshbpf = [0 0.125 0] [1 0 0.25];
 $spanbpf = [0 2000 0] [1 250 0.25];
@@ -16,6 +16,7 @@ while $t < $totdur do (
         1 xrand($maxincr) xrand(1/3, 1/2) * xchoose(-1 1) 
     ];
     $vel = xrandom($minvel, 127);
+    $weights = (1 1 1 1) * (1 - $nt) + $nt * (0 1 0 0);
     $chord = xchoose(
         ## 
         [1/2 1 18/7 20/9 3/2 24/7 56/15] 
@@ -25,6 +26,8 @@ while $t < $totdur do (
         [1/2 1 11/9 16/7 3/2 20/7 15/4] 
         ## 
         [1/2 5/6 4/3 20/9 5/3 2 7/2] 
+        ## 
+        @weights $weights
     )::1;
     $offset = 0;
     $chordsize = length($chord);
@@ -32,21 +35,35 @@ while $t < $totdur do (
     $chord = r2mc($chord, $root).left($numnotes).sort();
     $chordsize = length($chord);
     for $mc $mci in $chord do (
+        $prob = xrand();
         $arpt = ($mci - 1) / ($chordsize - 1);
         $incr = samplebpf($incrbpf, $arpt);
-        $env = [0 1 0] [1 0 -xrand(1/2, 3/4)];
         $onset = $t + $offset;
-        if xrand() > $nt ** 0.5 then (
+        if $prob > $nt ** 0.5 then (
+            $env = [0 1 0] [1 0 -xrand(2/3, 4/5)];
+            $fq = $mc.mc2f() * exp2(xrandom(-2, 4));
+            $gainmul = $mc.scale(2100, 10800, 1, 0.25, -0.25);
+            $dur = xrand().scale(0, 1, 200, 2000, 1/2);
+            $pan = xrand() xrand();
+            $process = gain(($vel / 127) * 0.07 * $gainmul);
+            $phase = xrand();
+            if xrand() > 0.5 then (
+                $process _= freqshift(
+                    @shift xrand(0.5, 8) * xchoose(-1 1) 
+                ) 
+            );
+            if xrand() > 0.9 then (
+                $onset -= $dur;
+                $env = revbpf($env) 
+            );
             cycle(
-                @frequency $mc.mc2f() * exp2(xrandom(-2, 4)) 
-                @duration xrand(1).scale(0, 1, 50, 900, 0.5) 
-                @phase xrand() 
-            ).process(
-                gain(($vel / 127) * 0.125) 
-            ).transcribe(
+                @frequency $fq
+                @duration $dur
+                @phase $phase
+            ).process($process).transcribe(
                 @onset $onset
                 @gain $env
-                @pan xrand() 
+                @pan $pan
             ) 
         ) else (
             $sampler = xchoose(viola violin cello bass guitar harp);
@@ -58,9 +75,7 @@ while $t < $totdur do (
                 @type $type
             );
             $b.transcribe(
-                @onset $onset
-                @pan xrand() 
-                @gain $env
+                @onset $onset @pan xrand() 
             ) 
         );
         $offset += $incr
@@ -75,7 +90,7 @@ while $t < $totdur do (
 render(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.707
-        @wet 0.0125
+        @wet [0 0.015 0] [1 0.05 0.25] 
         @damp 1
         @width 1
     ) 
