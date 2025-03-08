@@ -50,21 +50,20 @@ while $t < $totdur do (
             ) 
         ) else (
             $sampler = xchoose(viola violin cello bass guitar harp);
-            $type = if $sampler.intersection(harp guitar) != null then 'harm' else xchoose('pizz' 'pizz-secco');
-            $sampler(
+            $type = if $sampler.intersection(harp guitar) != null then if $sampler == harp then choose('harm' 'harm-in-wood') else 'harm' else xchoose('pizz' 'pizz-secco');
+            $b = $sampler(
                 @pitch $mc
                 @duration null
                 @velocity $vel
                 @type $type
-            ).transcribe(
+            );
+            $b.transcribe(
                 @onset $onset
                 @pan xrand() 
                 @gain $env
             ) 
         );
         $offset += $incr
-        ## 
-        null
     );
     $t += $span;
     $gapthresh = samplebpf($gapthreshbpf, $nt);
