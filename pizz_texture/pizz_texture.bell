@@ -1,14 +1,20 @@
 setseed(2);
-$tot = 45000;
-$N = round($tot / 800);
-$toff = 0;
+$totdur = 60000;
+$t = 0;
 $root = 4800;
-$minvelbpf = [0 0 0] [1 127 0.33];
-for $t in arithmser(0, 1, null, $N).scale(0, 1, 0, $tot, -0.25) do (
-    $nt = $t / $tot;
+$minvelbpf = [0 0 0] [1 70 0.33];
+$gapbpf = [0 2500 0] [1 0 0.35];
+$gapthreshbpf = [0 0.125 0] [1 0 0.25];
+$spanbpf = [0 2000 0] [1 250 0.25];
+$maxincrbpf = [0 250 0] [1 300 0.25];
+while $t < $totdur do (
+    $nt = $t / $totdur;
     $minvel = samplebpf($minvelbpf, $nt);
-    $off = 0;
-    $incr = xrand(190);
+    $span = samplebpf($spanbpf, $nt);
+    $maxincr = samplebpf($maxincrbpf, $nt);
+    $incrbpf = [0 xrand($maxincr) 0] [
+        1 xrand($maxincr) xrand(1/3, 1/2) * xchoose(-1 1) 
+    ];
     $vel = xrandom($minvel, 127);
     $chord = xchoose(
         ## 
@@ -17,9 +23,19 @@ for $t in arithmser(0, 1, null, $N).scale(0, 1, 0, $tot, -0.25) do (
         [1/2 1 5/2 9/4 3/2 5 15/4] 
         ## 
         [1/2 1 11/9 16/7 3/2 20/7 15/4] 
+        ## 
+        [1/2 5/6 4/3 20/9 5/3 2 7/2] 
     )::1;
-    for $mc in r2mc($chord, $nt.scale(0, 1, $root, $root + 50)).left(xrandom(4, 9)).sort() do (
+    $offset = 0;
+    $chordsize = length($chord);
+    $numnotes = xrandom(4, $chordsize);
+    $chord = r2mc($chord, $root).left($numnotes).sort();
+    $chordsize = length($chord);
+    for $mc $mci in $chord do (
+        $arpt = ($mci - 1) / ($chordsize - 1);
+        $incr = samplebpf($incrbpf, $arpt);
         $env = [0 1 0] [1 0 -xrand(1/2, 3/4)];
+        $onset = $t + $offset;
         if xrand() > $nt ** 0.5 then (
             cycle(
                 @frequency $mc.mc2f() * exp2(xrandom(-2, 4)) 
@@ -28,28 +44,34 @@ for $t in arithmser(0, 1, null, $N).scale(0, 1, 0, $tot, -0.25) do (
             ).process(
                 gain(($vel / 127) * 0.125) 
             ).transcribe(
-                @onset $t + $off
+                @onset $onset
                 @gain $env
                 @pan xrand() 
             ) 
         ) else (
             $sampler = xchoose(viola violin cello bass guitar harp);
+            $type = if $sampler.intersection(harp guitar) != null then 'harm' else xchoose('pizz' 'pizz-secco');
             $sampler(
                 @pitch $mc
                 @duration null
                 @velocity $vel
-                @type if $sampler.intersection(harp guitar) != null then 'harm' else xchoose('pizz' 'pizz-secco') 
+                @type $type
             ).transcribe(
-                @onset $t + $off + $toff
+                @onset $onset
                 @pan xrand() 
                 @gain $env
             ) 
         );
-        $off += $incr
+        $offset += $incr
         ## 
         null
     );
-    if xrand() > 0.9 then ($toff += xrand(1000, 2500)) 
+    $t += $span;
+    $gapthresh = samplebpf($gapthreshbpf, $nt);
+    if xrand() < $gapthresh then (
+        $gap = samplebpf($gapbpf, $nt);
+        $t += $gap
+    ) 
 );
 render(
     @play 1 @process normalize(-3) freeverb(
