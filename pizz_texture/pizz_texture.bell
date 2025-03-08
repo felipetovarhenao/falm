@@ -15,6 +15,8 @@ for $t in arithmser(0, 1, null, $N).scale(0, 1, 0, $tot, -0.25) do (
         [1/2 1 18/7 20/9 3/2 24/7 56/15] 
         ## 
         [1/2 1 5/2 9/4 3/2 5 15/4] 
+        ## 
+        [1/2 1 11/9 16/7 3/2 20/7 15/4] 
     )::1;
     for $mc in r2mc($chord, $nt.scale(0, 1, $root, $root + 50)).left(xrandom(4, 9)).sort() do (
         $env = [0 1 0] [1 0 -xrand(1/2, 3/4)];
@@ -36,7 +38,7 @@ for $t in arithmser(0, 1, null, $N).scale(0, 1, 0, $tot, -0.25) do (
                 @pitch $mc
                 @duration null
                 @velocity $vel
-                @type if $sampler.intersection(harp guitar) != null then 'harm' else 'pizz' 
+                @type if $sampler.intersection(harp guitar) != null then 'harm' else xchoose('pizz' 'pizz-secco') 
             ).transcribe(
                 @onset $t + $off + $toff
                 @pan xrand() 
