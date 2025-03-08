@@ -7,6 +7,17 @@ $gapbpf = [0 2500 0] [1 0 0.35];
 $gapthreshbpf = [0 0.125 0] [1 0 0.25];
 $spanbpf = [0 2000 0] [1 250 0.25];
 $maxincrbpf = [0 250 0] [1 300 0.25];
+$samplers = for $instrument in violin viola cello collect [$instrument 'pizz' 'pizz-secco'];
+$samplers _= (
+    ## 
+    [
+        harp 'harm' 'harm-in-wood' 'xylo' 'near-board' 'near-pegs' 
+    ] 
+    ## 
+    [
+        guitar 'harm' 'pizz' 
+    ] 
+);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $minvel = samplebpf($minvelbpf, $nt);
@@ -67,12 +78,10 @@ while $t < $totdur do (
             ) 
         ) else (
             $sampweights = (2 2 1 1 3 4) * (1 - $nt) + $nt * (1 :* 6);
-            $sampler = xchoose(viola violin cello bass guitar harp @weights $sampweights);
-            $type = if $sampler.intersection(harp guitar) != null then (
-                ## 
-                if $sampler == harp then xchoose('harm' 'harm-in-wood') else 'harm'
-            ) else xchoose('pizz' 'pizz-secco');
-            $b = $sampler(
+            $sampler = xchoose($samplers @weights $sampweights)::1;
+            $instrument = $sampler:1;
+            $type = xchoose($sampler.right(1));
+            $b = $instrument(
                 @pitch $mc
                 @duration null
                 @velocity $vel
