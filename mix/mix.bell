@@ -8,4 +8,5 @@ for $f in 'pizz_texture' 'pizz_sustain' do (
     $data = read($txtfile);
     $t += $data.maximum() 
 );
-render(@play 1)
+render(@play 1);
+ezexport()
