@@ -1,6 +1,9 @@
 ezexport = (
-    -> (
+    $data -> (
         $filename = thispath(1).getkey('name');
-        export('./' + $filename + '.wav') 
+        export('./' + $filename + '.wav');
+        $data &&& write(
+            @data $data @path './' + $filename + '.txt'
+        ) 
     ) 
 )

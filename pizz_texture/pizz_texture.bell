@@ -19,6 +19,7 @@ $samplers _= (
     ] 
 );
 $chordweightmixbpf = [0 0 0] [1 1 0.25];
+$markers = null;
 while $t < $totdur do (
     $nt = $t / $totdur;
     $minvel = samplebpf($minvelbpf, $nt);
@@ -93,6 +94,7 @@ while $t < $totdur do (
                 @onset $onset @pan xrand() 
             ) 
         );
+        $markers _= $onset;
         $offset += $incr
     );
     $t += $span;
@@ -110,4 +112,4 @@ render(
         @width 1
     ) 
 );
-ezexport()
+ezexport($markers)

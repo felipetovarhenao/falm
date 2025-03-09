@@ -1,0 +1,11 @@
+$t = 0;
+for $f in 'pizz_texture' 'pizz_sustain' do (
+    $basepath = '../' + $f + '/' + $f;
+    $txtfile = $basepath + '.txt';
+    $wavfile = $basepath + '.wav';
+    $b = importaudio($wavfile);
+    $b.transcribe($t);
+    $data = read($txtfile);
+    $t += $data.maximum() 
+);
+render(@play 1)
