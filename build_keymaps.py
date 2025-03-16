@@ -107,8 +107,7 @@ types = (
     $name -> (
         SOL_TECHNIQUES.$name
     )
-)
-"""
+)"""
 
 
 def abbreviate(str: str, hyphen: bool = False):
