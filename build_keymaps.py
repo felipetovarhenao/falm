@@ -102,7 +102,13 @@ sol = (
             @useseed $useseed
         ) 
     ) 
-)"""
+);
+types = (
+    $name -> (
+        SOL_TECHNIQUES.$name
+    )
+)
+"""
 
 
 def abbreviate(str: str, hyphen: bool = False):
@@ -270,9 +276,11 @@ for root, dirs, files in os.walk(indir):
     out_path = os.path.join(out_dir, filename + '.txt')
     organize_wav_files(root, out_path)
 
+
 for instrument in instrument_dict.keys():
     techniques = instrument_dict[instrument]
     found = False
+
     for technique in ['stacc', 'ord', 'pizz']:
         if technique in techniques:
             define_function(instrument, technique)
@@ -281,6 +289,12 @@ for instrument in instrument_dict.keys():
     if not found:
         define_function(instrument, techniques[0])
 
+BELL_CODE += ''';
+SOL_TECHNIQUES = (
+'''
+for instrument in instrument_dict.keys():
+    BELL_CODE += f"\t['{instrument}' {" ".join([f"'{t}'"for t in instrument_dict[instrument]])}]\n"
 
+BELL_CODE += ')'
 with open("./sol.bell", 'w') as f:
     f.write(BELL_CODE)
