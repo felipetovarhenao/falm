@@ -36,7 +36,7 @@ $shift = 0 for $mc $mci in $chord do (
             $t += $incr
         ) 
     );
-    $shift += 50
+    $shift += 90
 );
 render(@play 1);
 ezexport()
