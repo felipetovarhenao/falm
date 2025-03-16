@@ -292,7 +292,7 @@ BELL_CODE += ''';
 SOL_TECHNIQUES = (
 '''
 for instrument in instrument_dict.keys():
-    BELL_CODE += f"\t['{instrument}' {" ".join([f"'{t}'"for t in instrument_dict[instrument]])}]\n"
+    BELL_CODE += f"    ['{instrument}' {" ".join([f"'{t}'"for t in instrument_dict[instrument]])}]\n"
 
 BELL_CODE += ')'
 with open("./sol.bell", 'w') as f:
