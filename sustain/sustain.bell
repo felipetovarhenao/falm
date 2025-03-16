@@ -1,0 +1,41 @@
+$chord = r2mc(1/2 1 3/2 5/2 3/1 15/4, 6400);
+$totdur = 60000;
+$graindur = 400;
+$overlap = 3;
+$delay = 50;
+$incr = $graindur / $overlap;
+$slope = 0.125;
+$analysis = envmaxtime() effectiveduration(@thresholdratio 0.001);
+$shift = 0;
+$readbpf = [0 0 0] [1 1 $slope];
+$shift = 0 for $mc $mci in $chord do (
+    $t = $shift;
+    $pan = rand();
+    $b = harp(
+        @pitch $mc
+        @type 'harm' 
+        @velocity 127
+        @duration null
+    ).analyze($analysis);
+    $sust = $b.getkey('envmaxtime') + $delay;
+    transcribe(
+        @buffer process(setkey($b, 'duration', $sust), fade(@fadein 0 @fadeout $incr)), 
+        @onset $t
+        @pan $pan
+    );
+    $t += max(0, $sust - $incr);
+    $maxdur = $b.getkey('effectiveduration');
+    $b = $b.setkey('duration', $graindur);
+    if $b != null then (
+        while $t < $totdur do (
+            $nt = $t / $totdur;
+            $read = samplebpf($readbpf, $nt);
+            $offset = scale($read, 0, 1, $sust, $maxdur);
+            $grain = $b.setkey('offset', $offset);
+            $grain.process(window()).transcribe($t @pan $pan);
+            $t += $incr
+        ) 
+    );
+    $shift += 50
+);
+render(@play 1)
