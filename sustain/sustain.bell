@@ -38,4 +38,5 @@ $shift = 0 for $mc $mci in $chord do (
     );
     $shift += 50
 );
-render(@play 1)
+render(@play 1);
+ezexport()
