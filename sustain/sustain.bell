@@ -5,7 +5,7 @@ $overlap = 3;
 $delay = 50;
 $incr = $graindur / $overlap;
 $slope = 0.125;
-$analysis = envmaxtime() effectiveduration(@thresholdratio 0.001);
+$analysis = envmaxtime() effectiveduration(@thresholdratio 0.0125);
 $shift = 0;
 $readbpf = [0 0 0] [1 1 $slope];
 $shift = 0 for $mc $mci in $chord do (
@@ -26,9 +26,10 @@ $shift = 0 for $mc $mci in $chord do (
     $t += max(0, $sust - $incr);
     $maxdur = $b.getkey('effectiveduration');
     $b = $b.setkey('duration', $graindur);
+    $numgrains = ($totdur - $t) / $incr;
     if $b != null then (
-        while $t < $totdur do (
-            $nt = $t / $totdur;
+        for $g in 1...$numgrains do (
+            $nt = scale($g, 1, $numgrains, 0, 1);
             $read = samplebpf($readbpf, $nt);
             $offset = scale($read, 0, 1, $sust, $maxdur);
             $grain = $b.setkey('offset', $offset);
