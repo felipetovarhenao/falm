@@ -3,7 +3,13 @@ ezexport = (
         $filename = thispath(1).getkey('name');
         export('./' + $filename + '.wav');
         $data &&& write(
-            @data $data @path './' + $filename + '.txt'
+            @data $data @path './' + $filename + '.txt' 
         ) 
     ) 
+);
+ms2samps = (
+    $ms, $sr = 48000 -> int(($ms / 1000.) * $sr) 
+);
+samps2ms = (
+    $samps, $sr = 48000 -> (($samps / $sr) * 1000.) 
 )
