@@ -76,7 +76,11 @@ while $t < $totaldur do (
     $mcs = thin($mcs);
     $mcs = $distsort($mcs, d5).left($chordsize);
     for $mc in $mcs do (
-        $instruments = for $n in left($instrumentnames, $numnames) collect instrument($n, $techniques.left($numtechniques));
+        $instruments = for $n in left($instrumentnames, $numnames) collect instrument(
+            @name $n
+            @types $techniques.left($numtechniques) 
+            @join 0
+        );
         $instrument = $instruments.pitchfilter($mc, 1200).xchoose();
         $fn = $instrument.getkey('fn');
         $type = $instrument.getkey('types').xchoose();
