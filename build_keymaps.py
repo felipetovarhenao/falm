@@ -141,7 +141,7 @@ sol = (
     $velocity = 64, 
     $resample = 1, 
     $useseed = 1 -> (
-        BP_FN_CHECK_ARGS('sol', 'name', $name, 'type', $type, 'pitch', $pitch, 'duration', $duration);
+        BP_FN_CHECK_ARGS('sol', 'name', $name, 'type', $type, 'pitch', $pitch);
         $keymap = keymap($name, $type);
         ezsampler(
             @pitch $pitch
