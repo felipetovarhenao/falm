@@ -6,41 +6,56 @@ $wedgesort = (
         $llll
     ) 
 );
+$distsort = (
+    $llll, $pitch -> (
+        $dist = abs($llll - $pitch);
+        $ids = argsort($dist);
+        $llll:[$ids] 
+    ) 
+);
 $root = d2;
 ## create groups instead
-$techniques = 'nonvib' 'nonvib+mute' 'ord' 'ord-to-crushed' 'crushed-to-ord';
-$names = 'violin' 'viola' 'cello' 'bass';
+$techniques = 'nonvib' 'nonvib+mute' 'ord' 'cresc' 'dim' 'ord-to-crushed' 'crushed-to-ord' 'sfz' 'trem' 'trem-to-ord';
+$names = 'viola' 'violin' 'cello' 'bass';
 $rootpc = $root.mc2pc();
-$chord = r2mc(1...32 @mc $root);
+$stpitch = $root + 1200 * 3;
+$chord = r2mc(
+    arithmser(1, 64, 2) @mc $root
+) $stpitch;
 $pcs1 = r2pc(1 10/9 6/5 4/3 3/2 8/5 7/4, $rootpc);
 $pcs2 = r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8, $rootpc);
-$chord1 = $wedgesort(
-    thin(
+$chord1 = $distsort(
+    @llll thin(
         for $mc in $chord collect int(
             round($mc + pitchdiff($mc, $pcs1)) 
         ) 
-    ) 
+    ) @pitch $stpitch
 );
 $chord2 = (for $mc in $chord1 collect $mc + pitchdiff($mc, $pcs2));
 $t = 0;
-$totaldur = 60000 * 3;
-$climax = 0.9;
-$slope = 1/3;
-$glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
-$velbpf = [0 0 0] [1 127 $slope];
-$chordiszebpf = [0 1 0] [1 length($chord1) $slope];
-$numtechniquesbpf = [0 1 0] [1 length($techniques) 0.75];
+$minute = 60000;
+$totaldur = $minute * 5;
+$glissbpf = [0 0 0] [0.9 1 0.95] [1 1 0];
+$velbpf = [0 0 0] [1 127 0.25];
+$gapbpf = [0 4500 0] [1 2000 -0.125];
+$chordsizebpf = [0 1 0] [1 length($chord1) 0.125];
+$numnamesbpf = [0 1 0] [1 length($names) 0.125];
+$numtechniquesbpf = [0 1 0] [1 length($techniques) 0.5];
+$timejitbpf = [0 0 0] [1 1 0.75];
 $chordpan = $wedgesort(
     arithmser(0, 1, null, length($chord1)) 
 );
-$fadeinbpf = [0 1000 0] [1 0 -0.5];
+$fadeinbpf = [0 2000 0] [1 0 -0.5];
 while $t < $totaldur do (
     $nt = $t / $totaldur;
     $gliss = samplebpf($glissbpf, $nt);
     $vel = samplebpf($velbpf, $nt);
     $fadein = samplebpf($fadeinbpf, $nt);
+    $gap = samplebpf($gapbpf, $nt);
+    $timejit = $gap * samplebpf($timejitbpf, $nt);
+    $numnames = samplebpf($numnamesbpf, $nt).round().int();
     $chordsize = int(
-        round(samplebpf($chordiszebpf, $nt)) 
+        round(samplebpf($chordsizebpf, $nt)) 
     );
     $numtechniques = max(
         1, int(samplebpf($numtechniquesbpf, $nt)) 
@@ -50,33 +65,33 @@ while $t < $totaldur do (
     $mcs = $chord.left($chordsize);
     $gain = sqrt(1/length($mcs));
     for $mc in $mcs, $pan in $chordpan.left($chordsize) do (
-        $instruments = for $n in $names collect instrument($n, $techniques.left($numtechniques));
-        $instrument = $instruments.pitchfilter($mc, 700).choose();
+        $instruments = for $n in left($names, $numnames) collect instrument($n, $techniques.left($numtechniques));
+        $instrument = $instruments.pitchfilter($mc, 1200).choose();
         $fn = $instrument.getkey('fn');
-        $types = $instrument.getkey('types').choose();
+        $type = $instrument.getkey('types').choose();
         $b = $fn(
             @pitch $mc
             @duration null
             @velocity min(
-                127, max(0, $vel + random(-15, 15) ) 
+                127, max(0, $vel + random(-15, 15)) 
             ) 
-            @type $types
+            @type $type
         ).process(fade(@fadein $fadein, @fadeout 0));
         $mindur = min(
             $mindur, $b.analyze(effectiveduration(@thresholdratio 0.02)).getkey('effectiveduration') 
         );
         $b.transcribe(
-            @onset $t
+            @onset $t + $timejit * rand(-0.5, 0.5) 
             @pan $pan
             @gain $gain
         ) 
     );
-    $t += $mindur ||| 3000.print() 
+    $t += $gap
 );
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
-        @wet [0 0.001 0] [1 0.025 0.125] 
+        @wet [0 0.001 0] [1 0.05 0.125] 
         @damp 1
         @width 1
         @tail 5000
