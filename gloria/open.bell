@@ -7,7 +7,8 @@ $sortchord = (
     ) 
 );
 $root = d2;
-$techniques = 'nonvib' 'harm' 'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 'trem' 'sfz';
+## create groups instead
+$techniques = 'nonvib' :* 3 'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 'trem' 'sfz' 'harm';
 $names = 'violin' 'viola' 'cello' 'bass';
 $rootpc = $root.mc2pc();
 $chord = r2mc(1...32 @mc $root);
@@ -22,7 +23,7 @@ $chord1 = $sortchord(
 );
 $chord2 = (for $mc in $chord1 collect $mc + pitchdiff($mc, $pcs2));
 $t = 0;
-$totaldur = 20000 * 4;
+$totaldur = 120000;
 $climax = 0.618033;
 $slope = 0.25;
 $glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
@@ -32,10 +33,12 @@ $numtechniquesbpf = [0 1 0] [1 length($techniques) 0.75];
 $chordpan = $sortchord(
     arithmser(0, 1, null, length($chord1)) 
 );
+$fadeinbpf = [0 1000 0] [1 0 -0.5];
 while $t < $totaldur do (
     $nt = $t / $totaldur;
     $gliss = samplebpf($glissbpf, $nt);
     $vel = samplebpf($velbpf, $nt);
+    $fadein = samplebpf($fadeinbpf, $nt);
     $chordsize = int(
         round(samplebpf($chordiszebpf, $nt)) 
     );
@@ -57,7 +60,7 @@ while $t < $totaldur do (
                 127, max(0, $vel + random(-15, 15) ) 
             ) 
             @type $types
-        );
+        ).process(fade(@fadein $fadein, @fadeout 0));
         $mindur = min(
             $mindur, $b.analyze(effectiveduration(@thresholdratio 0.005)).getkey('effectiveduration') 
         );
@@ -65,6 +68,17 @@ while $t < $totaldur do (
             @onset $t @pan $pan
         ) 
     );
-    $t += $mindur ||| 3000
+    $t += $mindur ||| 3000.print() 
 );
-render(@play 1)
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet [0 0.001 0] [1 0.025 0.125] 
+        @damp 1
+        @width 1
+        @tail 5000
+    ) normalize(-3) 
+);
+export(
+    './' + thispath().getkey('name') + '.wav' 
+)
