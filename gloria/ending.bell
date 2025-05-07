@@ -1,5 +1,5 @@
 $chord = r2mc(1...64, d2);
-$pcs = r2pc(1 3/2);
+$pcs = r2pc(1 3/2, 2);
 $chord = thin(
     for $mc in $chord collect int(
         round($mc + pitchdiff($mc, $pcs)) 
@@ -31,5 +31,5 @@ render(
     ) 
 );
 export(
-    './' + thispath(1).getkey('name') + '.wav'
+    './' + thispath(1).getkey('name') + '.wav' 
 )
