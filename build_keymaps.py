@@ -80,6 +80,7 @@ KEYMAP_CACHE = null;
 keymap = (
     $name,
     $type -> (
+        BP_FN_CHECK_ARGS('keymap', 'name', $name, 'type', $type);
         $path = $name + '/' + $type;
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
@@ -93,6 +94,7 @@ keymap = (
 );
 range = (
     $name, $types = null -> (
+        BP_FN_CHECK_ARGS('range', 'name', $name, 'types', $types);
         if $types == null then ($types = types($name));
         $keymap = for $t in $types collect keymap($name, $t);
         $pitches = $keymap.trans()::1;
@@ -101,6 +103,7 @@ range = (
 );
 instrument = (
     $name, $types -> (
+        BP_FN_CHECK_ARGS('instrument', 'name', $name, 'types', $types);
         $fn = INSTRUMENT_MAP.$name;
         $alltypes = types($name);
         $types = if $types == null then $alltypes else intersection($alltypes, $types);
@@ -115,6 +118,7 @@ instrument = (
 );
 pitchfilter = (
     $instruments, $pitch, $tolerance = 300 -> (
+        BP_FN_CHECK_ARGS('pitchfilter', 'instruments', $instruments, 'pitch', $pitch);
         $diffs = null; 
         $choices = for $x in $instruments collect (
             $range = $x.getkey('range') ||| BP_FN_ERROR("pitchfilter", "invalid instrument:" $x);
@@ -122,10 +126,11 @@ pitchfilter = (
             $diffs _= $diff;
             if $pitch >= ($range:1 - $tolerance) && $pitch <= ($range:2 + $tolerance) then $x
         );
-        if $choices == null then (
+        $out = if $choices == null then (
             $id = abs($diffs).minmax()::2;
             $instruments:$id
-        ) else $choices
+        ) else $choices;
+        $out ||| BP_FN_ERROR("pitchfilter", "null output")
     ) 
 );
 sol = (
@@ -136,6 +141,7 @@ sol = (
     $velocity = 64, 
     $resample = 1, 
     $useseed = 1 -> (
+        BP_FN_CHECK_ARGS('sol', 'name', $name, 'type', $type, 'pitch', $pitch, 'duration', $duration);
         $keymap = keymap($name, $type);
         ezsampler(
             @pitch $pitch
