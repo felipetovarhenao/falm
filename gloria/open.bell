@@ -48,6 +48,7 @@ while $t < $totaldur do (
     $chord = thin($chord1 * (1 - $gliss) + $chord2 * $gliss);
     $mindur = $totaldur;
     $mcs = $chord.left($chordsize);
+    $gain = sqrt(1/length($mcs));
     for $mc in $mcs, $pan in $chordpan.left($chordsize) do (
         $instruments = for $n in $names collect instrument($n, $techniques.left($numtechniques));
         $instrument = $instruments.pitchfilter($mc, 700).choose();
@@ -65,7 +66,9 @@ while $t < $totaldur do (
             $mindur, $b.analyze(effectiveduration(@thresholdratio 0.005)).getkey('effectiveduration') 
         );
         $b.transcribe(
-            @onset $t @pan $pan
+            @onset $t
+            @pan $pan
+            @gain $gain
         ) 
     );
     $t += $mindur ||| 3000.print() 
