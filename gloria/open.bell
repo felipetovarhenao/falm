@@ -8,7 +8,7 @@ $wedgesort = (
 );
 $root = d2;
 ## create groups instead
-$techniques = 'nonvib' :* 3 'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 'trem' 'sfz' 'harm';
+$techniques = 'nonvib' 'nonvib+mute' 'ord';
 $names = 'violin' 'viola' 'cello' 'bass';
 $rootpc = $root.mc2pc();
 $chord = r2mc(1...32 @mc $root);
