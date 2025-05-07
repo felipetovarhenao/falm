@@ -7,9 +7,7 @@ $sortchord = (
     ) 
 );
 $root = d2;
-$techniques = 'nonvib' (
-    'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 
-);
+$techniques = 'nonvib' 'harm' 'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 'trem' 'sfz';
 $names = 'violin' 'viola' 'cello' 'bass';
 $rootpc = $root.mc2pc();
 $chord = r2mc(1...32 @mc $root);
@@ -24,7 +22,7 @@ $chord1 = $sortchord(
 );
 $chord2 = (for $mc in $chord1 collect $mc + pitchdiff($mc, $pcs2));
 $t = 0;
-$totaldur = 10000 * 4;
+$totaldur = 20000 * 4;
 $climax = 0.618033;
 $slope = 0.25;
 $glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
@@ -49,9 +47,9 @@ while $t < $totaldur do (
     $mcs = $chord.left($chordsize);
     for $mc in $mcs, $pan in $chordpan.left($chordsize) do (
         $instruments = for $n in $names collect instrument($n, $techniques.left($numtechniques));
-        $instrument = $instruments.pitchfilter($mc).choose();
+        $instrument = $instruments.pitchfilter($mc, 700).choose();
         $fn = $instrument.getkey('fn');
-        $types = $instrument.getkey('types');
+        $types = $instrument.getkey('types').choose();
         $b = $fn(
             @pitch $mc
             @duration null
@@ -61,7 +59,7 @@ while $t < $totaldur do (
             @type $types
         );
         $mindur = min(
-            $mindur, $b.analyze(effectiveduration(@thresholdratio 0.001)).getkey('effectiveduration') 
+            $mindur, $b.analyze(effectiveduration(@thresholdratio 0.005)).getkey('effectiveduration') 
         );
         $b.transcribe(
             @onset $t @pan $pan
