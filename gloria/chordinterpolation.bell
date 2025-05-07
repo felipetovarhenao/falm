@@ -7,7 +7,7 @@ $distsort = (
     ) 
 );
 $pcprog = r2pc(
-    [1 6/5 3/2] 
+    [1 6/5 3/2] :* 3
     ## 
     [1 9/8 6/5 3/2] 
     ## 
@@ -31,16 +31,16 @@ $pcprog = r2pc(
     ## 
     [1 5/4 3/2 5/3] 
     ## 
-    [1 5/4 3/2] :* 1
+    [1 5/4 3/2] :* 2
     ## 
     [1 3/2] :* 4
     ## 
     @pc 2
 );
 $instrumentnames = 'viola' 'violin' 'cello' 'bass';
-$techniques = 'nonvib' 'nonvib+mute' 'ord+mute' 'ord' 'harm' 'dim' 'cresc' 'ord-to-crushed' 'crushed-to-ord' 'sfz' 'trem' 'trem-to-ord';
+$techniques = 'nonvib' 'nonvib+mute' 'ord+mute' 'ord' 'harm' 'dim' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 'sfz' 'trem-to-ord' 'trem' 'stacc';
 $chord = r2mc(1...32, d3);
-$totaldur = 60000;
+$totaldur = 60 * 1000 * 7;
 $t = 0;
 $pcidbpf = [0 1 0] [1 length($pcprog) - 1 0.125];
 $onsetvarbpf = [0 0 0] [1 1 1/3];
