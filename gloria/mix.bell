@@ -1,0 +1,8 @@
+$b = importaudio('./chordinterpolation-2.wav');
+$b.transcribe();
+$b = importaudio('./ending.wav');
+$b.transcribe(8 * 1000 * 60 + 4000);
+## $b = render(@reset 1);
+## $b.setkey('offset', 8 * 1000 * 60).transcribe();
+render(@play 1);
+export('./gloria.wav')
