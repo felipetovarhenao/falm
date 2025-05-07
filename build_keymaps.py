@@ -102,18 +102,23 @@ range = (
     )
 );
 instrument = (
-    $name, $types -> (
+    $name, $types, $join = 1 -> (
         BP_FN_CHECK_ARGS('instrument', 'name', $name, 'types', $types);
         $fn = INSTRUMENT_MAP.$name;
         $alltypes = types($name);
         $types = if $types == null then $alltypes else intersection($alltypes, $types);
-        $range = range($name, $types);
-        [
-            ['name' $name]
-            ['fn' $fn]
-            ['types' $types]
-            ['range' pitch($range)]
-        ]
+        if $join == 1 then (
+            $types = [$types]
+        );
+        for $t in $types with @unwrap 1 collect (
+            $range = range($name, $t);
+            [
+                ['name' $name]
+                ['fn' $fn]
+                ['types' $t]
+                ['range' pitch($range)]
+            ]
+        )
     )
 );
 pitchfilter = (
