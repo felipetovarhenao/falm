@@ -1,20 +1,3 @@
-$root = d2;
-$techniques = 'nonvib' 'nonvib+mute' 'nonvib+piombo' 'ord' 'pont' 'tasto' 'ord-to-crushed' 'crushed-to-ord';
-$names = 'violin' 'viola' 'cello' 'bass';
-$rootpc = $root.mc2pc();
-$chord = r2mc(1...32 @mc $root);
-$pcs1 = r2pc(1 10/9 6/5 4/3 3/2 8/5 7/4, $rootpc);
-$pcs2 = r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8, $rootpc);
-$chord1 = thin(for $mc in $chord collect $mc + pitchdiff($mc, $pcs1));
-$chord2 = (for $mc in $chord1 collect $mc + pitchdiff($mc, $pcs2));
-$t = 0;
-$totaldur = 60000 * 4;
-$climax = 0.618033;
-$slope = 0.25;
-$glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
-$velbpf = [0 0 0] [1 127 $slope];
-$chordiszebpf = [0 1 0] [1 length($chord1) 0];
-$numtechniquesbpf = [0 1 0] [1 length($techniques) $slope];
 $sortchord = (
     $chord -> (
         $size = length($chord);
@@ -23,6 +6,31 @@ $sortchord = (
         $chord
     ) 
 );
+$root = d2;
+$techniques = 'nonvib' (
+    'ord' 'nonvib+mute' 'nonvib+piombo' 'pont' 'tasto' 'cresc' 'cresc-to-dim' 'ord-to-crushed' 'crushed-to-ord' 
+);
+$names = 'violin' 'viola' 'cello' 'bass';
+$rootpc = $root.mc2pc();
+$chord = r2mc(1...32 @mc $root);
+$pcs1 = r2pc(1 10/9 6/5 4/3 3/2 8/5 7/4, $rootpc);
+$pcs2 = r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8, $rootpc);
+$chord1 = $sortchord(
+    thin(
+        for $mc in $chord collect int(
+            round($mc + pitchdiff($mc, $pcs1)) 
+        ) 
+    ) 
+);
+$chord2 = (for $mc in $chord1 collect $mc + pitchdiff($mc, $pcs2));
+$t = 0;
+$totaldur = 10000 * 4;
+$climax = 0.618033;
+$slope = 0.25;
+$glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
+$velbpf = [0 0 0] [1 127 $slope];
+$chordiszebpf = [0 1 0] [1 length($chord1) $slope];
+$numtechniquesbpf = [0 1 0] [1 length($techniques) 0.75];
 $chordpan = $sortchord(
     arithmser(0, 1, null, length($chord1)) 
 );
@@ -38,21 +46,22 @@ while $t < $totaldur do (
     );
     $chord = thin($chord1 * (1 - $gliss) + $chord2 * $gliss);
     $mindur = $totaldur;
-    $mcs = $sortchord($chord).left($chordsize);
-    for $mc in $mcs, $pan in $chordpan do (
+    $mcs = $chord.left($chordsize);
+    for $mc in $mcs, $pan in $chordpan.left($chordsize) do (
         $instruments = for $n in $names collect instrument($n, $techniques.left($numtechniques));
         $instrument = $instruments.pitchfilter($mc).choose();
-        $name = $instrument.getkey('name');
         $fn = $instrument.getkey('fn');
         $types = $instrument.getkey('types');
         $b = $fn(
             @pitch $mc
             @duration null
-            @velocity $vel + random(-30, 30) 
+            @velocity min(
+                127, max(0, $vel + random(-15, 15) ) 
+            ) 
             @type $types
         );
         $mindur = min(
-            $mindur, $b.analyze(effectiveduration(@thresholdratio 0.0001)).getkey('effectiveduration') 
+            $mindur, $b.analyze(effectiveduration(@thresholdratio 0.001)).getkey('effectiveduration') 
         );
         $b.transcribe(
             @onset $t @pan $pan
