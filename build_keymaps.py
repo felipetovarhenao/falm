@@ -77,14 +77,9 @@ def organize_wav_files(folder_path, output_file):
 
 BELL_CODE = """
 KEYMAP_CACHE = null;
-sol = (
-    $name = 'guitar', 
-    $type = 'ord', 
-    $pitch = 6000, 
-    $duration = 500, 
-    $velocity = 64, 
-    $resample = 1, 
-    $useseed = 1 -> (
+keymap = (
+    $name,
+    $type -> (
         $path = $name + '/' + $type;
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
@@ -93,6 +88,55 @@ sol = (
             );
             if $keymap != null then KEYMAP_CACHE _= [$path $keymap] 
         );
+        (KEYMAP_CACHE.$path) ||| BP_FN_ERROR('keymap', 'no matching keymap:' $name $type)
+    )
+);
+range = (
+    $name, $types = null -> (
+        if $types == null then ($types = types($name));
+        $keymap = for $t in $types collect keymap($name, $t);
+        $pitches = $keymap.trans()::1;
+        minmax($pitches):[1 3]
+    )
+);
+instrument = (
+    $name, $types -> (
+        $fn = INSTRUMENT_MAP.$name;
+        $alltypes = types($name);
+        $types = if $types == null then $alltypes else intersection($alltypes, $types);
+        $range = range($name, $types);
+        [
+            ['name' $name]
+            ['fn' $fn]
+            ['types' $types]
+            ['range' pitch($range)]
+        ]
+    )
+);
+pitchfilter = (
+    $instruments, $pitch, $tolerance = 300 -> (
+        $diffs = null; 
+        $choices = for $x in $instruments collect (
+            $range = $x.getkey('range') ||| BP_FN_ERROR("pitchfilter", "invalid instrument:" $x);
+            $diff = pitchdiff($pitch, $range);
+            $diffs _= $diff;
+            if $pitch >= ($range:1 - $tolerance) && $pitch <= ($range:2 + $tolerance) then $x
+        );
+        if $choices == null then (
+            $id = abs($diffs).minmax()::2;
+            $instruments:$id
+        ) else $choices
+    ) 
+);
+sol = (
+    $name = 'guitar', 
+    $type = 'ord', 
+    $pitch = 6000, 
+    $duration = 500, 
+    $velocity = 64, 
+    $resample = 1, 
+    $useseed = 1 -> (
+        $keymap = keymap($name, $type);
         ezsampler(
             @pitch $pitch
             @duration $duration
@@ -295,5 +339,14 @@ for instrument in instrument_dict.keys():
     BELL_CODE += f"    ['{instrument}' {" ".join([f"'{t}'"for t in instrument_dict[instrument]])}]\n"
 
 BELL_CODE += ')'
+
+BELL_CODE += ''';
+INSTRUMENT_MAP = (
+'''
+for instrument in instrument_dict.keys():
+    BELL_CODE += f"    ['{instrument}' {instrument}]\n"
+
+BELL_CODE += ')'
+
 with open("./sol.bell", 'w') as f:
     f.write(BELL_CODE)
