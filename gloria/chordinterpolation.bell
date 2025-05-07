@@ -1,0 +1,93 @@
+$distsort = (
+    $llll, $pitch -> (
+        $dist = abs($llll - $pitch);
+        $ids = argsort($dist);
+        $llll:[$ids] 
+    ) 
+);
+$pcprog = r2pc(
+    [1 6/5 3/2] 
+    ## 
+    [1 9/8 6/5 3/2] 
+    ## 
+    [1 9/8 6/5 3/2 7/4] 
+    ## 
+    [1 9/8 6/5 4/3 3/2 7/4] 
+    ## 
+    [1 9/8 6/5 4/3 3/2 8/5 7/4] 
+    ## 
+    [1 9/8 6/5 4/3 3/2 5/3 7/4] 
+    ## 
+    [1 9/8 5/4 4/3 3/2 5/3 7/4] 
+    ## 
+    [1 9/8 5/4 4/3 3/2 5/3 15/8] 
+    ## 
+    [1 9/8 5/4 7/5 3/2 5/3 15/8] 
+    ## 
+    [1 9/8 5/4 3/2 5/3 15/8] 
+    ## 
+    [1 9/8 5/4 3/2 5/3] 
+    ## 
+    [1 5/4 3/2 5/3] 
+    ## 
+    [1 5/4 3/2] :* 4
+    ## 
+    @pc 2
+);
+$instrumentnames = 'viola' 'violin' 'cello' 'bass';
+$techniques = 'nonvib' 'nonvib+mute' 'ord+mute' 'ord' 'harm' 'dim' 'cresc' 'ord-to-crushed' 'crushed-to-ord' 'sfz' 'trem' 'trem-to-ord';
+$chord = r2mc(1...32, d3);
+$totaldur = 30000;
+$t = 0;
+$pcidbpf = [0 1 0] [1 length($pcprog) - 1 0.125];
+$onsetvarbpf = [0 0 0] [1 1 1/3];
+$velbpf = [0 0 0] [1 127 1/3];
+$velvarbpf = [0 0 0] [1 20 1/3];
+$timestepbpf = [0 4000 0] [1 1500 1/3];
+$chordsizebpf = [0 1 0] [1 length($chord) 0];
+$numnamesbpf = [0 1 0] [1 length($instrumentnames) 1/3];
+$numtechniquesbpf = [0 1 0] [1 length($techniques) 0.5];
+while $t < $totaldur do (
+    $nt = $t / $totaldur;
+    $pcid = samplebpf($pcidbpf, $nt);
+    $vel = samplebpf($velbpf, $nt);
+    $velvar = samplebpf($velvarbpf, $nt);
+    $numnames = samplebpf($numnamesbpf, $nt).round().int();
+    $chordsize = samplebpf($chordsizebpf, $nt);
+    $onsetvar = samplebpf($onsetvarbpf, $nt);
+    $timestep = samplebpf($timestepbpf, $nt);
+    $numtechniques = max(
+        1, int(samplebpf($numtechniquesbpf, $nt)) 
+    );
+    $pcmix = fmod($pcid, 1) ** 2;
+    $pcid = int($pcid);
+    $pcs1 = $pcprog::$pcid;
+    $pcs2 = $pcprog::($pcid + 1);
+    $mcs = for $mc in $chord collect (
+        $mc1 = $mc + pitchdiff($mc, $pcs1);
+        $mc2 = $mc + pitchdiff($mc, $pcs2);
+        int(
+            round((1 - $pcmix) * $mc1 + $pcmix * $mc2) 
+        ) 
+    );
+    $mcs = thin($mcs);
+    $mcs = $distsort($mcs, d5).left($chordsize);
+    for $mc in $mcs do (
+        $instruments = for $n in left($instrumentnames, $numnames) collect instrument($n, $techniques.left($numtechniques));
+        $instrument = $instruments.pitchfilter($mc, 1200).choose();
+        $fn = $instrument.getkey('fn');
+        $type = $instrument.getkey('types').choose();
+        $fn(
+            @pitch $mc
+            @duration null
+            @velocity $vel + rand(-0.5, 0.5) * $velvar
+            @type $type
+        ).transcribe(
+            @onset $t + $timestep * rand(-0.5, 0.5) * $onsetvar
+            @gain sqrt(1/length($mcs)) 
+            @pan rand() 
+        ) 
+    );
+    $t += $timestep
+);
+render(@play 1)
