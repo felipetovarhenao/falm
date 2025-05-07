@@ -1,0 +1,35 @@
+$chord = r2mc(1...64, d2);
+$pcs = r2pc(1 3/2);
+$chord = thin(
+    for $mc in $chord collect int(
+        round($mc + pitchdiff($mc, $pcs)) 
+    ) 
+);
+$instrumentnames = 'violin' 'viola' 'cello' 'bass';
+$techniques = 'nonvib' 'ord';
+for $mc in $chord do (
+    $instruments = for $n in $instrumentnames collect instrument($n, $techniques @join 0);
+    $instruments = pitchfilter($instruments, $mc, 800);
+    $instrument = choose($instruments);
+    $fn = $instrument.getkey('fn');
+    $type = $instrument.getkey('types').choose();
+    $b = $fn(
+        @pitch $mc
+        @type $type
+        @velocity 0
+        @duration null
+    ).analyze(effectiveduration(@thresholdratio 0.01));
+    $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
+    $b.transcribe(@pan rand()) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.1
+        @damp 1
+        @width 1
+    ) 
+);
+export(
+    './' + thispath(1).getkey('name') + '.wav'
+)
