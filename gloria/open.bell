@@ -1,0 +1,60 @@
+$root = d2;
+$techniques = 'nonvib' 'nonvib+mute' 'nonvib+piombo' 'ord' 'pont' 'tasto' 'ord-to-crushed' 'crushed-to-ord';
+$names = 'violin' 'viola' 'cello' 'bass';
+$rootpc = $root.mc2pc();
+$chord = r2mc(1...48 @mc $root);
+$pcs1 = r2pc(1 10/9 6/5 4/3 3/2 8/5 7/4, $rootpc);
+$pcs2 = r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8, $rootpc);
+$chord1 = thin(for $mc in $chord collect $mc + pitchdiff($mc, $pcs1));
+$chord2 = thin(for $mc in $chord collect $mc + pitchdiff($mc, $pcs2));
+$t = 0;
+$totaldur = 60000 * 4;
+$climax = 0.618033;
+$slope = 0.25;
+$glissbpf = [0 0 0] [$climax 1 $slope] [1 1 0];
+$velbpf = [0 0 0] [1 127 $slope];
+$chordiszebpf = [0 1 0] [1 length($chord1) 0];
+$numtechniquesbpf = [0 1 0] [1 length($techniques) $slope];
+$sortchord = (
+    $chord -> (
+        $size = length($chord);
+        $chord = $chord.slice(round($size / 2));
+        $chord = trans($chord:2 [$chord::1.rev()]).flat();
+        $chord
+    ) 
+);
+while $t < $totaldur do (
+    $nt = $t / $totaldur;
+    $gliss = samplebpf($glissbpf, $nt);
+    $vel = samplebpf($velbpf, $nt);
+    $chordsize = int(
+        round(samplebpf($chordiszebpf, $nt)) 
+    );
+    $numtechniques = max(
+        1, int(samplebpf($numtechniquesbpf, $nt)) 
+    );
+    $chord = $chord1 * (1 - $gliss) + $chord2 * $gliss;
+    $mindur = $totaldur;
+    $mcs = $sortchord($chord).left($chordsize);
+    for $mc in $mcs do (
+        $instruments = for $n in $names collect instrument($n, $techniques.left($numtechniques));
+        $instrument = $instruments.pitchfilter($mc).choose();
+        $name = $instrument.getkey('name');
+        $fn = $instrument.getkey('fn');
+        $types = $instrument.getkey('types');
+        $b = $fn(
+            @pitch $mc
+            @duration null
+            @velocity $vel + random(-30, 30) 
+            @type $types
+        );
+        $mindur = min(
+            $mindur, $b.analyze(effectiveduration(@thresholdratio 0.0001)).getkey('effectiveduration') 
+        );
+        $b.transcribe(
+            @onset $t @pan rand() 
+        ) 
+    );
+    $t += $mindur ||| 3000
+);
+render(@play 1)
