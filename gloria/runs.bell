@@ -1,0 +1,49 @@
+setseed(1);
+$metadata = read('./chordinterpolation.meta.txt');
+$events = $metadata.getkey('events');
+$totdur = $metadata.getkey('totdur');
+$han = hanning();
+for $e in $events do (
+    $onset = $e.getkey('onset');
+    $chord = $e.getkey('chord');
+    $density = $e.getkey('density');
+    $duration = $e.getkey('duration');
+    $t = 0;
+    $nt = $onset / $totdur;
+    $oct = int(round($nt ** 2 * 4));
+    $chord = $chord.left($density);
+    for $mc in $chord.xscramble() do (
+        $gain = sqrt(
+            xrand(0.00001, 1/length($chord)) 
+        ) * 0.1;
+        $env = xchoose(
+            [$han * $gain] [
+                [0 0 0] [1 $gain xrand(1/3, 3/4)] 
+            ] [
+                [0 $gain 0] [1 0 -xrand(1/3, 3/4)] 
+            ] 
+        )::1;
+        $dur = xrand($duration / $density, $duration);
+        cycle(
+            @frequency $mc.mc2f() * exp2(xrandom(0, $oct)) 
+            @phase xrand() 
+            @duration $dur * xrand(1, 4) 
+        ).transcribe(
+            @onset $onset + $t
+            @pan xrand() 
+            @gain $env
+        );
+        $t += $dur
+    ) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.05
+        @damp 1
+        @width 1
+    ) 
+);
+export(
+    './' + thispath(1).getkey('name') + '.wav' 
+)
