@@ -1,0 +1,29 @@
+setseed(20);
+$names = 'flute';
+$types = 'whistle' 'whistle-sweep' 'air';
+$keymap = for $n in $names collect (
+    for $type in intersection(types($n), $types) collect keymap($n, $type) 
+);
+$t = 0;
+$bufs = for $key in $keymap.xscramble() with @unwrap 1 collect (
+    $mc = $key.left(1);
+    $files = $key.right(1);
+    $detune = $mc.pitchdiff(2);
+    $r = 1/c2r($detune);
+    for $f in $files collect (
+        $b = importaudio($f).process(resample($r));
+        $b.transcribe($t @pan xrand());
+        $t += $b.getkey('duration') / 5
+    ) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.1
+        @width 1
+        @damp 1
+    ) 
+);
+export(
+    './' + thispath(1).getkey('name') + '.wav' 
+)
