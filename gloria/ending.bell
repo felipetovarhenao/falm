@@ -1,3 +1,4 @@
+setseed(50);
 $chord = r2mc(1/2 1...64, d3);
 $pcs = r2pc(1 3/2, 2);
 $chord = thin(
@@ -5,14 +6,14 @@ $chord = thin(
         round($mc + pitchdiff($mc, $pcs)) 
     ) 
 );
-$instrumentnames = 'violin' 'viola' 'cello' 'bass';
-$techniques = 'nonvib' 'ord';
+$instrumentnames = 'violin' 'viola' 'cello' 'bass' 'flute';
+$techniques = 'nonvib' 'ord' 'harm' 'air';
 for $mc in $chord do (
     $instruments = for $n in $instrumentnames collect instrument($n, $techniques @join 0);
     $instruments = pitchfilter($instruments, $mc, 800);
-    $instrument = choose($instruments);
+    $instrument = xchoose($instruments);
     $fn = $instrument.getkey('fn');
-    $type = $instrument.getkey('types').choose();
+    $type = $instrument.getkey('types').xchoose();
     $b = $fn(
         @pitch $mc
         @type $type
@@ -20,17 +21,18 @@ for $mc in $chord do (
         @duration null
     ).analyze(effectiveduration(@thresholdratio 0.01));
     $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
-    $b.transcribe(@pan rand()) 
+    $b.transcribe(@pan xrand()) 
 );
 $b = render(@reset 1);
 $split = 300;
 $overlap = 4;
-$factor = 2;
+$factor = 1.5;
 $incr = $split / $overlap;
 $segs = $b.splitbuf(@split $split @overlap $overlap * $factor);
 $t = 0;
+$var = max(0, $factor - 1) / 2;
 for $s in $segs do (
-    $s.process(window()).transcribe($t + rand(-0.125, 0.125) * $incr);
+    $s.process(window()).transcribe($t + xrand(-$var, $var) * $incr);
     $t += $incr
 );
 render(
