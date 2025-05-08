@@ -1,8 +1,10 @@
-$b = importaudio('./chordinterpolation-2.wav');
+$metadata = read('./chordinterpolation.meta.txt');
+$b = importaudio('./chordinterpolation.wav');
 $b.transcribe();
 $b = importaudio('./ending.wav');
-$b.transcribe(8 * 1000 * 60 + 4000);
-## $b = render(@reset 1);
-## $b.setkey('offset', 8 * 1000 * 60).transcribe();
+$last = $metadata.getkey('events'):-1;
+$onset = $last.getkey('onset');
+$dur = $last.getkey('duration');
+$b.transcribe($onset + $dur * 2);
 render(@play 1);
 export('./gloria.wav')
