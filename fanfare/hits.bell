@@ -1,0 +1,47 @@
+$pcs = r2pc(1 5/4 3/2 9/8 15/8 7/5 5/3, 2);
+$names = 'tpt' 'tromb' 'tuba' 'horn' 'oboe' 'bassoon' 'flute' 'clar' 'violin' 'cello' 'viola' 'bass' 'sax' 'harp';
+$techs = 'stacc' 'pizz' 'pizz-secco' 'bartok';
+$t = 0;
+$rot = 0;
+$basechord = thin(
+    for $mc in r2mc(1...16, d3) collect round($mc + pitchdiff($mc, $pcs)) 
+);
+$root = $basechord:1;
+for $j in 1...10 do (
+    $numnotes = random(4, length($basechord));
+    $numnotes = length($basechord);
+    $timestep = 1500 * choose(1/4 1/8 1/20 1/12 1/16 3/16 1/6);
+    $vel = random(0, 127);
+    $vel = 127;
+    for $i in 1...random(3, 10) do (
+        $chord = x2dx($basechord).rot(-$rot).dx2x($root).sort();
+        for $mc $mci in $chord.left($numnotes) do (
+            $pan = $mci.scale(1, length($chord), 0, 1);
+            $instruments = for $n in $names collect instrument($n, $techs @join 0);
+            $instruments = pitchfilter($instruments, $mc, 600);
+            $instrument = choose($instruments);
+            $fn = $instrument.getkey('fn');
+            $type = $instrument.getkey('types');
+            $fn(
+                @pitch $mc
+                @velocity $vel
+                @type $type
+                @duration $timestep * 2
+            ).transcribe(
+                @onset $t
+                @pan $pan
+                @gain [0 1 0] [1 0 -0.25] 
+            ) 
+        );
+        $rot += 1;
+        $t += $timestep
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.5
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+)
