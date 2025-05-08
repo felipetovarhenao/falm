@@ -122,7 +122,7 @@ while $t < $totaldur do (
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
             @pan $pan
-            @voice $voicemap.$name
+            @voice $voicemap.$name ||| 1
         ) 
     );
     $t += $timestep
