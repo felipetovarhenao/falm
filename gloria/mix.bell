@@ -9,11 +9,21 @@ $b.transcribe($onset + $dur * 2);
 $b = importaudio('./runs2.wav');
 $b.transcribe(@gain 0.25);
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.95
-        @wet 0.025
-        @damp 1
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process (
+        dynamics(
+            @knee 0.33
+            @thresh -30
+            @ratio 4
+        ) 
+        ## 
+        freeverb(
+            @roomsize 0.95
+            @wet 0.025
+            @damp 1
+            @width 1
+        ) 
+        ## 
+        normalize(-3) 
+    ) 
 );
 export('./gloria.wav')

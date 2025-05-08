@@ -6,16 +6,18 @@ $han = hanning();
 $waves = cycle tri rect saw;
 $wetbpf = null;
 $legatobpf = [0 0 0] [1 1 0.5];
-$maxpatsizebpf = [0 1 0] [1 15 0.125];
-$numwavesbpf = [0 1 0] [1 length($waves) -0.05];
+$maxpatsizebpf = [0 1 0] [1 20 0.125];
+$numwavesbpf = [0 1 0] [1 length($waves) -0.1];
 $octbpf = [0 0 0] [1 1 0.125];
 $extrasizebpf = [0 0 0] [1 10 0.1];
+$maxspeedbpf = [0 0.5 0] [1 0.99 0.1];
 $minfq = mc2f(d2);
 for $e in $events do (
     $density = $e.getkey('density');
     $onset = $e.getkey('onset');
     $nt = $onset / $totdur;
     $legato = samplebpf($legatobpf, $nt);
+    $maxspeed = samplebpf($maxspeedbpf, $nt);
     $numwaves = int(
         round(samplebpf($numwavesbpf, $nt)) 
     );
@@ -38,12 +40,12 @@ for $e in $events do (
         $offset = xrand(0, $duration * 0.5);
         $onset += $offset;
         $incr = ($duration - $offset) / length($pat);
-        $speed = xrand(0.05, 0.9);
-        $wetbpf _= [$onset - 1 xrand(0.01, 0.25) xrand(-0.25, 0.25)];
+        $speed = xrand(0.05, $maxspeed);
+        $wetbpf _= [$onset - 1 xrand(0.01, 0.2) xrand(-0.25, 0.25)];
         $legato = exp2(xrand(-$legato, $legato * 3));
         for $fq in $freqs do (
             $slope = xrand(1/8, 1/2);
-            $peak = xrand(0.01, 0.99);
+            $peak = xrand(0.001, 0.999);
             $env = xchoose(
                 [$han * $gain] [
                     [0 0 0] [$peak $gain $slope] [1 0 -$slope] 
@@ -69,12 +71,12 @@ for $e in $events do (
         ) 
     ) 
 );
-$wetbpf _= [$onset 0.5 0.5];
+$wetbpf _= [$onset 0.2 0.5];
 $b = render(
     @play 1 @process freeverb(
         @roomsize 0.9
         @wet $wetbpf
-        @dry 0.4
+        @dry [0 0.1 0] [1 1 0.25] 
         @damp 1
         @width 1
     ) 
