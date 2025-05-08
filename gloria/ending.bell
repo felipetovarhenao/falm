@@ -22,10 +22,21 @@ for $mc in $chord do (
     $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
     $b.transcribe(@pan rand()) 
 );
+$b = render(@reset 1);
+$split = 300;
+$overlap = 4;
+$factor = 2;
+$incr = $split / $overlap;
+$segs = $b.splitbuf(@split $split @overlap $overlap * $factor);
+$t = 0;
+for $s in $segs do (
+    $s.process(window()).transcribe($t + rand(-0.125, 0.125) * $incr);
+    $t += $incr
+);
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
-        @wet 0.1
+        @wet 0.2
         @damp 1
         @width 1
     ) 
