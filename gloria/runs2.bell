@@ -1,0 +1,84 @@
+setseed(101);
+$metadata = read('./chordinterpolation.meta.txt');
+$totdur = $metadata.getkey('totdur');
+$events = $metadata.getkey('events');
+$han = hanning();
+$waves = cycle tri rect saw;
+$wetbpf = null;
+$legatobpf = [0 0 0] [1 1 0.5];
+$maxpatsizebpf = [0 1 0] [1 15 0.125];
+$numwavesbpf = [0 1 0] [1 length($waves) -0.05];
+$octbpf = [0 0 0] [1 1 0.125];
+$extrasizebpf = [0 0 0] [1 10 0.1];
+$minfq = mc2f(d2);
+for $e in $events do (
+    $density = $e.getkey('density');
+    $onset = $e.getkey('onset');
+    $nt = $onset / $totdur;
+    $legato = samplebpf($legatobpf, $nt);
+    $numwaves = int(
+        round(samplebpf($numwavesbpf, $nt)) 
+    );
+    $extrasize = round(samplebpf($extrasizebpf, $nt));
+    $maxpatsize = samplebpf($maxpatsizebpf, $nt);
+    $gain = max(0.05, $e.getkey('velocity') / 127.) ** 0.5 * 0.25;
+    $oct = samplebpf($octbpf, $nt);
+    $oct = xrand(-$oct, $oct * 3).round().exp2();
+    $chord = $e.getkey('chord').left($density + $extrasize);
+    if length($chord) > 0 then (
+        $duration = $e.getkey('duration');
+        $chordsize = length($chord);
+        $chord = sort($chord);
+        $dxpat = for $i in 1...xrandom(1, $maxpatsize) collect xchoose(-1 1);
+        $pat = $dxpat.dx2x(xrandom(1, $chordsize));
+        $pat = int(fold($pat / $chordsize * 1.) * $chordsize);
+        $freqs = mc2f(
+            $chord:[max(1, $pat)] 
+        );
+        $offset = xrand(0, $duration * 0.5);
+        $onset += $offset;
+        $incr = ($duration - $offset) / length($pat);
+        $speed = xrand(0.05, 0.9);
+        $wetbpf _= [$onset - 1 xrand(0.01, 0.25) xrand(-0.25, 0.25)];
+        $legato = exp2(xrand(-$legato, $legato * 3));
+        for $fq in $freqs do (
+            $slope = xrand(1/8, 1/2);
+            $peak = xrand(0.01, 0.99);
+            $env = xchoose(
+                [$han * $gain] [
+                    [0 0 0] [$peak $gain $slope] [1 0 -$slope] 
+                ] 
+            )::1;
+            $phase = xrand();
+            $b = xchoose($waves.left($numwaves))(
+                @frequency max($minfq, $fq * $oct) 
+                @duration $incr * $legato
+                @phase $phase
+                @duty $phase
+            );
+            if xrand() > 0.9 then (
+                $fqshift = xchoose(-1 1) * (for $x in 1...xrandom(2, 4) collect xrand(1, 9));
+                $b = $b.process(freqshift($fqshift @negative 0)) 
+            );
+            $b.transcribe(
+                @onset $onset
+                @gain $env
+                @pan xrand() 
+            );
+            $onset += $incr * $speed
+        ) 
+    ) 
+);
+$wetbpf _= [$onset 0.5 0.5];
+$b = render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet $wetbpf
+        @dry 0.4
+        @damp 1
+        @width 1
+    ) 
+);
+export(
+    './' + thispath(1).getkey('name') + '.wav' 
+)
