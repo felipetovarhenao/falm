@@ -1,10 +1,10 @@
 $files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
 $keymap = null;
 $dynamics = (
-    'ff' 'f' 'mf' 'mp' 'p' 'pp' 
+    'ff' 'f' 'mf' 'mp' 'p' 
 ).rev();
 $velocities = int(
-    arithmser(10, 127., null, length($dynamics)) 
+    arithmser(1, 127., null, length($dynamics)) 
 );
 $portal = {fromsymbol};
 $regex1 = {regexp @re [A-G](b|#)?};
