@@ -30,7 +30,7 @@ for $j in 1...10 do (
             ).transcribe(
                 @onset $t
                 @pan $pan
-                @gain [0 1 0] [1 0 -0.25] 
+                @gain [0 1 0] [1 0 0.25] 
             ) 
         );
         $rot += 1;
@@ -44,4 +44,5 @@ render(
         @damp 1
         @width 1
     ) normalize(-3) 
-)
+);
+ezexport()

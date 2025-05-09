@@ -1,0 +1,8 @@
+$files = 'introduction' 'prelude';
+$t = 0;
+for $f in $files do (
+    $basepath = './' + $f + '/main';
+    importaudio($basepath + '.wav').transcribe($t);
+    $t += read($basepath + '.txt') 
+);
+render(@play 1)

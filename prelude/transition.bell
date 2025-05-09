@@ -5,7 +5,7 @@ $keymap = for $n in $names collect (
     for $type in intersection(types($n), $types) collect keymap($n, $type) 
 );
 $t = 0;
-$bufs = for $key in $keymap.xscramble() with @unwrap 1 collect (
+for $key in $keymap.xscramble() with @unwrap 1 collect (
     $mc = $key.left(1);
     $files = $key.right(1);
     $detune = $mc.pitchdiff(2);
@@ -24,6 +24,4 @@ render(
         @damp 1
     ) 
 );
-export(
-    './' + thispath(1).getkey('name') + '.wav' 
-)
+ezexport($t)
