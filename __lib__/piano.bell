@@ -1,0 +1,51 @@
+$files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
+$keymap = null;
+$dynamics = (
+    'ff' 'f' 'mf' 'mp' 'p' 'pp' 
+).rev();
+$velocities = int(
+    arithmser(10, 127., null, length($dynamics)) 
+);
+$portal = {fromsymbol};
+$regex1 = {regexp @re [A-G](b|#)?};
+$regex2 = {regexp @re [0-9]};
+$regex3 = {regexp @re (ff|pp|mp|mf|p|f)};
+$dyn2vel = for $d in $dynamics, $v in $velocities collect [$d $v];
+for $f in $files do (
+    $parsed = parsepath($f);
+    $filename = $parsed.getkey('name');
+    $pitchname = $regex1(
+        $filename @out 'm' @fetch 3
+    ):2;
+    $oct = $regex2(
+        $filename @out 'm' @fetch 3
+    );
+    $mc = $pitchname + tosymbol($oct);
+    $mc = $portal($mc @out 'm');
+    $dyn = $regex3(
+        $filename @out 'm' @fetch 3
+    );
+    $vel = $dyn2vel.$dyn;
+    if $keymap.$mc == null then ($keymap _= [$mc]);
+    if ($keymap.$mc).$vel == null then ($keymap.$mc _= [$vel]);
+    $keymap.$mc.$vel _= $f
+);
+pno = (
+    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $type = 'ord' -> ( 
+    ## -----
+    sol(
+        @name 'pno' 
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @useseed $useseed
+        @usecache $usecache
+        @resample $resample
+        @type $type
+    )) 
+);
+write(
+    @data $keymap
+    @path '../keymaps/pno/ord.txt' 
+    @escape 2
+)
