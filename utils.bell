@@ -1,3 +1,6 @@
+fold = (
+    $x -> 1 - 2 * abs(mod($x * 0.5, 1) - 0.5) 
+);
 ezexport = (
     $data -> (
         $filename = thispath(1).getkey('name');
