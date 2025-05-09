@@ -23,18 +23,6 @@ for $mc in $chord do (
     $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
     $b.transcribe(@pan xrand()) 
 );
-## $b = render(@reset 1);
-## $split = 300;
-## $overlap = 4;
-## $factor = 1.5;
-## $incr = $split / $overlap;
-## $segs = $b.splitbuf(@split $split @overlap $overlap * $factor);
-## $t = 0;
-## $var = max(0, $factor - 1) / 2;
-## for $s in $segs do (
-##     $s.process(window()).transcribe($t + xrand(-$var, $var) * $incr);
-##     $t += $incr
-## );
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
@@ -43,6 +31,4 @@ render(
         @width 1
     ) 
 );
-export(
-    './' + thispath(1).getkey('name') + '.wav' 
-)
+ezexport()

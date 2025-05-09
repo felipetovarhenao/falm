@@ -1,12 +1,12 @@
-$metadata = read('./chordinterpolation.meta.txt');
-$b = importaudio('./chordinterpolation.wav');
+$metadata = read('./strings.txt');
+$b = importaudio('./strings.wav');
 $b.transcribe();
-$b = importaudio('./ending.wav');
+$b = importaudio('./tail.wav');
 $last = $metadata.getkey('events'):-1;
 $onset = $last.getkey('onset');
 $dur = $last.getkey('duration');
 $b.transcribe($onset + $dur * 2);
-$b = importaudio('./runs2.wav');
+$b = importaudio('./runs.wav');
 $b.transcribe(@gain 0.25);
 render(
     @play 1 @process (
@@ -26,4 +26,4 @@ render(
         normalize(-3) 
     ) 
 );
-export('./gloria.wav')
+ezexport()

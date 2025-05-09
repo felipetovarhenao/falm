@@ -136,10 +136,5 @@ render(
         @damp 1
     ) normalize(-3) 
 );
-$filename = thispath(1).getkey('name');
-write(
-    [['totdur' $totaldur] ['events' $chordseq]], './' + $filename + '.meta.txt' 
-);
-export(
-    './' + $filename + '.wav' 
-)
+$metadata = [['totdur' $totaldur] ['events' $chordseq]];
+ezexport($metadata)
