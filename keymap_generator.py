@@ -362,5 +362,12 @@ for instrument in instrument_dict.keys():
 
 BELL_CODE += ')'
 
-with open("./sol.bell", 'w') as f:
+OUT_DIR = './__lib__/'
+
+if not os.path.exists(OUT_DIR):
+    os.mkdir(OUT_DIR)
+
+OUT_PATH = os.path.join(OUT_DIR, 'sol.bell')
+
+with open(OUT_PATH, 'w') as f:
     f.write(BELL_CODE)
