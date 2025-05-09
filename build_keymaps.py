@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import pathlib
 from collections import defaultdict
 
 
@@ -75,7 +76,9 @@ def organize_wav_files(folder_path, output_file):
             f.write("]\n")
 
 
-BELL_CODE = """
+PARENT_FOLDER = pathlib.Path(__file__).parent
+
+BELL_CODE = f"""
 KEYMAP_CACHE = null;
 keymap = (
     $name,
@@ -85,7 +88,7 @@ keymap = (
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
             $keymap = read(
-                '/Users/felipetovarhenao/Documents/bandcamp album/keymaps/' + $path + '.txt' 
+                '{PARENT_FOLDER}/keymaps/' + $path + '.txt' 
             );
             if $keymap != null then KEYMAP_CACHE _= [$path $keymap] 
         );
