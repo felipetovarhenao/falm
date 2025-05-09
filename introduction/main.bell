@@ -5,6 +5,7 @@ importaudio('./runs.wav').transcribe(@onset $onset @gain 0.25);
 $lastevent = $metadata.getkey('events'):-1;
 $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.3;
 importaudio('./tail.wav').transcribe($onset);
+$onset += read('./tail.txt') * 0.7;
 render(
     @play 1 @process (
         ## dynamics(

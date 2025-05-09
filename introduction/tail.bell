@@ -8,6 +8,7 @@ $chord = thin(
 );
 $instrumentnames = 'violin' 'viola' 'cello' 'bass' 'flute';
 $techniques = 'nonvib' 'ord' 'harm' 'air';
+$durs = null;
 for $mc in $chord do (
     $instruments = for $n in $instrumentnames collect instrument($n, $techniques @join 0);
     $instruments = pitchfilter($instruments, $mc, 800);
@@ -21,6 +22,7 @@ for $mc in $chord do (
         @duration null
     ).analyze(effectiveduration(@thresholdratio 0.01));
     $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
+    $durs _= $b.getkey('duration');
     $b.transcribe(@pan xrand()) 
 );
 render(
@@ -31,4 +33,4 @@ render(
         @width 1
     ) 
 );
-ezexport()
+ezexport(maximum($durs))
