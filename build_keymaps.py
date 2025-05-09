@@ -97,7 +97,7 @@ keymap = (
 );
 range = (
     $name, $types = null -> (
-        BP_FN_CHECK_ARGS('range', 'name', $name, 'types', $types);
+        BP_FN_CHECK_ARGS('range', 'name', $name);
         if $types == null then ($types = types($name));
         $keymap = for $t in $types collect keymap($name, $t);
         $pitches = $keymap.trans()::1;
