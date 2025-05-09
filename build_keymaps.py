@@ -105,8 +105,8 @@ range = (
     )
 );
 instrument = (
-    $name, $types, $join = 1 -> (
-        BP_FN_CHECK_ARGS('instrument', 'name', $name, 'types', $types);
+    $name, $types = null, $join = 1 -> (
+        BP_FN_CHECK_ARGS('instrument', 'name', $name);
         $fn = INSTRUMENT_MAP.$name;
         $alltypes = types($name);
         $types = if $types == null then $alltypes else intersection($alltypes, $types);

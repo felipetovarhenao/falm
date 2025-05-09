@@ -1,5 +1,26 @@
+jispectrum = (
+    $harmonics = 1...32, $ratios = 1 5/4 3/2 5/3, $root = d2 -> (
+        $pcs = r2pc($ratios, mc2pc($root));
+        $chord = r2mc($harmonics, $root);
+        thin(
+            int(
+                round(for $mc in $chord collect $mc + pitchdiff($mc, $pcs) ) 
+            ) 
+        ) 
+    ) 
+);
 fold = (
     $x -> 1 - 2 * abs(mod($x * 0.5, 1) - 0.5) 
+);
+ezinstrument = (
+    $pitch, $names = 'guitar' 'harp', $types = 'ord', $useseed = 0 -> (
+        BP_FN_CHECK_ARGS(
+            'ezinstrument', 'pitch', $pitch, 'names', $names
+        );
+        $choose = if $useseed == 1 then xchoose else choose;
+        $instruments = for $n in $names collect instrument($n, $types @join 0);
+        $instruments.pitchfilter($pitch).$choose() 
+    ) 
 );
 ezexport = (
     $data -> (
