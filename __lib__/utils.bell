@@ -9,6 +9,17 @@ jispectrum = (
         ) 
     ) 
 );
+pcquant = (
+    $mc, $pcs = 0 4 7, $thin = 1 -> (
+        for $x $addr in $mc with @maxdepth -1 @spikemode 1 do ($mc:$addr += pitchdiff($x, $pcs));
+        if $thin == 1 then (
+            $mc = thin(
+                int(round($mc))
+            )
+        );
+        $mc
+    ) 
+);
 fold = (
     $x -> 1 - 2 * abs(mod($x * 0.5, 1) - 0.5) 
 );
