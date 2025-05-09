@@ -6,15 +6,21 @@ for $f in $files do (
     $t += read($basepath + '.txt') 
 );
 render(
-    @play 1 @process dynamics(
-        @knee 0.33
-        @thresh -30
-        @ratio 4
-        @attack 50
-        @release 300
-        @makeup 3
+    @play 1 @process (
+        ## -----
+        ## crop(@start $t - 62000 @end $t + 10000) 
+        ## -----
+        dynamics(
+            @knee 0.33
+            @thresh -30
+            @ratio 4
+            @attack 50
+            @release 300
+            @makeup 3
+        ) 
+        ## -----
+        ## resample(1/c2r(-150)) 
+        
     ) 
-    ##  resample(1/c2r(-150)) 
-    
 );
 ezexport()

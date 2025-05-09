@@ -1,4 +1,6 @@
+$onset = 0;
 $b = importaudio('./transition.wav');
+$onset += read('./transition.txt');
 $b.transcribe();
 render(@play 1);
-ezexport($b.getkey('duration'))
+ezexport($onset)
