@@ -5,4 +5,16 @@ for $f in $files do (
     importaudio($basepath + '.wav').transcribe($t);
     $t += read($basepath + '.txt') 
 );
-render(@play 1)
+render(
+    @play 1 @process dynamics(
+        @knee 0.33
+        @thresh -30
+        @ratio 4
+        @attack 50
+        @release 300
+        @makeup 3
+    ) 
+    ##  resample(1/c2r(-150)) 
+    
+);
+ezexport()

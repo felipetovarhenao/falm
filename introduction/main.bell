@@ -7,11 +7,11 @@ $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.5;
 importaudio('./tail.wav').transcribe($onset);
 render(
     @play 1 @process (
-        dynamics(
-            @knee 0.33
-            @thresh -30
-            @ratio 4
-        ) 
+        ## dynamics(
+        ##     @knee 0.33
+        ##     @thresh -30
+        ##     @ratio 4
+        ## ) 
         ## 
         freeverb(
             @roomsize 0.95
