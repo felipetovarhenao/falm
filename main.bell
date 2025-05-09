@@ -8,7 +8,7 @@ for $f in $files do (
 render(
     @play 1 @process (
         ## -----
-        ## crop(@start $t - 62000 @end $t + 10000) 
+        ## crop(@start $t - 67000 @end $t + 10000) 
         ## -----
         dynamics(
             @knee 0.33
