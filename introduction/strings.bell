@@ -1,4 +1,5 @@
-setseed(4);
+## seeds: 4 208
+setseed(208);
 scoreconfig(
     @voicenames 'violin' 'viola' 'cello' 'bass' @clefs 'g' 'Alto' 'f' 'F8vb' 
 );
