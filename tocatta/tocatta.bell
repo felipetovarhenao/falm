@@ -1,12 +1,12 @@
 $nums = (3...16).scramble();
 $dynpat = round((1 0.5 0.25 0.75 0.3 0.1) * 127);
 $count = 0;
+$root = d2 + r2c(7/5);
+$rootpc = $root.mc2pc();
 for $shift $si in 0...2 do (
-    $chord = r2mc(
-        $nums + $shift, d2 + r2c(6/5) 
-    );
+    $chord = r2mc($nums + $shift, $root);
     $pcs = r2pc(
-        [1 5/4 3/2] [9/8 4/3 3/2 15/8] [1 4/3 5/3] 
+        [1 5/4 3/2] [9/8 4/3 3/2 15/8] [1 4/3 5/3], $rootpc
     );
     $t = 0;
     for $pc in $pcs :* 4 with @unwrap 1 do (
