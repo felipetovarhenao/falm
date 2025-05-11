@@ -14,14 +14,34 @@ pcquant = (
         for $x $addr in $mc with @maxdepth -1 @spikemode 1 do ($mc:$addr += pitchdiff($x, $pcs));
         if $thin == 1 then (
             $mc = thin(
-                int(round($mc))
-            )
+                int(round($mc)) 
+            ) 
         );
         $mc
     ) 
 );
 fold = (
     $x -> 1 - 2 * abs(mod($x * 0.5, 1) - 0.5) 
+);
+pno = (
+    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $norm = 0.5 -> (
+        ## -----
+        $b = sol(
+            @name 'pno' 
+            @pitch $pitch
+            @duration $duration
+            @velocity $velocity
+            @useseed $useseed
+            @usecache $usecache
+            @resample $resample
+            @type 'ord' 
+        ).process(mixdown());
+        $maxabs = $b.getkey('maxabs');
+        if $maxabs > $norm then (
+            $b = $b.process(normalize(@level $norm @ampunit 0)) 
+        );
+        $b
+    ) 
 );
 ezinstrument = (
     $pitch, $names = 'guitar' 'harp', $types = 'ord', $useseed = 0 -> (
