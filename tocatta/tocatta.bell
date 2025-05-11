@@ -1,5 +1,7 @@
 $nums = (3...16).scramble();
-for $shift in 0...2 do (
+$dynpat = round((1 0.5 0.25 0.75 0.3 0.1) * 127);
+$count = 0;
+for $shift $si in 0...2 do (
     $chord = r2mc(
         $nums + $shift, d2 + r2c(6/5) 
     );
@@ -10,7 +12,12 @@ for $shift in 0...2 do (
     for $pc in $pcs :* 4 with @unwrap 1 do (
         $mcs = $chord.pcquant($pc);
         for $mc in $mcs do (
-            maracas(@velocity rand(127)).transcribe($t);
+            if $si == 1 then (
+                maracas(
+                    @velocity $dynpat:($count % length($dynpat) + 1) + rand(-1, 1) * 7
+                ).transcribe($t @gain 0.123);
+                $count += 1
+            );
             acc(
                 @pitch $mc
                 @type choose('stacc' 'reg') 
@@ -28,7 +35,7 @@ for $shift in 0...2 do (
 render(
     @play 1 @process freeverb(
         @roomsize 0.8
-        @wet 0.0125
+        @wet 0.025
         @damp 1
         @width 1
     ) normalize(-4) 

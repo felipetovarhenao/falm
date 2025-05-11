@@ -1,5 +1,6 @@
 $files = readfolder('/Users/felipetovarhenao/Google Drive/My Drive/FTH Drive/Sample libraries/Instruments/Maracas/');
 $keymap = null;
+$velstep = 20;
 for $f in $files do (
     $b = importaudio($f).analyze(onsets());
     $split = $b.getkey('onsets');
@@ -30,13 +31,15 @@ for $f in $files do (
         render(@reset 1 @numchannels 1);
         export($path);
         $vel = int(
-            round($s.getkey('larm').scale(
-                @inmin $larmrange:1
-                @inmax $larmrange:2
-                @outmin 1
-                @outmax 127
-            )) 
-        );
+            round(
+                $s.getkey('larm').scale(
+                    @inmin $larmrange:1
+                    @inmax $larmrange:2
+                    @outmin 1
+                    @outmax 127
+                ) / $velstep
+            ) * $velstep
+        ).min(127);
         $mc = int(
             round(
                 $s.getkey('spectralcentroid').f2mc().scale(
