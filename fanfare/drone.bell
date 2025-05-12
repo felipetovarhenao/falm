@@ -1,0 +1,46 @@
+$root = d2;
+$pcroot = mc2pc($root);
+$pcs = r2pc(1 5/4 3/2 6/5 7/4 9/4 5/3, $pcroot);
+$mcs = r2mc(1...16, $root).pcquant($pcs);
+$dur = 120;
+$t = 0;
+$types = 'ord' 'brassy-to-ord' 'sfz';
+$names = 'tuba' 'tpt' 'tromb';
+for $i in 1...90 do (
+    for $mc in $mcs do (
+        $in = ezinstrument(
+            @pitch $mc
+            @names $names
+            @types $types
+        );
+        $fn = $in.getkey('fn');
+        $type = $in.getkey('types');
+        $env = choose(
+            [hanning()] [
+                [0 1 0] [1 0 -rand(0.1, 0.5)] 
+            ] [
+                [0 0 0] [1 1 rand(0.1, 0.5)] 
+            ] [] 
+        )::1;
+        $fn(
+            @pitch $mc
+            @type $type
+            @duration $dur
+            @velocity 127
+        ).transcribe(
+            @onset $t
+            @pan rand() 
+            @gain $env
+        ) 
+    );
+    $t += $dur
+);
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+);
+ezexport()
