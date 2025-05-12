@@ -1,0 +1,43 @@
+$totdur = 9000;
+$t = 0;
+$pcs = r2pc(7/8 9/8 4/3 5/3 3/2, 2);
+$chord = r2mc(1...32, d3).pcquant($pcs);
+$velbpf = [0 0 0] [0.5 127 0.5] [1 0 -0.5];
+$incrbpf = [0 400 0] [0.5 10 -0.5] [1 400 0.5];
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $vel = samplebpf($velbpf, $nt);
+    $incr = samplebpf($incrbpf, $nt);
+    $mc = choose($chord);
+    $dur = rand(50, 300);
+    $pan = rand();
+    if rand() > 0.125 then (
+        flute(
+            @pitch $mc
+            @type choose('ord') 
+            @velocity $vel
+            @duration $dur
+        ).process(window()).transcribe(
+            @onset $t @pan $pan
+        ) 
+    ) else (
+        $fq = $mc.mc2f() * random(-1, 2).exp2();
+        $wave = choose(cycle tri saw rect);
+        $phase = rand();
+        $wave(
+            @frequency $fq
+            @duration $dur
+            @phase $phase
+            @duty $phase
+        ).process(dcfilter()).transcribe(
+            @onset $t
+            @pan $pan
+            @gain [0 ($vel / 127) ** 2. * 0.125 0] [1 0 -0.5] 
+        ) 
+    );
+    $t += $incr
+);
+render(
+    @play 1 @process ezverb() normalize(-3) 
+);
+ezexport()
