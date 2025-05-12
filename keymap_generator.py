@@ -104,6 +104,16 @@ range = (
         minmax($pitches):[1 3]
     )
 );
+samples = (
+    $name, $type, $preload = 0 -> (
+        $keymap = keymap($name, $type);
+        $files = for $k in $keymap with @maxdepth -1 collect (
+            if $k.is() == 'symbol' then $k
+        );
+        $files = thin($files);
+        if $preload == 0 then $files else (for $f in $files collect importaudio($f))
+    )
+);
 instrument = (
     $name, $types = null, $join = 1 -> (
         BP_FN_CHECK_ARGS('instrument', 'name', $name);
