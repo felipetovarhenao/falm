@@ -44,24 +44,16 @@ pno = (
     ) 
 );
 maracas = (
-    $pitch = 6000,
-    $duration = 500,
-    $velocity = 64,
-    $useseed = 1,
-    $usecache = 1,
-    $resample = 0,
-    $type = 'ord' -> (
-        sol(
-            @name 'maracas'
-            @pitch $pitch
-            @duration $duration
-            @velocity $velocity
-            @useseed $useseed
-            @usecache $usecache
-            @resample $resample
-            @type $type
-        )
-    )
+    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 0, $type = 'ord' -> (sol(
+        @name 'maracas' 
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @useseed $useseed
+        @usecache $usecache
+        @resample $resample
+        @type $type
+    ) ) 
 );
 ezinstrument = (
     $pitch, $names = 'guitar' 'harp', $types = 'ord', $useseed = 0 -> (
@@ -99,4 +91,10 @@ ms2samps = (
 );
 samps2ms = (
     $samps, $sr = 48000 -> (($samps / $sr) * 1000.) 
-)
+);
+ezverb = (-> freeverb(
+    @roomsize 0.9
+    @wet 0.0125
+    @damp 1
+    @width 1
+))
