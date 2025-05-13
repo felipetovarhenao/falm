@@ -1,0 +1,25 @@
+$chord = r2mc(1...32, d2).pcquant(r2pc(1 9/8 10/9 5/4 7/5 3/2 5/3 15/8)).int();
+$mcs = randpattern(
+    $chord, @length 400 @steps 2 -1
+);
+$t = 0;
+for $mc in $mcs do (
+    $in = ezinstrument(
+        $mc @names 'guitar' 'harp' @types 'harm' 'ord' 'pont' 'ord-high' 'tasto' 'xylo' 
+    );
+    $fn = $in.getkey('fn');
+    $type = $in.getkey('types');
+    $b = $fn(
+        @pitch $mc
+        @duration 3000
+        @velocity 0
+        @type $type
+    );
+    $offset = $b.setkey('duration', 200).analyze(envmaxtime()).getkey('envmaxtime');
+    $b.transcribe(
+        @onset $t - $offset @pan rand() 
+    );
+    $t += 80
+);
+render(@play 1);
+ezexport()
