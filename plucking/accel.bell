@@ -51,4 +51,5 @@ for $i in 1...9 do (
 );
 render(
     @play 1 @process ezverb() normalize(-3) 
-)
+);
+ezexport()
