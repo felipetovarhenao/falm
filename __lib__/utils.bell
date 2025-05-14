@@ -89,9 +89,23 @@ randpattern = (
         $st = $random(0, $N);
         $x = dx2x($dx, $st);
         $x = int(
-            round(fold($x / $N) * $N)
+            round(fold($x / $N) * $N) 
         ) + 1;
         $source:[$x] 
+    ) 
+);
+family = (
+    $name -> (
+        $families = (
+            [
+                'strings' 'violin' 'viola' 'cello' 'bass' 
+            ] [
+                'winds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 
+            ] [
+                'plucked' 'harp' 'guitar' 'pno' 
+            ] 
+        );
+        $families.$name ||| BP_FN_ERROR('invalid family name:' $name) 
     ) 
 );
 ms2samps = (

@@ -1,0 +1,50 @@
+pluckramp = (
+    $time = 0, $duration = 2000, $rate = 10, $legato = 2, $slope = -1/4, $velocity = 64, $cents = 6000 -> (
+        BP_FN_CHECK_ARGS(
+            'rampobj', 'time', $time, 'duration', $duration
+        );
+        $numnotes = int(
+            round(
+                max(1,  ($duration / 1000.) * $rate) 
+            ) 
+        );
+        $names = family('strings');
+        $types = 'pizz';
+        $onsets = arithmser(0, 1, null, $numnotes).scale(0, 1, 0, $duration, $slope);
+        $subdurs = x2dx($onsets);
+        for $onset in $onsets, $subdur in $subdurs do (
+            for $mc in $cents do (
+                $in = ezinstrument(
+                    @pitch $mc
+                    @names $names
+                    @types $types
+                );
+                $fn = $in.getkey('fn');
+                $type = $in.getkey('types');
+                $fn(
+                    @pitch $mc
+                    @type $type
+                    @duration max(50, $subdur * $legato) 
+                    @velocity $velocity
+                ).transcribe(
+                    @onset $onset + $time @pan rand() 
+                ) 
+            ) 
+        );
+        $duration
+    ) 
+);
+$t = 0;
+for $i in 1...9 do (
+    $dur = rand(1000, 3000);
+    $dur = pluckramp(
+        @cents r2mc(1 5/4 3/2 15/8) 
+        @time $t
+        @legato 8
+        @duration $dur
+        @slope rand(1/4, 3/4) * choose(-1 1) 
+    );
+    $t += $dur;
+    if rand() > 0.9 then ($t += rand(250, 1000)) 
+);
+render(@play 1)
