@@ -108,6 +108,7 @@ family = (
         $families.$name ||| BP_FN_ERROR('invalid family name:' $name) 
     ) 
 );
+mc2pan = ($mc -> $mc.mc2pc() / 12.);
 ms2samps = (
     $ms, $sr = 48000 -> int(($ms / 1000.) * $sr) 
 );

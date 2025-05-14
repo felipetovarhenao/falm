@@ -1,7 +1,7 @@
 $root = d2;
 $pcroot = mc2pc($root);
 $ratios = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
-## $ratios = 1 9/8 5/4 7/5 3/2 5/3 7/4 15/8;
+$ratios = 1 9/8 5/4 7/5 3/2 5/3 7/4 15/8;
 $pcs = r2pc($ratios, $pcroot);
 $chord = r2mc(1...48, $root).pcquant($pcs);
 $mcs = randpattern(
@@ -11,7 +11,7 @@ $mcs = randpattern(
 );
 $t = 0;
 $names = 'guitar' 'harp';
-$types = 'ord' 'harm' 'harm-in-wood' 'pont' 'ord-high' 'tasto' 'xylo' 'near-pegs' 'near-board' 'near-board-w-nail' 'bartok' 'tap';
+$types = 'ord' 'harm' 'harm-in-wood' 'pont' 'ord-high' 'tasto' 'xylo' 'near-pegs' 'near-board' 'near-board-w-nail' 'bartok' 'damp' 'tap' 'buzz-ped';
 $numtypesbpf = [0 1 0] [1 length($types) 0.125];
 $velbpf = [0 1 0] [1 127 0.35];
 $unit = 75;
@@ -37,8 +37,9 @@ for $mc $mci in $mcs do (
         @type $type
     );
     $offset = $b.setkey('duration', $unit * 2).analyze(envmaxtime()).getkey('envmaxtime');
+    $pan = mc2pan($mc);
     $b.transcribe(
-        @onset $t - $offset @pan rand() 
+        @onset $t - $offset @pan $pan
     );
     $t += $unit
 );
