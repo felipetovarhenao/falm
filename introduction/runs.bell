@@ -60,7 +60,7 @@ for $e in $events do (
             );
             if xrand() > 0.7 then (
                 $sgn = xchoose(-1 1);
-                $fqshiftx = dx2x(for $x in 1...3 collect random(1, 3));
+                $fqshiftx = dx2x(for $x in 1...3 collect xrandom(1, 3));
                 $fqshift = for $x in $fqshiftx collect [$x xrand(1, 6.5) * $sgn xrand(1/8, 1/3)];
                 $fx = freqshift(@shift $fqshift @negative 0);
                 $b = $b.process($fx) 

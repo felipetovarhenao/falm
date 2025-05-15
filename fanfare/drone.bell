@@ -15,11 +15,11 @@ for $i in 1...90 do (
         );
         $fn = $in.getkey('fn');
         $type = $in.getkey('types');
-        $env = choose(
+        $env = xchoose(
             [hanning()] [
-                [0 1 0] [1 0 -rand(0.1, 0.5)] 
+                [0 1 0] [1 0 -xrand(0.1, 0.5)] 
             ] [
-                [0 0 0] [1 1 rand(0.1, 0.5)] 
+                [0 0 0] [1 1 xrand(0.1, 0.5)] 
             ] [] 
         )::1;
         $fn(
@@ -29,7 +29,7 @@ for $i in 1...90 do (
             @velocity 127
         ).transcribe(
             @onset $t
-            @pan rand() 
+            @pan xrand() 
             @gain $env
         ) 
     );

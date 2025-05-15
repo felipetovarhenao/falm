@@ -8,18 +8,18 @@ $basechord = thin(
 );
 $root = $basechord:1;
 for $j in 1...10 do (
-    $numnotes = random(4, length($basechord));
+    $numnotes = xrandom(4, length($basechord));
     $numnotes = length($basechord);
-    $timestep = 1500 * choose(1/4 1/8 1/20 1/12 1/16 3/16 1/6);
-    $vel = random(0, 127);
+    $timestep = 1500 * xchoose(1/4 1/8 1/20 1/12 1/16 3/16 1/6);
+    $vel = xrandom(0, 127);
     $vel = 127;
-    for $i in 1...random(3, 10) do (
+    for $i in 1...xrandom(3, 10) do (
         $chord = x2dx($basechord).rot(-$rot).dx2x($root).sort();
         for $mc $mci in $chord.left($numnotes) do (
             $pan = $mci.scale(1, length($chord), 0, 1);
             $instruments = for $n in $names collect instrument($n, $techs @join 0);
             $instruments = pitchfilter($instruments, $mc, 600);
-            $instrument = choose($instruments);
+            $instrument = xchoose($instruments);
             $fn = $instrument.getkey('fn');
             $type = $instrument.getkey('types');
             $fn(

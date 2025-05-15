@@ -1,4 +1,4 @@
-$nums = (3...16).scramble();
+$nums = (3...16).xscramble();
 $dynpat = round((1 0.5 0.25 0.75 0.3 0.1) * 127);
 $count = 0;
 $root = d2 + r2c(7/5);
@@ -14,18 +14,18 @@ for $shift $si in 0...2 do (
         for $mc in $mcs do (
             if $si == 1 then (
                 maracas(
-                    @velocity $dynpat:($count % length($dynpat) + 1) + rand(-1, 1) * 7
+                    @velocity $dynpat:($count % length($dynpat) + 1) + xrand(-1, 1) * 7
                 ).transcribe($t @gain 0.123);
                 $count += 1
             );
             acc(
                 @pitch $mc
-                @type choose('stacc' 'reg') 
+                @type xchoose('stacc' 'reg') 
                 @duration 200
                 @velocity 127
             ).transcribe(
                 @onset $t
-                @pan rand() 
+                @pan xrand() 
                 @gain [0 1 0] [1 0 0.5] 
             );
             $t += 90

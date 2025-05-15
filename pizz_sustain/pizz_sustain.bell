@@ -3,15 +3,15 @@ $t = 0;
 $totdur = 25000;
 $markers = null;
 while $t < $totdur do (
-    $sampler = choose(violin viola cello bass);
+    $sampler = xchoose(violin viola cello bass);
     $off = 0;
     $b = $sampler(
-        @pitch choose($chord) + xchoose(-1 0 1 2 @weights 2 4 2 1) * 1200
-        @type choose('pizz' 'pizz-secco' ) 
+        @pitch xchoose($chord) + xchoose(-1 0 1 2 @weights 2 4 2 1) * 1200
+        @type xchoose('pizz' 'pizz-secco' ) 
         @duration null
         @velocity xrandom(0, 127) 
     );
-    if rand() > 0.95 then (
+    if xrand() > 0.95 then (
         $maxdur = max(
             50, min($b.getkey('duration'), $t) 
         );
@@ -19,10 +19,10 @@ while $t < $totdur do (
         $off -= $b.getkey('duration') 
     );
     $b.transcribe(
-        @onset $t + $off @pan rand() 
+        @onset $t + $off @pan xrand() 
     );
     $markers _= $t;
-    $t += rand(150) 
+    $t += xrand(150) 
 );
 render(
     @play 1 @process normalize(-3) freeverb(

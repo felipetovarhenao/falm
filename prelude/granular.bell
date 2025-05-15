@@ -8,22 +8,22 @@ while $t < $totdur do (
     $nt = $t / $totdur;
     $vel = samplebpf($velbpf, $nt);
     $incr = samplebpf($incrbpf, $nt);
-    $mc = choose($chord);
-    $dur = rand(50, 300);
-    $pan = rand();
-    if rand() > 0.125 then (
+    $mc = xchoose($chord);
+    $dur = xrand(50, 300);
+    $pan = xrand();
+    if xrand() > 0.125 then (
         flute(
             @pitch $mc
-            @type choose('ord') 
+            @type xchoose('ord') 
             @velocity $vel
             @duration $dur
         ).process(window()).transcribe(
             @onset $t @pan $pan
         ) 
     ) else (
-        $fq = $mc.mc2f() * random(-1, 2).exp2();
-        $wave = choose(cycle tri saw rect);
-        $phase = rand();
+        $fq = $mc.mc2f() * xrandom(-1, 2).exp2();
+        $wave = xchoose(cycle tri saw rect);
+        $phase = xrand();
         $wave(
             @frequency $fq
             @duration $dur
