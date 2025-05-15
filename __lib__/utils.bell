@@ -78,7 +78,7 @@ ezsol = (
             @duration $duration
             @velocity $velocity
             @type $type
-            @resample 1
+            @resample $resample
             @useseed $useseed
         ).setkey('name', $name, @mode 1);
         $b
@@ -125,7 +125,11 @@ family = (
             [
                 'strings' 'violin' 'viola' 'cello' 'bass' 
             ] [
-                'winds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 
+                'woodwinds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 
+            ] [
+                'winds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 'tpt' 'horn' 'tromb' 'tuba' 
+            ] [
+                'brass' 'tpt' 'horn' 'tromb' 'tuba' 
             ] [
                 'plucked' 'harp' 'guitar' 'pno' 
             ] 
