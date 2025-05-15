@@ -1,43 +1,59 @@
+setseed(100);
 $chord = jispectrum(
     @harmonics 1...64
     @ratios 1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8
     @root eb2 
 ).int().thin();
 $t = 0;
-$names = family('strings') family('winds') family('brass') family('plucked');
-for $i in 0...3 do (
-    for $mc in $chord.scramble() do (
+$names = thin(
+    family('plucked') family('strings') family('winds') family('brass') 
+);
+$types = 'nonvib' 'ord' 'harm' 'air' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'cresc-to-dim';
+$N = 15;
+$chordlen = length($chord);
+$gapbpf = [0 2000 0] [1 7000 0.125];
+$jitterbpf = [0 500 0] [1 100 -0.125];
+$numnamesbpf = [0 3 0] [1 length($names) 0.125];
+$numtypesbpf = [0 2 0] [1 length($types) 0.125];
+for $i in 0...$N do (
+    $nt = $i / $N;
+    $numnotes = $nt.scale(0, 1, 5, $chordlen, 0.25);
+    $gap = samplebpf($gapbpf, $nt);
+    $jitter = samplebpf($jitterbpf, $nt);
+    $numnames = samplebpf($numnamesbpf, $nt).round();
+    $numtypes = samplebpf($numtypesbpf, $nt).round();
+    for $mc in $chord.xscramble().left($numnotes) do (
         $pan = mc2pan($mc);
-        if rand() > 0.01 then (
+        if xrand() > 0.01 then (
             cycle(
-                @frequency $mc.mc2f() * random(-1, 3).exp2() 
-                @duration rand(100, 1000) 
-                @phase rand() 
+                @frequency $mc.mc2f() * xrandom(-1, 3).exp2() 
+                @duration xrand(100, 1000) 
+                @phase xrand() 
             ).transcribe(
                 @onset $t
                 @pan $pan
-                @gain [0 rand(0.001, 0.025) 0] [1 0 -rand(1/4, 3/4)] 
+                @gain [0 xrand(0.001, 0.025) 0] [1 0 -xrand(1/4, 3/4)] 
             ) 
         );
         ezsol(
             @pitch $mc
             @duration null
-            @types 'nonvib' 'ord' 'harm' 'air' 'air-and-ord' 
-            @names $names
+            @types left($types, $numtypes) 
+            @names $names.left($numnames) 
             @velocity 0
         ).transcribe(
             @onset $t
             @pan $pan
             @gain [0 1 0] [1 0 1/3] 
         );
-        $t += rand(200) 
+        $t += xrand($jitter) 
     );
-    $t += 5000
+    $t += $gap
 );
 render(
     @play 1 @process freeverb(
         @roomsize 0.97
-        @wet [0 0.025 0] [1 0.3 0.25] 
+        @wet [0 0.025 0] [1 0.1 0.25] 
         @damp 1
         @width 1
     ) 
