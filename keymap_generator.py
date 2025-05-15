@@ -145,7 +145,7 @@ pitchfilter = (
             if $pitch >= ($range:1 - $tolerance) && $pitch <= ($range:2 + $tolerance) then $x
         );
         $out = if $choices == null then (
-            $id = abs($diffs).minmax()::2;
+            $id = abs($diffs ||| 0).minmax()::2;
             $instruments:$id
         ) else $choices;
         $out ||| BP_FN_ERROR("pitchfilter", "null output")
