@@ -4,7 +4,7 @@ jispectrum = (
         $chord = r2mc($harmonics, $root);
         thin(
             int(
-                round(for $mc in $chord collect $mc + pitchdiff($mc, $pcs) ) 
+                round(for $mc in $chord collect $mc + pitchdiff($mc, $pcs)) 
             ) 
         ) 
     ) 
