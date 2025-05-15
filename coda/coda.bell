@@ -42,6 +42,7 @@ for $i in 0...$N do (
             @types left($types, $numtypes) 
             @names $names.left($numnames) 
             @velocity $vel
+            @useseed 1
         ).transcribe(
             @onset $t
             @pan $pan
