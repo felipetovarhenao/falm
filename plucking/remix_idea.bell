@@ -1,0 +1,24 @@
+setseed(212);
+$t = 0;
+$spectrum = f2mc((1...16) * 90).pcquant(r2pc(1 7/6 3/2 7/4 9/8 4/3, 0));
+for $i in 0...5 do (
+    for $mc in $spectrum do (
+        ezsol(
+            @pitch $mc
+            @names 'violin' 'viola' 'cello' 'bass' 'guitar' 'harp' 
+            @types 'pizz' 
+            @duration 100
+            @velocity xrand() * 127
+            @useseed 1
+        ).transcribe(
+            @onset $t @pan xrand() 
+        );
+        $t += 5
+    );
+    $t += xrand(50) 
+);
+render(
+    @play 1 @process (
+        for $i in 1...4 collect repeat(xrand(1, 2)) fade(5, 5) 
+    ) repeat(4) 
+)
