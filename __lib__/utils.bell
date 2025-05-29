@@ -72,7 +72,7 @@ ezsol = (
         $instrument = $instruments.pitchfilter($pitch).$choose();
         $fn = $instrument.getkey('fn');
         $type = $instrument.getkey('types');
-        $name = $instrument.getkey('types');
+        $name = $instrument.getkey('name');
         $b = $fn(
             @pitch $pitch
             @duration $duration
@@ -80,7 +80,9 @@ ezsol = (
             @type $type
             @resample $resample
             @useseed $useseed
-        ).setkey('name', $name, @mode 1);
+        ).setkey(
+            'instrument', ['name' $name] ['type' $type], @mode 1
+        );
         $b
     ) 
 );
