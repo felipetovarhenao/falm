@@ -1,0 +1,38 @@
+$n = 3;
+$chord = r2mc(
+    ((1...32) + $n) / $n, 4800
+).pcquant(r2pc(1 5/4 3/2 15/8 9/8 5/3, 2));
+$mcs = randpattern(
+    @source $chord
+    @length 100
+    @steps -2 1
+);
+$t = 0;
+$dur = 70;
+for $mc in $mcs :* 5 do (
+    ezsol(
+        @pitch $mc
+        @duration $dur * 2
+        @names 'flute' 'clar' 'sax' 
+        @types 'ord' 
+        @velocity 0
+    ).process(window()).transcribe(
+        @onset $t @pan null
+    );
+    $t += $dur
+);
+$b = render(@reset 1 @numchannels 1);
+$delays = x2dx(1 2 3 5 8 13 21).rev();
+$t = 0;
+for $d $i in $delays do (
+    $b.transcribe(
+        @onset $t
+        @gain ($i/length($delays) * 1.) ** 2.
+        @pan rand() 
+        @detune rand(-5, 5) 
+    );
+    $t += $d * $dur * 2
+);
+render(
+    @play 1 @process ezverb() normalize(-8) 
+)
