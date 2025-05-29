@@ -83,8 +83,8 @@ KEYMAP_CACHE = null;
 #(
 ```bell
 keymap(
-    @name # required
-    @type # required
+    @name ## required
+    @type ## required
 ) 
 ```
 
@@ -113,8 +113,8 @@ keymap = (
 #(
 ```bell
 range(
-    @name # required
-    @types # required
+    @name ## required
+    @types ## required
 ) 
 ```
 
@@ -148,8 +148,8 @@ samples = (
 #(
 ```bell
 instrument(
-    @name # required
-    @types # required
+    @name ## required
+    @types ## required
     @join 1
 ) 
 ```
@@ -195,8 +195,8 @@ instrument = (
 #(
 ```bell
 pitchfilter(
-    @instruments # required
-    @pitch # required
+    @instruments ## required
+    @pitch ## required
     @tolerance 300
 ) 
 ```

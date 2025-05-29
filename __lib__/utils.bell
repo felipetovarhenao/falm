@@ -52,6 +52,27 @@ maracas = (
         @type $type
     ) ) 
 );
+#(
+```bell
+ezinstrument(
+    @pitch ## required
+    @names 'guitar' 'harp'
+    @types 'ord'
+    @useseed 0
+)
+```
+
+Returns an SOL instrument with the following structure:
+
+```bell
+[
+    ['name' <instrument name>]
+    ['fn' <callback>]
+    ['types' <keymap_types>]
+    ['range' <pitch_range>]
+]
+```
+)#
 ezinstrument = (
     $pitch, $names = 'guitar' 'harp', $types = 'ord', $useseed = 0 -> (
         BP_FN_CHECK_ARGS(
@@ -62,6 +83,21 @@ ezinstrument = (
         $instruments.pitchfilter($pitch).$choose() 
     ) 
 );
+#(
+```bell
+ezsol(
+    @pitch ## required
+    @names 'guitar' 'harp'
+    @types 'ord'
+    @velocity 64
+    @duration 1000
+    @resample 1
+    @useseed 0
+) -> ## buffer
+```
+
+Returns a buffer given parametric constraints.
+)#
 ezsol = (
     $pitch, $names = 'guitar' 'harp', $types = 'ord', $velocity = 64, $duration = 1000, $resample = 1, $useseed = 0 -> (
         BP_FN_CHECK_ARGS(
