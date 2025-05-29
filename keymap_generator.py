@@ -80,6 +80,21 @@ PARENT_FOLDER = pathlib.Path(__file__).parent
 
 BELL_CODE = f"""
 KEYMAP_CACHE = null;
+#(
+```bell
+keymap(
+    @name # required
+    @type # required
+) 
+```
+
+Returns the keymap corresponding to a given `@name` and `@type`.
+
+**Arguments**:
+
+- `@name`: name of SOL instrument.
+- `@type`: keymap type or technique ID.
+)#
 keymap = (
     $name,
     $type -> (
@@ -95,6 +110,21 @@ keymap = (
         (KEYMAP_CACHE.$path) ||| BP_FN_ERROR('keymap', 'no matching keymap:' $name $type)
     )
 );
+#(
+```bell
+range(
+    @name # required
+    @types # required
+) 
+```
+
+Returns the lowest and highest pitch values within a collection of keymap types.
+
+**Arguments**:
+
+- `@name`: name of SOL instrument.
+- `@types`: one or more keymap or technique IDs.
+)#
 range = (
     $name, $types = null -> (
         BP_FN_CHECK_ARGS('range', 'name', $name);
@@ -104,6 +134,7 @@ range = (
         minmax($pitches):[1 3]
     )
 );
+
 samples = (
     $name, $type, $preload = 0 -> (
         $keymap = keymap($name, $type);
@@ -114,6 +145,32 @@ samples = (
         if $preload == 0 then $files else (for $f in $files collect importaudio($f))
     )
 );
+#(
+```bell
+instrument(
+    @name # required
+    @types # required
+    @join 1
+) 
+```
+
+Given a SOL instrument and one or more technique types, returns one or more instruments with the following key-value pair _llll_:
+
+```bell
+[
+    ['name' <instrument name>]
+    ['fn' <callback>]
+    ['types' <keymap_types>]
+    ['range' <pitch_range>]
+]
+```
+
+**Arguments**:
+
+- `@name`: name of SOL instrument.
+- `@types`: one or more keymap or technique IDs.
+- `@join`: joins all types into a single instrument.
+)#
 instrument = (
     $name, $types = null, $join = 1 -> (
         BP_FN_CHECK_ARGS('instrument', 'name', $name);
@@ -134,6 +191,24 @@ instrument = (
         )
     )
 );
+
+#(
+```bell
+pitchfilter(
+    @instruments # required
+    @pitch # required
+    @tolerance 300
+) 
+```
+
+Given a target pitch and list of instrument _lllls_ (see `instrument`), filters them out based on range compatibility:
+
+**Arguments**:
+
+- `@instruments`: instrument _lllls_.
+- `@pitch`: target pitch.
+- `@tolerance`: Maximum cents deviation from instrument's range.
+)#
 pitchfilter = (
     $instruments, $pitch, $tolerance = 300 -> (
         BP_FN_CHECK_ARGS('pitchfilter', 'instruments', $instruments, 'pitch', $pitch);
@@ -151,6 +226,7 @@ pitchfilter = (
         $out ||| BP_FN_ERROR("pitchfilter", "null output")
     ) 
 );
+
 sol = (
     $name = 'guitar', 
     $type = 'ord', 
@@ -284,6 +360,21 @@ def abbreviate(str: str, hyphen: bool = False):
 def define_function(name: str, default_type: str):
     global BELL_CODE
     BELL_CODE += f""";
+#(
+```bell
+{name}(
+    @pitch 6000
+    @duration 500
+    @velocity 64
+    @useseed 1
+    @usecache 1
+    @resample 1
+    @type '{default_type}'
+)
+```
+
+SOL-based sampler. Given a SOL keymap `@type`, returns a buffer with a {name} sample that best matches `@pitch` and `@velocity`.
+)#
 {name} = (
     $pitch = 6000,
     $duration = 500,
