@@ -134,7 +134,22 @@ range = (
         minmax($pitches):[1 3]
     )
 );
+#(
+```bell
+samples(
+    @name ## required
+    @type ## required
+    @preload 0
+) 
+``` 
+Returns samples associated with a given a SOL name and keymap type. Use `@preload 1` to get buffers instead of file paths.
 
+**Arguments**:
+
+- `@name`: name of SOL instrument.
+- `@type`: keymap or technique IDs.
+- `@preload`: preload samples as buffers. If `0`, returns file paths.
+)#
 samples = (
     $name, $type, $preload = 0 -> (
         $keymap = keymap($name, $type);
