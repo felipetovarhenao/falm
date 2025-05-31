@@ -20,8 +20,8 @@ for $cell $voice in $cells, $mc in $mcs, $pan in $pans.xscramble() with @unwrap 
         $id = ($count % length($cell)) + 1;
         $beatsize = $cell:$id;
         $pitch = $mc + ($count % ($voice) * 15);
+        $timestep = abs($beatsize) * $bardur;
         if $beatsize > 0 then (
-            $timestep = abs($beatsize) * $bardur;
             if $voice > 0 then (
                 if xrand() > 0.8 then ($b = maracas(
                     @pitch $pitch
