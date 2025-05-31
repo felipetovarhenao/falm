@@ -499,6 +499,7 @@ for root, dirs, files in os.walk(indir):
     out_dir = os.path.join(keymap_dir, instrument)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
+
     out_path = os.path.join(out_dir, filename + '.txt')
     organize_wav_files(root, out_path)
 
@@ -540,3 +541,7 @@ OUT_PATH = os.path.join(OUT_DIR, 'sol.bell')
 
 with open(OUT_PATH, 'w') as f:
     f.write(BELL_CODE)
+
+for n in ['pno', 'maracas']:
+    dir_name = os.path.join(keymap_dir, n)
+    os.makedirs(dir_name, exist_ok=True)
