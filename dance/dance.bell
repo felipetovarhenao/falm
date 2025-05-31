@@ -1,4 +1,4 @@
-setseed(2420);
+setseed(1518);
 $cells = (
     ## ---
     [-1/4 1/8] 
@@ -16,10 +16,10 @@ $cells = (
     ([-5/16 3/16 2/16 2/16] * 3) 
 );
 $mcs = r2mc(
-    @ratios [1/2] [2/3] [1] [9/4] [6/5] [15/16] [3/2] @mc d5 
+    @ratios [1/2] [3/4] [15/16] [9/8] [4/3] [8/5] [2] @mc a4 
 ).xscramble();
-$totdur = 13000;
 $bardur = 2100;
+$totdur = $bardur * 8;
 scoreconfig(
     @clefs 'f' :* length($cells) 
 );
