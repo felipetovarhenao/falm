@@ -5,7 +5,7 @@ $t = 0;
 $wetbpf = null;
 while $t < $maxdur do (
     $chord = r2mc(1...48, a2).pcquant(r2pc(1 9/8 4/3 3/2 15/8 6/5));
-    $pat = randpattern(
+    $pat = randomseq(
         @source $chord
         @length xrandom(5, 10) 
         @steps 2 -1 3 -4

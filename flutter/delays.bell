@@ -2,7 +2,7 @@ $n = 3;
 $chord = r2mc(
     ((1...32) + $n) / $n, 4800
 ).pcquant(r2pc(1 5/4 3/2 15/8 9/8 5/3, 2));
-$mcs = randpattern(
+$mcs = randomseq(
     @source $chord
     @length 100
     @steps -2 1

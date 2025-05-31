@@ -209,15 +209,35 @@ ezexport = (
 );
 randwalk = (
     $length = 10, $steps = -1 1, $st = 0, $useseed = 0 -> (
-        $choose = if $useseed == 1 then xchoose else choose ;
+        $choose = if $useseed == 1 then xchoose else choose;
         $dx = for $i in 1...max(0, $length - 1) collect $choose($steps);
         ($dx &&& dx2x($dx, $st)) ||| $st
     ) 
 );
-randpattern = (
-    $source, $length = 10, $steps = -1 1, $useseed = 0 -> (
-        BP_FN_CHECK_ARGS('randpattern', 'source', $source);
-        $size = length($source);
+#(
+```bell
+randomseq(
+    @llll null
+    @length 10
+    @steps -1 1
+    @useseed 0
+```
+
+Generates a random pattern from a _llll_.
+
+---
+
+### Arguments
+
+- `@llll`: _llll_ from which to retrieve pattern elements. (_required_)
+- `@length`: Sequence length. (_default_: `10`)
+- `@steps`: Step choices for random walk (_default_: `-1 1`)
+- `@useseed`: Use seeded randomness. (_default_: `0`)
+)#
+randomseq = (
+    $llll = null, $length = 10, $steps = -1 1, $useseed = 0 -> (
+        BP_FN_CHECK_ARGS('randomseq', 'source', $llll);
+        $size = length($llll);
         $N = ($size - 1);
         $random = if $useseed == 1 then xrandom else random ;
         $st = $random(0, $N);
@@ -230,7 +250,7 @@ randpattern = (
         $x = int(
             round(fold($x / $N) * $N) 
         ) + 1;
-        $source:[$x] 
+        $llll:[$x] 
     ) 
 );
 family = (
