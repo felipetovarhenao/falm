@@ -1,10 +1,22 @@
-setseed(1);
+setseed(2420);
 $cells = (
-    ## 
-    [-1/4 1/8] [1/8 1/16 1/16 1/8] [6/16] [-5/16 3/16 2/16 2/16] [3/16] [1/16] ([-5/16 3/16 2/16 2/16] * 3) 
+    ## ---
+    [-1/4 1/8] 
+    ## ---
+    [1/8 1/16 1/16 1/8] 
+    ## ---
+    [6/16] 
+    ## ---
+    [-5/16 3/16 2/16 2/16] 
+    ## ---
+    [3/16] 
+    ## ---
+    [1/16] 
+    ## ---
+    ([-5/16 3/16 2/16 2/16] * 3) 
 );
 $mcs = r2mc(
-    [1/2] [2/3] [1] [9/4] [6/5] [15/16] [3/2] 
+    @ratios [1/2] [2/3] [1] [9/4] [6/5] [15/16] [3/2] @mc d5 
 ).xscramble();
 $totdur = 13000;
 $bardur = 2100;
@@ -64,11 +76,16 @@ for $cell $voice in $cells, $mc in $mcs, $pan in $pans.xscramble() with @unwrap 
                 @velocity $vel
                 @useseed 1
             );
-            $b.transcribe(
-                @onset $t
-                @pan $pan
-                @voice $voice
-                @gain $env
+            $numattacks = 1;
+            if $beatsize == 1/16 && xrand() > 0.98 then ($numattacks = xchoose(2 3 @weights 4 1));
+            for $attack in (1...$numattacks) - 1 do (
+                ## 
+                $b.transcribe(
+                    @onset $t + $attack * $timestep / $numattacks
+                    @pan $pan
+                    @voice $voice
+                    @gain $env
+                ) 
             ) 
         );
         $t += $timestep;
@@ -76,7 +93,7 @@ for $cell $voice in $cells, $mc in $mcs, $pan in $pans.xscramble() with @unwrap 
     ) 
 );
 render(
-    @play 1 @process freeverb(
+    @play 1 @process dynamics() freeverb(
         @roomsize 0.7
         @wet 0.015
         @damp 1
