@@ -14,6 +14,22 @@ def file_id_to_pitch(file_id: int, num_files: int):
     return str(int(round(n * 3800 + center)))
 
 
+def dynamic_to_velocity(dynamic: str):
+    step = 1
+    level = 0
+    for let in dynamic:
+        if let == 'm':
+            step *= 0.75
+        elif let == 'f':
+            level += step
+            step = 1
+        elif let == 'p':
+            level -= step
+            step = 1
+    vel = (2 ** level)
+    return int(round((vel / 4) * 127))
+
+
 def organize_wav_files(folder_path, output_file):
     # Dictionary to hold pitch groups and dynamic levels
     pitch_data = defaultdict(lambda: defaultdict(list))
@@ -24,7 +40,7 @@ def organize_wav_files(folder_path, output_file):
 
     # Regex to parse pitch, dynamic level, and other details
     pattern = re.compile(
-        r"([A-G#bq]+\d+|N)-([mfpN]+)-")
+        r"([A-G#bq]+\d+|N)-([\w+]+)-")
 
     # Iterate over all files in the folder
     for root, _, files in os.walk(folder_path):
@@ -36,7 +52,9 @@ def organize_wav_files(folder_path, output_file):
             match = pattern.search(file)
             if match:
                 pitch, dynamic = match.groups()
+
                 vel = dynamic_map[dynamic] if dynamic in dynamic_map else 64
+                vel = dynamic_to_velocity(dynamic)
                 if pitch != 'N':
                     # Adjust the pitch to an octave higher
                     pitch_letter = pitch[:-1]
