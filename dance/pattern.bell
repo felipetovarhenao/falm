@@ -1,0 +1,24 @@
+$b = importaudio('./layer.wav');
+$maxdur = $b.getkey('duration') / 2;
+$t = 0;
+while $t < $maxdur do (
+    $chord = r2mc(1...32, a2).pcquant(r2pc(1 9/8 4/3 3/2 15/8 6/5));
+    $pat = randpattern(
+        $chord @length random(5, 10) @steps 2 -1 3 -4
+    );
+    $dur = rand(40, 150);
+    $pan = rand();
+    for $mc in $pat do (
+        choose(tri saw cycle)(
+            $mc.mc2f() @duration $dur
+        ).transcribe(
+            $t @gain hanning() * 0.3 @pan $pan
+        );
+        $t += $dur * 0.5
+    );
+    $t += rand(500, 2000) 
+);
+render(
+    @play 1 @process freeverb(@roomsize 0.6) mix($b) normalize(-3) freqshift(-200) 
+);
+ezexport()

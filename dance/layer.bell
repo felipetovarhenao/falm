@@ -1,0 +1,38 @@
+for $mc $mci in r2mc(
+    (1/2 1/4 9/4 4/3 3/2 15/4 16/3 4 6 15/2 9 8/3) :* 2 @mc a2 
+).scramble() do (
+    for $i $ii in (0...9) * 2100 * 3/4 do (
+        $copies = 1;
+        if rand() > 0.9 then ($copies += choose(1 2));
+        $pan = rand();
+        for $c in (1...$copies) - 1 do (
+            $b = pno(
+                @pitch $mc
+                @duration rand(50, 300) 
+                ## @names 'tpt' 'tromb' 'horn' 'tuba' 
+                ## @types 'stacc' 
+                ## @names 'violin' 'cello' 'viola' 'harp' 'guitar' 
+                ## @types 'pizz' 
+                @velocity rand(0, 127) 
+            );
+            $b.transcribe(
+                @onset $i + ($mci - 1 + $c / $copies) * 2100 * (1/16) 
+                @pan $pan
+                @gain [0 0.3 0] [1 0 -0.5] 
+                ## @gain hanning() * 0.2
+                
+            ) 
+        ) 
+    ) 
+);
+$mix = importaudio('./dance.wav');
+render(
+    @play 1 @process freeverb(
+        @wet 0.05
+        @roomsize 0.9
+        @damp 1
+    ) mix($mix) 
+    ## resample(9/8) freqshift(-20) 
+    dynamics() 
+);
+ezexport()
