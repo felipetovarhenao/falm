@@ -280,8 +280,26 @@ sol = (
         ) 
     ) 
 );
+#(
+```bell
+types(
+    @name ## symbol (required)
+)
+```
+
+---
+
+Returns all techniques associated with a given SOL instrument name
+
+---
+
+## Arguments:
+
+- `@name`: SOL instrument name.
+)#
 types = (
     $name -> (
+        BP_FN_CHECK_ARGS('types', 'name', $name);
         SOL_TECHNIQUES.$name
     )
 )"""
@@ -390,8 +408,12 @@ def abbreviate(str: str, hyphen: bool = False):
     return str
 
 
-def define_function(name: str, default_type: str):
+def define_function(name: str, default_type: str, techniques: list[str]):
     global BELL_CODE
+    technique_docs = []
+    for tech in sorted(techniques):
+        technique_docs.append(f"    - `'{tech}'`")
+    technique_docs = "\n".join(technique_docs)
     BELL_CODE += f""";
 #(
 ```bell
@@ -407,6 +429,19 @@ def define_function(name: str, default_type: str):
 ```
 
 SOL-based sampler. Given a SOL keymap `@type`, returns a buffer with a {name} sample that best matches `@pitch` and `@velocity`.
+
+--- 
+
+### Arguments
+
+- `@pitch`: Target pitch. (_default_: `6000`)
+- `@duration`: Target duration. (_default_: `500`)
+- `@velocity`: Target velocity. (_default_: `64`)
+- `@useseed`: Use seeded random selection. (_default_: `1`)
+- `@usecache`: Use buffer pre-loading cache. (_default_: `1`)
+- `@resample`: Resample buffer based on target `@pitch`. (_default_: `1`)
+- `@type`: SOL technique type. (_default_: `'{default_type}'`)
+{technique_docs}
 )#
 {name} = (
     $pitch = 6000,
@@ -474,11 +509,11 @@ for instrument in instrument_dict.keys():
 
     for technique in ['stacc', 'ord', 'pizz']:
         if technique in techniques:
-            define_function(instrument, technique)
+            define_function(instrument, technique, techniques)
             found = True
             break
     if not found:
-        define_function(instrument, techniques[0])
+        define_function(instrument, techniques[0], techniques)
 
 BELL_CODE += ''';
 SOL_TECHNIQUES = (
