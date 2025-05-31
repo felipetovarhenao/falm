@@ -64,10 +64,11 @@ SOL-based sampler. Returns a buffer with a piano sample that best matches `@pitc
 - `@useseed`: Use seeded random selection. (_default_: `1`)
 - `@usecache`: Use buffer pre-loading cache. (_default_: `1`)
 - `@resample`: Resample buffer based on target `@pitch`. (_default_: `1`)
-- `@norm`: SOL technique type. (_default_: 0.3)
+- `@gain`: Pre-gain.
+- `@norm`: SOL technique type. (_default_: 0.707)
 )#
 pno = (
-    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $norm = 0.3 -> (
+    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $gain = 0.25 $norm = 0.707 -> (
         ## -----
         $b = sol(
             @name 'pno' 
@@ -78,7 +79,7 @@ pno = (
             @usecache $usecache
             @resample $resample
             @type 'ord' 
-        ).process(mixdown());
+        ).process(mixdown(@autogain 1) gain($gain));
         $maxabs = $b.getkey('maxabs');
         if $maxabs > $norm then (
             $b = $b.process(normalize(@level $norm @ampunit 0)) 
