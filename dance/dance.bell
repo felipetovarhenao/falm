@@ -62,6 +62,7 @@ for $cell $voice in $cells, $mc in $mcs, $pan in $pans.xscramble() with @unwrap 
                 @types $types
                 @duration $timestep * 2
                 @velocity $vel
+                @useseed 1
             );
             $b.transcribe(
                 @onset $t
