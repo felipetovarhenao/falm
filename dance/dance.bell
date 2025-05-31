@@ -57,7 +57,7 @@ for $cell $voice in $cells, $mc in $mcs, $pan in $pans.xscramble() with @unwrap 
             $names = 'flute' 'sax' 'clar';
             $types = 'keys' 'pizz' 'slap-unpitch';
             $env = [0 1 0] [1 0 -xrand(1/3, 3/4)];
-            if xrand() > 0.25 then (
+            if xrand() > 0.33 then (
                 $vel = 0;
                 if xrand() > 0.5 then (
                     $names = 'harp';
