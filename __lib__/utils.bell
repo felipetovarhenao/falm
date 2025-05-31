@@ -69,7 +69,7 @@ SOL-based sampler. Returns a buffer with a piano sample that best matches `@pitc
 - `@norm`: SOL technique type. (_default_: 0.707)
 )#
 pno = (
-    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $gain = 0.25 $norm = 0.707 -> (
+    $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $gain = 0.25, $norm = 0.707 -> (
         ## -----
         $b = sol(
             @name 'pno' 
@@ -251,7 +251,13 @@ family = (
         $families.$name ||| BP_FN_ERROR('invalid family name:' $name) 
     ) 
 );
-mc2pan = ($mc -> $mc.mc2pc() / 12.);
+mc2pan = (
+    $mc, $spread = 1.0 -> (
+        $pan = mc2pc($mc) / 12.;
+        $pan = ($pan - 0.5) * $spread + 0.5;
+        $pan
+    ) 
+);
 ms2samps = (
     $ms, $sr = 48000 -> int(($ms / 1000.) * $sr) 
 );
