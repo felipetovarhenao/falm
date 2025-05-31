@@ -9,6 +9,25 @@ jispectrum = (
         ) 
     ) 
 );
+#(
+```bell
+pcquant(
+    @mc ## pitch/int/float (required)
+    @pcs 0 4 7
+    @thin 1
+)
+```
+
+Quantizes a _llll_ of MIDIcents to the nearest pitch class in `@pcs`.
+
+---
+
+### Arguments
+
+- `@mc`: _llll_ of MIDIcents to quantize. (_required_)
+- `@pcs`: List of MIDIcents (_default_: `0 4 7`)
+- `@thin`: Remove duplicates after quantization (_default_: `1`)
+)#
 pcquant = (
     $mc, $pcs = 0 4 7, $thin = 1 -> (
         for $x $addr in $mc with @maxdepth -1 @spikemode 1 do ($mc:$addr += pitchdiff($x, $pcs));
@@ -20,6 +39,33 @@ pcquant = (
         $mc
     ) 
 );
+#(
+```bell
+pno(
+    @pitch 6000
+    @duration 500
+    @velocity 64
+    @useseed 1
+    @usecache 1
+    @resample 1
+    @norm 0.5
+)
+```
+
+SOL-based sampler. Returns a buffer with a piano sample that best matches `@pitch` and `@velocity`.
+
+--- 
+
+### Arguments
+
+- `@pitch`: Target pitch. (_default_: `6000`)
+- `@duration`: Target duration. (_default_: `500`)
+- `@velocity`: Target velocity. (_default_: `64`)
+- `@useseed`: Use seeded random selection. (_default_: `1`)
+- `@usecache`: Use buffer pre-loading cache. (_default_: `1`)
+- `@resample`: Resample buffer based on target `@pitch`. (_default_: `1`)
+- `@norm`: SOL technique type. (_default_: 0.5)
+)#
 pno = (
     $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $norm = 0.5 -> (
         ## -----
@@ -40,6 +86,34 @@ pno = (
         $b
     ) 
 );
+#(
+```bell
+maracas(
+    @pitch 6000
+    @duration 500
+    @velocity 64
+    @useseed 1
+    @usecache 1
+    @resample 1
+    @type `'ord'`
+)
+```
+
+SOL-based sampler. Returns a buffer with a maracas sample that best matches `@pitch` and `@velocity`.
+
+--- 
+
+### Arguments
+
+- `@pitch`: Target pitch. (_default_: `6000`)
+- `@duration`: Target duration. (_default_: `500`)
+- `@velocity`: Target velocity. (_default_: `64`)
+- `@useseed`: Use seeded random selection. (_default_: `1`)
+- `@usecache`: Use buffer pre-loading cache. (_default_: `1`)
+- `@resample`: Resample buffer based on target `@pitch`. (_default_: `1`)
+- `@type`: SOL technique type. (_default_: `'ord'`)
+    - `'ord'`
+)#
 maracas = (
     $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 0, $type = 'ord' -> (sol(
         @name 'maracas' 
