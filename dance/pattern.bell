@@ -1,4 +1,4 @@
-setseed(100);
+setseed(1518);
 $b = importaudio('./layer.wav');
 $maxdur = $b.getkey('duration') / 2;
 $t = 0;
@@ -18,17 +18,19 @@ while $t < $maxdur do (
         [hanning()] [[0 1 0] [1 0 -0.5]] [[0 0 0] [1 1 0.25]] 
     )::1;
     for $mc in $pat do (
-        xchoose(tri saw cycle rect phasor)(
+        xchoose(tri saw cycle rect phasor triangle)(
             $mc.mc2f() * choose(-1 1) @duration $dur
         ).process(dcfilter() gain($gain)).transcribe(
-            $t @gain $env @pan $pan
+            @onset $t
+            @gain $env
+            @pan $pan
         );
         $t += $dur * 0.5
     );
-    $wetbpf _= [$t xrand(0.01, 0.2) 0.1];
+    $wetbpf _= [$t xrand(0.05, 0.2) 0.1];
     $t += xrand(500, 2000) 
 );
 render(
-    @play 1 @process freeverb(@roomsize 0.6 @wet $wetbpf) mix($b) normalize(-3) freqshift(-200) 
+    @play 1 @process freeverb(@roomsize 0.6 @wet $wetbpf) mix($b) normalize(-3) freqshift(-250) 
 );
 ezexport()
