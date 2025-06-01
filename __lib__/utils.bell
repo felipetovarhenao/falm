@@ -175,7 +175,7 @@ ezsol(
 Returns a buffer given parametric constraints.
 )#
 ezsol = (
-    $pitch, $names = 'guitar' 'harp', $types = 'ord', $velocity = 64, $duration = 1000, $resample = 1, $useseed = 0 -> (
+    $pitch = 6000, $names = 'guitar' 'harp', $types = 'ord', $velocity = 64, $duration = 1000, $resample = 1, $useseed = 0 -> (
         BP_FN_CHECK_ARGS(
             'ezsol', 'pitch', $pitch, 'names', $names
         );
