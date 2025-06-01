@@ -1,0 +1,35 @@
+$t = 0;
+for $mc in r2mc(1/2 3/4 1 9/8 7/5 3/2 15/8 5/2) do (
+    $t = 0;
+    $pan = rand();
+    for $i in 0...9 do (
+        $b = ezsol(
+            @pitch $mc
+            @names 'flute' 
+            @duration null
+            @types 'air-and-ord' 'air' 'air-to-ord' 'ord-to-air' 
+            @velocity 0
+        );
+        $b = $b.process(
+            multiply(
+                cycle(
+                    for $x in 0...10 collect rand(13) @duration $b.getkey('duration') 
+                ).process(
+                    scaling(
+                        -1, 1, for $y in 0...random(0, 2) collect rand(0.01, 0.5), 1
+                    ) 
+                ) 
+            ) 
+        );
+        $b.transcribe(
+            @onset $t
+            @pan $pan
+            @gain hanning() 
+        );
+        $t += 3000
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) ezverb() 
+);
+ezexport()
