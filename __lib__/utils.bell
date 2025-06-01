@@ -1,3 +1,18 @@
+BP_FN_ON_BEFORE = (
+    -> (
+        BP_FN_SANDBOX_CLEAR();
+        setseed(1);
+        scoreconfig();
+        BP_URN = null;
+        BP_VIEWER_DATA = null;
+        BP_DATABASE_BROWSER = null;
+        BP_DATABASE_TABLES = null;
+        BP_FN_DISPATCH('db', ['erase']);
+        BP_BUFFER_CACHE = null;
+        BP_PLAY_TOGGLE = 0;
+        NORMALIZED_PNO_SAMPLES = null
+    ) 
+);
 jispectrum = (
     $harmonics = 1...32, $ratios = 1 5/4 3/2 5/3, $root = d2 -> (
         $pcs = r2pc($ratios, mc2pc($root));
@@ -39,6 +54,7 @@ pcquant = (
         $mc
     ) 
 );
+NORMALIZED_PNO_SAMPLES = null;
 #(
 ```bell
 pno(
@@ -80,10 +96,19 @@ pno = (
             @usecache $usecache
             @resample $resample
             @type 'ord' 
-        ).process(mixdown(@autogain 1) gain($gain));
+        );
+        $file = $b.getkey('file');
+        $process = mixdown(@autogain 1) gain($gain);
+        if NORMALIZED_PNO_SAMPLES.$file == null then (
+            BP_BUFFER_CACHE.$file = BP_BUFFER_CACHE.$file.process($process);
+            NORMALIZED_PNO_SAMPLES _= [$file 1];
+            $b = $b.process($process) 
+        );
         $maxabs = $b.getkey('maxabs');
         if $maxabs > $norm then (
-            $b = $b.process(normalize(@level $norm @ampunit 0)) 
+            $b = $b.process(
+                normalize(@level $norm @ampunit 0) @keepkeys 'file' 
+            ) 
         );
         $b
     ) 
