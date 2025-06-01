@@ -278,6 +278,26 @@ randomseq = (
         $llll:[$x] 
     ) 
 );
+#(
+```bell
+family(
+    @name ## symbol (required)
+)
+```
+
+Returns a list of SOL names.
+
+---
+
+### Arguments
+
+- `@name`: instrument family name:
+    - `'strings'`
+    - `'woodwinds'`
+    - `'winds'`
+    - `'brass'`
+    - `'plucked'`
+)#
 family = (
     $name -> (
         $families = (

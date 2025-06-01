@@ -411,7 +411,7 @@ def abbreviate(str: str, hyphen: bool = False):
 def define_function(name: str, default_type: str, techniques: list[str]):
     global BELL_CODE
     technique_docs = []
-    for tech in sorted(techniques):
+    for tech in sorted(list(set(techniques))):
         technique_docs.append(f"    - `'{tech}'`")
     technique_docs = "\n".join(technique_docs)
     BELL_CODE += f""";
