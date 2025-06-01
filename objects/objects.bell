@@ -45,13 +45,22 @@ $obj1 = (
     ) 
 );
 $t = 0;
+$wetbpf = [0 0 0];
 for $i in 1...12 do (
     $t += $obj1(
         @t $t @dur rand(900, 3000) 
     );
+    $wetbpf _= [
+        $t rand(0.001, 0.05) rand(0.01, 0.2) * choose(-1 1)
+    ];
     if rand() > 0.75 then ($t += rand(300, 2200) ) 
 );
 render(
-    @play 1 @process ezverb() normalize(-3) 
+    @play 1 @process freeverb(
+        @roomsize 0.8
+        @wet $wetbpf
+        @damp 0.8
+        @width 1
+    ) normalize(-3) 
 );
 ezexport()
