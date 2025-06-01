@@ -320,7 +320,7 @@ WAVESYNTH = (
     ## ----
     $velocity = 64, 
     ## ----
-    $envelope = [0 1 0] [1 0 -0.25], 
+    $envelope = [0 0.33 0] [1 0 -0.25], 
     ## ----
     $phase = 0.25, 
     ## ----
@@ -349,7 +349,7 @@ sinewave(
     @pitch c5
     @duration 1000
     @velocity 64
-    @envelope [0 1 0] [1 0 -0.25]
+    @envelope [0 0.33 0] [1 0 -0.25]
     @phase 0.25
 ) -> llll
 ```
@@ -357,7 +357,7 @@ sinewave(
 Sampler-style wrapper function for `cycle`. 
 )#
 sinewave = (
-    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
     ## -----
     WAVESYNTH(
         @pitch $pitch
@@ -374,7 +374,7 @@ triwave(
     @pitch c5
     @duration 1000
     @velocity 64
-    @envelope [0 1 0] [1 0 -0.25]
+    @envelope [0 0.33 0] [1 0 -0.25]
     @phase 0.25
 ) -> llll
 ```
@@ -382,7 +382,7 @@ triwave(
 Sampler-style wrapper function for `tri`. 
 )#
 triwave = (
-    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
     ## -----
     WAVESYNTH(
         @pitch $pitch
@@ -399,7 +399,7 @@ rectwave(
     @pitch c5
     @duration 1000
     @velocity 64
-    @envelope [0 1 0] [1 0 -0.25]
+    @envelope [0 0.33 0] [1 0 -0.25]
     @phase 0.25
 ) -> llll
 ```
@@ -407,7 +407,7 @@ rectwave(
 Sampler-style wrapper function for `rect`. 
 )#
 rectwave = (
-    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
     ## -----
     WAVESYNTH(
         @pitch $pitch
@@ -424,7 +424,7 @@ sawwave(
     @pitch c5
     @duration 1000
     @velocity 64
-    @envelope [0 1 0] [1 0 -0.25]
+    @envelope [0 0.33 0] [1 0 -0.25]
     @phase 0.25
 ) -> llll
 ```
@@ -432,7 +432,7 @@ sawwave(
 Sampler-style wrapper function for `saw`. 
 )#
 sawwave = (
-    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
     ## -----
     WAVESYNTH(
         @pitch $pitch
