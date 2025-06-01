@@ -1,0 +1,29 @@
+## $chord = r2mc(1...32, 3000).pcquant(r2pc(1 7/5 3/2 5/3 12/7));
+## $seq = randomseq(
+##     $chord @length 30 @steps -1 2
+## );
+## $t = 0;
+## $incrbpf = [0 20 0] [1 300 0.5];
+## for $mc $mci in $seq do (
+##     $nt = scale($mci, 1, length($seq), 0, 1);
+##     $incr = samplebpf($incrbpf, $nt);
+##     pno(
+##         @pitch $mc
+##         @duration $incr * 7
+##         @velocity 127
+##     ).transcribe(
+##         @onset $t
+##         @pan mc2pan($mc, 0.2) 
+##         @gain [0 1 0] [1 0 0.25] 
+##     );
+##     $t += $incr
+## );
+## render(
+##     @play 1 @process ezverb() 
+## )
+$t = 0;
+for $i in r2mc(1...16, 3200) do (
+    choose(pno guitar)($i @type 'ord').transcribe($t);
+    $t += 500
+);
+render(@play 1)

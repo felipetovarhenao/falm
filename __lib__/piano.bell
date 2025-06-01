@@ -21,7 +21,7 @@ for $f in $files do (
         $filename @out 'm' @fetch 3
     );
     $mc = $pitchname + tosymbol($oct);
-    $mc = $portal($mc @out 'm');
+    $mc = pitch($portal($mc @out 'm') + 2400);
     $dyn = $regex3(
         $filename @out 'm' @fetch 3
     );

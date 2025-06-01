@@ -2,7 +2,7 @@ $obj1 = (
     $t = 0, $dur = 1000 -> (
         $onset = 0;
         $minincr = rand(10, 50);
-        $chord = r2mc(1...32, 2100).pcquant(r2pc(1 5/4 3/2 5/3 9/8 7/5));
+        $chord = r2mc(1...32, 3300).pcquant(r2pc(1 5/4 3/2 5/3 9/8 7/5, 9));
         $velbpf = [0 127 0] [1 0 -0.25];
         $incrbpf = [0 $minincr 0] [1 $minincr * 4 -0.25];
         $legatobpf = [0 2 0] [1 0.125 -0.25];
