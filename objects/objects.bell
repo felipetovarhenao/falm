@@ -1,8 +1,9 @@
+BaseChord = r2mc(1...64, 2100).pcquant(r2pc(1 5/4 3/2 5/3 9/8 7/5, 9));
 $obj1 = (
     $t = 0, $dur = 1000 -> (
         $onset = 0;
         $minincr = rand(10, 50);
-        $chord = r2mc(1...32, 3300).pcquant(r2pc(1 5/4 3/2 5/3 9/8 7/5, 9));
+        $chord = BaseChord;
         $velbpf = [0 127 0] [1 0 -0.25];
         $incrbpf = [0 $minincr 0] [1 $minincr * 4 -0.25];
         $legatobpf = [0 2 0] [1 0.125 -0.25];
@@ -17,7 +18,12 @@ $obj1 = (
             $incr = samplebpf($incrbpf, $nt);
             $legato = samplebpf($legatobpf, $nt);
             $mc = choose($chord);
+            $type = 'ord';
             $fn = choose(pno harp guitar sinewave @weights 4 3 2 1);
+            if $fn.intersection(harp guitar) != null then (
+                $type _= 'harm';
+                $type = choose($type) 
+            );
             if $fn == sinewave then ($mc += random(-1, 2) * 1200);
             $gain = [0 scale($vel, 0, 127, 0.25, 1) 0] [1 0 -rand(1/2, 3/4)];
             $fn(
@@ -25,10 +31,13 @@ $obj1 = (
                 @duration $dur * $legato
                 @velocity $vel
                 @envelope $gain.bpf(@yfunc $y ->$y * 0.2) 
+                @type $type
             ).transcribe(
                 @onset $onset + $t
                 @gain $gain
-                @pan $mc.mc2pan(0.5) 
+                @pan (
+                    $mc + (0 rand(-100, 100)) 
+                ).mc2pan(0.5) 
             );
             $onset += $incr
         );
