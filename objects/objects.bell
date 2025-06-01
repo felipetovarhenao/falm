@@ -1,0 +1,44 @@
+$obj1 = (
+    $t = 0, $dur = 1000 -> (
+        $onset = 0;
+        $minincr = rand(10, 50);
+        $chord = r2mc(1...32, 2100).pcquant(r2pc(1 5/4 3/2 5/3 9/8 7/5));
+        $velbpf = [0 127 0] [1 0 -0.25];
+        $incrbpf = [0 $minincr 0] [1 $minincr * 4 -0.25];
+        $legatobpf = [0 2 0] [1 0.125 -0.25];
+        if rand() > 0.5 then (
+            $incrbpf = revbpf($incrbpf);
+            $velbpf = revbpf($velbpf);
+            $legatobpf = revbpf($legatobpf) 
+        );
+        while $onset < $dur do (
+            $nt = $onset / $dur;
+            $vel = samplebpf($velbpf, $nt);
+            $incr = samplebpf($incrbpf, $nt);
+            $legato = samplebpf($legatobpf, $nt);
+            $mc = choose($chord);
+            choose(harp pno guitar)(
+                @pitch $mc
+                @duration $dur * $legato
+                @velocity $vel
+            ).transcribe(
+                @onset $onset + $t
+                @gain [0 scale($vel, 0, 127, 0.25, 1) 0] [1 0 -rand(1/2, 3/4)] 
+                @pan $mc.mc2pan(0.5) 
+            );
+            $onset += $incr
+        );
+        $dur
+    ) 
+);
+$t = 0;
+for $i in 1...12 do (
+    $t += $obj1(
+        @t $t @dur rand(900, 3000) 
+    );
+    if rand() > 0.75 then ($t += rand(300, 2200) ) 
+);
+render(
+    @play 1 @process ezverb() 
+);
+ezexport()
