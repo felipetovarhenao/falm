@@ -17,7 +17,7 @@ $obj1 = (
             $incr = samplebpf($incrbpf, $nt);
             $legato = samplebpf($legatobpf, $nt);
             $mc = choose($chord);
-            $fn = choose(harp pno guitar sinewave);
+            $fn = choose(pno harp guitar sinewave @weights 4 3 2 1);
             if $fn == sinewave then ($mc += random(-1, 2) * 1200);
             $gain = [0 scale($vel, 0, 127, 0.25, 1) 0] [1 0 -rand(1/2, 3/4)];
             $fn(
