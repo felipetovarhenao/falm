@@ -312,4 +312,134 @@ float2rat = (
             ) @maxdepth -1
         ) 
     ) 
+);
+WAVESYNTH = (
+    $pitch = c5, 
+    ## ----
+    $duration = 1000, 
+    ## ----
+    $velocity = 64, 
+    ## ----
+    $envelope = [0 1 0] [1 0 -0.25], 
+    ## ----
+    $phase = 0.25, 
+    ## ----
+    $fn = 'cycle' -> (
+        $map = ['cycle' cycle] ['tri' tri] ['rect' rect] ['saw' saw];
+        $wave = $map.$fn;
+        $b = $wave(
+            @frequency mc2f($pitch) 
+            @duration $duration
+            @phase $phase
+            @duty $phase
+        );
+        $envelope &&& (
+            $b = $b.process(
+                gain(
+                    bpf($envelope @yfunc $y -^ $velocity -> $y * ($velocity / 127.)) 
+                ) 
+            ) 
+        );
+        $b
+    ) 
+);
+#(
+```bell
+sinewave(
+    @pitch c5
+    @duration 1000
+    @velocity 64
+    @envelope [0 1 0] [1 0 -0.25]
+    @phase 0.25
+) -> llll
+```
+
+Sampler-style wrapper function for `cycle`. 
+)#
+sinewave = (
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    ## -----
+    WAVESYNTH(
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @envelope $envelope
+        @phase $phase
+        @fn 'cycle' 
+    )) 
+);
+#(
+```bell
+triwave(
+    @pitch c5
+    @duration 1000
+    @velocity 64
+    @envelope [0 1 0] [1 0 -0.25]
+    @phase 0.25
+) -> llll
+```
+
+Sampler-style wrapper function for `tri`. 
+)#
+triwave = (
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    ## -----
+    WAVESYNTH(
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @envelope $envelope
+        @phase $phase
+        @fn 'tri' 
+    )) 
+);
+#(
+```bell
+rectwave(
+    @pitch c5
+    @duration 1000
+    @velocity 64
+    @envelope [0 1 0] [1 0 -0.25]
+    @phase 0.25
+) -> llll
+```
+
+Sampler-style wrapper function for `rect`. 
+)#
+rectwave = (
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    ## -----
+    WAVESYNTH(
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @envelope $envelope
+        @phase $phase
+        @fn 'rect' 
+    )) 
+);
+#(
+```bell
+sawwave(
+    @pitch c5
+    @duration 1000
+    @velocity 64
+    @envelope [0 1 0] [1 0 -0.25]
+    @phase 0.25
+) -> llll
+```
+
+Sampler-style wrapper function for `saw`. 
+)#
+sawwave = (
+    $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 1 0] [1 0 -0.25], $phase = 0.25 -> ( 
+    ## -----
+    WAVESYNTH(
+        @pitch $pitch
+        @duration $duration
+        @velocity $velocity
+        @envelope $envelope
+        @phase $phase
+        @fn 'saw' 
+    )) 
 )
