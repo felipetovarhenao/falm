@@ -8,7 +8,7 @@ $obj1 = (
             $t = samplebpf($onsetbpf, $nt);
             $t
         );
-        $chord = r2mc(1...32, 5500).pcquant(r2pc(1 5/4 9/8 15/8));
+        $chord = pcquant(r2mc(1...32, 5500), r2pc(1 5/4 9/8 15/8 3/2));
         $durs = x2dx($onsets);
         $legato = 1.5;
         $dur *= $legato;
@@ -17,13 +17,28 @@ $obj1 = (
         )::1;
         for $t in $onsets, $dur in $durs do (
             $mc = choose($chord);
-            ezsol(
-                @pitch $mc
-                @names 'violin' 'viola' 'cello' 
-                @types 'ord' 
-                @velocity 128
-                @duration $dur + $offset
-            ).setkey('offset', $offset).setkey('duration', $dur).transcribe(
+            if rand() > 0.25 then (
+                $b = setkey(
+                    setkey(
+                        ezsol(
+                            @pitch $mc
+                            @names 'violin' 'viola' 'cello' 
+                            @types 'ord' 
+                            @velocity 128
+                            @duration $dur + $offset
+                        ), 'offset', $offset
+                    ), 'duration', $dur
+                ) 
+            ) else (
+                $b = sinewave(
+                    @pitch $mc
+                    @velocity rand(30, 80) 
+                    @duration $dur
+                    @envelope [0 0.125 0] 
+                ) 
+            );
+            transcribe(
+                @buffer $b
                 @onset $onset + $t
                 @gain $env
                 @pan mc2pan($mc, 0.5) 
@@ -31,10 +46,39 @@ $obj1 = (
         ) 
     ) 
 );
+$obj2 = (
+    $onset = 0, $duration = 1000 -> (
+        ## $type = choose('ord-to-crushed' 'crushed-to-ord');
+        ## $name = choose(
+        ##     'violin' 'viola' 'cello' 
+        ## );
+        ## $b = importaudio(
+        ##     choose(samples($name, $type)) 
+        ## );
+        $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2));
+        $offset = rand(100, 300);
+        $mc = choose($chord);
+        $b = ezsol(
+            @pitch $mc
+            @names 'violin' 'viola' 'cello' 
+            @types 'crushed-to-ord' 
+            @duration $duration + $offset
+        );
+        $b = setkey($b, 'offset', $offset);
+        $b = setkey($b, 'duration', $duration);
+        transcribe(
+            @buffer $b
+            @onset $onset
+            @gain [0 0 0] [1 1 rand(1/3, 3/4)] 
+            @pan mc2pan($mc) 
+        ) 
+    ) 
+);
 $onset = 0;
 for $i in 1...20 do (
     $dur = rand(300, 900);
-    $obj1(@onset $onset @duration $dur);
+    $obj = choose($obj1 $obj2 @weights 3 2);
+    $obj(@onset $onset @duration $dur);
     $onset += $dur
 );
 render(
