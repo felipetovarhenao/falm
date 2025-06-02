@@ -7,17 +7,18 @@ $dur = 100;
 for $dyad in group($seq, 2, 1) :* 4 with @unwrap 1 do (
     $mc1 = $dyad:1;
     $mc2 = $dyad:2;
-    flute(
+    ezsol(
         @pitch $mc1
         @duration $dur + 25
-        @type 'ord' 
+        @types ('ord' 'ord-micro') 
+        @names 'flute' 'clar' 'sax' 
         @velocity 50
     ).process(
         resample(
             [0 1 0] [1 1/c2r($mc2 - $mc1) rand(0.7, 0.9)] 
         ) 
     ).transcribe(
-        @onset $t @pan mc2pan($mc1 $mc2, 0.125) 
+        @onset $t @pan mc2pan($mc1 $mc2, 0.15) 
     );
     $t += $dur
 );
