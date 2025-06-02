@@ -104,16 +104,70 @@ $obj3 = (
     ) 
 );
 $obj4 = (-> null);
+$obj5 = (
+    $onset = 0, $duration = 1000 -> (
+        $pc = 0;
+        $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2, $pc));
+        $chord = $chord.scramble().left(10).sort();
+        $reps = random(2, 7);
+        $process = fade(2, 2) repeat($reps);
+        if rand() > 0.5 then (
+            $env = choose(
+                ## -----
+                [[0 0 0] [1 1 0.5]] 
+                ## -----
+                [[0 1 0] [1 0 -0.5]] 
+                ## -----
+                [hanning()] 
+            )::1;
+            $process !_= gain($env) 
+        );
+        $dur = $duration / $reps;
+        for $mc in $chord do (
+            $vel = rand(127);
+            $pan = abs(mc2pan($mc) - (1 0));
+            ezsol(
+                @pitch $mc
+                @names 'violin' 'viola' 'cello' 
+                @types 'nonvib' 
+                @duration $dur
+                @velocity $vel
+            ).process($process).transcribe(
+                @onset $onset @pan $pan
+            ) 
+        ) 
+    ) 
+);
+$obj6 = (
+    $onset = 0, $duration = 1000 -> (
+        $name = choose(
+            'violin' 'viola' 'cello' 'bass' 
+        );
+        $type = 'nat-harm-gliss';
+        $file = choose(samples(@name $name @type $type));
+        $b = importaudio($file).analyze(effectiveduration(@thresholdratio 0.001));
+        $b = $b.setkey('duration', $b.getkey('effectiveduration'));
+        $b = $b.process(resample(@duration $duration @timeunit 0));
+        $b.transcribe(
+            @onset $onset @pan abs(rand() - 0.5) * 0.2
+        ) 
+    ) 
+);
 $onset = 0;
-$bardur = 2000.;
+$bardur = 2250.;
 $durs = $bardur * (1/8 3/16 5/16 1/4 3/8 7/16 1/2);
 for $i in 1...50 do (
     $dur = choose($durs);
-    $obj = choose(@choices $obj1 $obj2 $obj3 $obj4 @weights 3 2 2 1);
+    $obj = choose(@choices $obj1 $obj2 $obj3 $obj4 $obj5 $obj6 @weights 3 2 2 1 1 0.5);
     $obj(@onset $onset @duration $dur);
     $onset += $dur
 );
 render(
-    @play 1 @process ezverb() normalize(-3) 
+    @play 1 @process dynamics(@knee 0.1 @ratio 3) freeverb(
+        @roomsize 0.6
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
 );
 ezexport()
