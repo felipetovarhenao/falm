@@ -163,7 +163,12 @@ for $i in 1...50 do (
     $onset += $dur
 );
 render(
-    @play 1 @process dynamics(@knee 0.1 @ratio 3) freeverb(
+    @play 1 @process dynamics(
+        @knee 0.1
+        @ratio 3
+        @thresh -30
+        @release 200
+    ) normalize(-3) freeverb(
         @roomsize 0.6
         @wet 0.0125
         @damp 1
