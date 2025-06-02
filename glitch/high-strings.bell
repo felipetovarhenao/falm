@@ -1,0 +1,43 @@
+$obj1 = (
+    $onset = 0, $duration = 500 -> (
+        $offset = 500;
+        $numnotes = random(5, 10);
+        $onsetbpf = [0 0 0] [1 $duration 0.25];
+        $onsets = for $n in 0...$numnotes collect (
+            $nt = $n / $numnotes;
+            $t = samplebpf($onsetbpf, $nt);
+            $t
+        );
+        $chord = r2mc(1...32, 5500).pcquant(r2pc(1 5/4 9/8 15/8));
+        $durs = x2dx($onsets);
+        $legato = 1.5;
+        $dur *= $legato;
+        $env = choose(
+            [hanning()] [[0 1 0] [1 0 -0.25]] [[0 0 0] [1 1 0.25]] 
+        )::1;
+        for $t in $onsets, $dur in $durs do (
+            $mc = choose($chord);
+            ezsol(
+                @pitch $mc
+                @names 'violin' 'viola' 'cello' 
+                @types 'ord' 
+                @velocity 128
+                @duration $dur + $offset
+            ).setkey('offset', $offset).setkey('duration', $dur).transcribe(
+                @onset $onset + $t
+                @gain $env
+                @pan mc2pan($mc, 0.5) 
+            ) 
+        ) 
+    ) 
+);
+$onset = 0;
+for $i in 1...20 do (
+    $dur = rand(300, 900);
+    $obj1(@onset $onset @duration $dur);
+    $onset += $dur
+);
+render(
+    @play 1 @process ezverb() 
+);
+ezexport()
