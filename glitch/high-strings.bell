@@ -1,7 +1,8 @@
+setseed(2);
 FastArpeggio = (
     $onset = 0, $duration = 500 -> (
         $offset = 500;
-        $numnotes = random(5, 10);
+        $numnotes = xrandom(5, 10);
         $onsetbpf = [0 0 0] [1 $duration 0.25];
         $onsets = for $n in 0...$numnotes collect (
             $nt = $n / $numnotes;
@@ -12,12 +13,12 @@ FastArpeggio = (
         $durs = x2dx($onsets);
         $legato = 1.5;
         $dur *= $legato;
-        $env = choose(
+        $env = xchoose(
             [hanning()] [[0 1 0] [1 0 -0.25]] [[0 0 0] [1 1 0.25]] 
         )::1;
         for $t in $onsets, $dur in $durs do (
-            $mc = choose($chord);
-            if rand() > 0.25 then (
+            $mc = xchoose($chord);
+            if xrand() > 0.25 then (
                 $b = setkey(
                     setkey(
                         ezsol(
@@ -32,7 +33,7 @@ FastArpeggio = (
             ) else (
                 $b = sinewave(
                     @pitch $mc
-                    @velocity rand(30, 80) 
+                    @velocity xrand(30, 80) 
                     @duration $dur
                     @envelope [0 0.125 0] 
                 ) 
@@ -46,26 +47,26 @@ FastArpeggio = (
         );
         $bassfq = mc2f(
             (
-                mc2pc(choose($chord)) + 36
+                mc2pc(xchoose($chord)) + 36
             ) * 100
         );
         $b = cycle(
             @frequency $bassfq
-            @duration $duration * exp2(rand(-2, 0)) 
-            @phase rand() 
+            @duration $duration * exp2(xrand(-2, 0)) 
+            @phase xrand() 
         );
         transcribe(
             @buffer $b
             @onset $onset
-            @gain [0 rand(0.05, 0.125) 0] [1 0 -rand(1/3, 3/4)] 
+            @gain [0 xrand(0.05, 0.125) 0] [1 0 -xrand(1/3, 3/4)] 
         ) 
     ) 
 );
 CrushedCresc = (
     $onset = 0, $duration = 1000 -> (
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2));
-        $offset = rand(100, 300);
-        $mc = choose($chord);
+        $offset = xrand(100, 300);
+        $mc = xchoose($chord);
         $b = ezsol(
             @pitch $mc
             @names 'violin' 'viola' 'cello' 
@@ -74,9 +75,9 @@ CrushedCresc = (
         );
         $b = setkey($b, 'offset', $offset);
         $b = setkey($b, 'duration', $duration);
-        $env = [0 0 0] [1 1 rand(1/3, 3/4)];
+        $env = [0 0 0] [1 1 xrand(1/3, 3/4)];
         $b = process(
-            @buffer $b @operations gain($env) normalize(rand(-12, -8)) 
+            @buffer $b @operations gain($env) normalize(xrand(-12, -8)) 
         );
         $pan = mc2pan($mc, 0.707);
         transcribe(
@@ -84,12 +85,12 @@ CrushedCresc = (
             @onset $onset
             @pan $pan
         );
-        $mc = $mc - random(-1, 3) * 1200 ;
+        $mc = $mc - xrandom(-1, 3) * 1200 ;
         transcribe(
             @buffer sinewave(
                 @pitch $mc
-                @duration $duration * exp2(rand(-2, 0)) 
-                @velocity rand(0.1, 1) * 50
+                @duration $duration * exp2(xrand(-2, 0)) 
+                @velocity xrand(0.1, 1) * 50
             ) 
             @onset $onset + $duration
             @pan 1 - $pan
@@ -98,7 +99,7 @@ CrushedCresc = (
         $b = cycle(
             @frequency $fq
             @duration $duration
-            @phase rand() 
+            @phase xrand() 
         );
         transcribe(
             @buffer $b
@@ -110,16 +111,16 @@ CrushedCresc = (
 );
 Strum = (
     $onset = 0, $duration = 1000 -> (
-        $pc = choose(r2pc(1 4/3 3/2));
+        $pc = xchoose(r2pc(1 4/3 3/2));
         $chord = pcquant(r2mc(1...32, 5500 - 2400), r2pc(1 5/4 9/8 15/8 3/2, $pc));
-        $chord = $chord.scramble().left(10).sort();
+        $chord = $chord.xscramble().left(10).sort();
         $t = 0;
         for $mc in $chord do (
             ezsol(
                 @pitch $mc
                 @types 'stacc' 'pizz' 'pizz-secco' 
                 @names 'violin' 'viola' 'cello' 'bass' 
-                @velocity rand(127) 
+                @velocity xrand(127) 
                 @duration $duration * 3
             ).transcribe(
                 @onset $onset + $t
@@ -135,11 +136,11 @@ SustainedChord = (
     $onset = 0, $duration = 1000 -> (
         $pc = 0;
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2, $pc));
-        $chord = $chord.scramble().left(10).sort();
-        $reps = random(2, 7);
+        $chord = $chord.xscramble().left(10).sort();
+        $reps = xrandom(2, 7);
         $process = fade(2, 2) repeat($reps);
-        if rand() > 0.5 then (
-            $env = choose(
+        if xrand() > 0.5 then (
+            $env = xchoose(
                 ## -----
                 [[0 0 0] [1 1 0.5]] 
                 ## -----
@@ -151,7 +152,7 @@ SustainedChord = (
         );
         $dur = $duration / $reps;
         for $mc in $chord do (
-            $vel = rand(127);
+            $vel = xrand(127);
             $pan = abs(mc2pan($mc) - (1 0));
             ezsol(
                 @pitch $mc
@@ -167,16 +168,16 @@ SustainedChord = (
 );
 HarmGliss = (
     $onset = 0, $duration = 1000 -> (
-        $name = choose(
+        $name = xchoose(
             'violin' 'viola' 'cello' 'bass' 
         );
         $type = 'nat-harm-gliss';
-        $file = choose(samples(@name $name @type $type));
+        $file = xchoose(samples(@name $name @type $type));
         $b = importaudio($file).analyze(effectiveduration(@thresholdratio 0.001));
         $b = $b.setkey('duration', $b.getkey('effectiveduration'));
         $b = $b.process(gain(1.414) resample(@duration $duration @timeunit 0));
         $b.transcribe(
-            @onset $onset @pan abs(rand() - 0.5) * 0.2
+            @onset $onset @pan abs(xrand() - 0.5) * 0.2
         ) 
     ) 
 );
@@ -184,22 +185,22 @@ SynthChord = (
     $onset = 0, $duration = 1000 -> (
         $pc = 0;
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2, $pc));
-        $chord = $chord.scramble().left(5).sort();
+        $chord = $chord.xscramble().left(5).sort();
         for $mc in $chord do (
-            $wave = choose(sinewave triwave rectwave sawwave);
+            $wave = xchoose(sinewave triwave rectwave sawwave);
             $b = $wave(
                 @pitch $mc + 2400
                 @duration $duration
-                @velocity rand(2, 30) 
+                @velocity xrand(2, 30) 
                 @envelope [0 0.5 0] 
             );
-            $env = [0 0 0] [1 1 rand(1/3, 3/4)];
-            if rand() > 0.5 then ($env = revbpf($env));
-            for $v in 1...random(1, 4) do (
+            $env = [0 0 0] [1 1 xrand(1/3, 3/4)];
+            if xrand() > 0.5 then ($env = revbpf($env));
+            for $v in 1...xrandom(1, 4) do (
                 $b.transcribe(
                     @onset $onset
                     @pan mc2pan($mc) 
-                    @detune rand(0, -5) 
+                    @detune xrand(0, -5) 
                     @gain $env
                 ) 
             ) 
@@ -226,8 +227,8 @@ $objects = (
     SynthChord
 );
 for $i in 1...50 do (
-    $dur = choose($durs);
-    $obj = choose(
+    $dur = xchoose($durs);
+    $obj = xchoose(
         @choices $objects @weights rev(1...7) 
     );
     $obj(@onset $onset @duration $dur);
@@ -236,7 +237,7 @@ for $i in 1...50 do (
 render(
     @play 1 @process dynamics(
         @knee 0.1
-        @ratio 3
+        @ratio 5
         @thresh -30
         @release 200
     ) normalize(-3) freeverb(
