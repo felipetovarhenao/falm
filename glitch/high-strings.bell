@@ -48,13 +48,6 @@ $obj1 = (
 );
 $obj2 = (
     $onset = 0, $duration = 1000 -> (
-        ## $type = choose('ord-to-crushed' 'crushed-to-ord');
-        ## $name = choose(
-        ##     'violin' 'viola' 'cello' 
-        ## );
-        ## $b = importaudio(
-        ##     choose(samples($name, $type)) 
-        ## );
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2));
         $offset = rand(100, 300);
         $mc = choose($chord);
@@ -66,22 +59,61 @@ $obj2 = (
         );
         $b = setkey($b, 'offset', $offset);
         $b = setkey($b, 'duration', $duration);
+        $b = process(
+            @buffer $b @operations gain(
+                [0 0 0] [1 1 rand(1/3, 3/4)] 
+            ) normalize(rand(-12, -8)) 
+        );
+        $pan = mc2pan($mc, 0.707);
         transcribe(
             @buffer $b
             @onset $onset
-            @gain [0 0 0] [1 1 rand(1/3, 3/4)] 
-            @pan mc2pan($mc) 
+            @pan $pan
+        );
+        transcribe(
+            @buffer sinewave(
+                @pitch $mc - random(-1, 2) * 1200
+                @duration $duration
+                @velocity rand(0.1, 1) * 50
+            ) 
+            @onset $onset + $duration
+            @pan 1 - $pan
         ) 
     ) 
 );
+$obj3 = (
+    $onset = 0, $duration = 1000 -> (
+        $pc = choose(r2pc(1 4/3 3/2));
+        $chord = pcquant(r2mc(1...32, 5500 - 2400), r2pc(1 5/4 9/8 15/8 3/2, $pc));
+        $chord = $chord.scramble().left(10).sort();
+        $t = 0;
+        for $mc in $chord do (
+            ezsol(
+                @pitch $mc
+                @types 'stacc' 'pizz' 'pizz-secco' 
+                @names 'violin' 'viola' 'cello' 'bass' 
+                @velocity rand(127) 
+                @duration $duration * 3
+            ).transcribe(
+                @onset $onset + $t
+                @pan mc2pan($mc, 0.25) 
+                @gain [0 1 0] [1 0 0.25] 
+            );
+            $t += 5
+        ) 
+    ) 
+);
+$obj4 = (-> null);
 $onset = 0;
-for $i in 1...20 do (
-    $dur = rand(300, 900);
-    $obj = choose($obj1 $obj2 @weights 3 2);
+$bardur = 2000.;
+$durs = $bardur * (1/8 3/16 5/16 1/4 3/8 7/16 1/2);
+for $i in 1...50 do (
+    $dur = choose($durs);
+    $obj = choose(@choices $obj1 $obj2 $obj3 $obj4 @weights 3 2 2 1);
     $obj(@onset $onset @duration $dur);
     $onset += $dur
 );
 render(
-    @play 1 @process ezverb() 
+    @play 1 @process ezverb() normalize(-3) 
 );
 ezexport()
