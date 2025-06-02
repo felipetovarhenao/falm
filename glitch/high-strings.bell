@@ -1,4 +1,4 @@
-$obj1 = (
+FastArpeggio = (
     $onset = 0, $duration = 500 -> (
         $offset = 500;
         $numnotes = random(5, 10);
@@ -43,10 +43,25 @@ $obj1 = (
                 @gain $env
                 @pan mc2pan($mc, 0.5) 
             ) 
+        );
+        $bassfq = mc2f(
+            (
+                mc2pc(choose($chord)) + 36
+            ) * 100
+        );
+        $b = cycle(
+            @frequency $bassfq
+            @duration $duration * exp2(rand(-2, 0)) 
+            @phase rand() 
+        );
+        transcribe(
+            @buffer $b
+            @onset $onset
+            @gain [0 rand(0.05, 0.125) 0] [1 0 -rand(1/3, 3/4)] 
         ) 
     ) 
 );
-$obj2 = (
+CrushedCresc = (
     $onset = 0, $duration = 1000 -> (
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2));
         $offset = rand(100, 300);
@@ -59,10 +74,9 @@ $obj2 = (
         );
         $b = setkey($b, 'offset', $offset);
         $b = setkey($b, 'duration', $duration);
+        $env = [0 0 0] [1 1 rand(1/3, 3/4)];
         $b = process(
-            @buffer $b @operations gain(
-                [0 0 0] [1 1 rand(1/3, 3/4)] 
-            ) normalize(rand(-12, -8)) 
+            @buffer $b @operations gain($env) normalize(rand(-12, -8)) 
         );
         $pan = mc2pan($mc, 0.707);
         transcribe(
@@ -70,18 +84,31 @@ $obj2 = (
             @onset $onset
             @pan $pan
         );
+        $mc = $mc - random(-1, 3) * 1200 ;
         transcribe(
             @buffer sinewave(
-                @pitch $mc - random(-1, 2) * 1200
-                @duration $duration
+                @pitch $mc
+                @duration $duration * exp2(rand(-2, 0)) 
                 @velocity rand(0.1, 1) * 50
             ) 
             @onset $onset + $duration
             @pan 1 - $pan
+        );
+        $fq = mc2f($mc) * 0.25;
+        $b = cycle(
+            @frequency $fq
+            @duration $duration
+            @phase rand() 
+        );
+        transcribe(
+            @buffer $b
+            @onset $onset
+            @pan mc2pan($mc) 
+            @gain bpf($env @yfunc $y -> $y * 0.125) 
         ) 
     ) 
 );
-$obj3 = (
+Strum = (
     $onset = 0, $duration = 1000 -> (
         $pc = choose(r2pc(1 4/3 3/2));
         $chord = pcquant(r2mc(1...32, 5500 - 2400), r2pc(1 5/4 9/8 15/8 3/2, $pc));
@@ -103,8 +130,8 @@ $obj3 = (
         ) 
     ) 
 );
-$obj4 = (-> null);
-$obj5 = (
+Rest = (-> null);
+SustainedChord = (
     $onset = 0, $duration = 1000 -> (
         $pc = 0;
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2, $pc));
@@ -138,7 +165,7 @@ $obj5 = (
         ) 
     ) 
 );
-$obj6 = (
+HarmGliss = (
     $onset = 0, $duration = 1000 -> (
         $name = choose(
             'violin' 'viola' 'cello' 'bass' 
@@ -153,7 +180,7 @@ $obj6 = (
         ) 
     ) 
 );
-$obj7 = (
+SynthChord = (
     $onset = 0, $duration = 1000 -> (
         $pc = 0;
         $chord = pcquant(r2mc(1...32, 5500 - 1200), r2pc(1 5/4 9/8 15/8 3/2, $pc));
@@ -180,9 +207,24 @@ $obj7 = (
     ) 
 );
 $onset = 0;
-$bardur = 2250.;
-$durs = $bardur * (1/8 3/16 5/16 1/4 3/8 7/16 1/2);
-$objects = $obj1 $obj2 $obj3 $obj4 $obj5 $obj6 $obj7;
+$bardur = 2150.;
+$durs = $bardur * thin(1/8 3/16 5/16 1/4 3/8 7/16 1/2 5/8);
+$objects = (
+    ## ----
+    FastArpeggio
+    ## ----
+    CrushedCresc
+    ## ----
+    Strum
+    ## ----
+    Rest
+    ## ----
+    SustainedChord
+    ## ----
+    HarmGliss
+    ## ----
+    SynthChord
+);
 for $i in 1...50 do (
     $dur = choose($durs);
     $obj = choose(
