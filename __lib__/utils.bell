@@ -223,8 +223,17 @@ ezsol = (
         $b
     ) 
 );
+#(
+```bell
+ezexport(
+    @data null
+)
+```
+
+Simplified exporting utility for solo album
+)#
 ezexport = (
-    $data -> (
+    $data = null -> (
         $filename = thispath(1).getkey('name');
         export('./' + $filename + '.wav');
         $data &&& write(

@@ -1,4 +1,4 @@
-setseed(20);
+setseed(21);
 FastArpeggio = (
     $onset = 0, $duration = 500 -> (
         $offset = 500;
@@ -218,7 +218,18 @@ SynthChord = (
 );
 $onset = 0;
 $bardur = 2150.;
-$durs = $bardur * thin(1/8 3/16 5/16 1/4 3/8 7/16 1/2 5/8);
+$units = sort(thin(1/8 3/16 5/16 1/4 3/8 7/16 1/2 5/8));
+$unitranks = (
+    for $u in $units collect (
+        $x = log2($u);
+        $rank = 0.5 - abs(
+            (abs($x) % 1.) - 0.5
+        );
+        $rank
+    ) 
+);
+$unitorder = argsort($unitranks);
+$units = $units:[$unitorder];
 $objects = (
     ## ----
     FastArpeggio
@@ -235,13 +246,34 @@ $objects = (
     ## ----
     SynthChord
 );
-for $i in 1...50 do (
-    $dur = xchoose($durs);
-    $obj = xchoose(
-        @choices $objects @weights rev(1...7) 
+$numsections = 8;
+$sectionsizebpf = [0 20 0] [1 10 -0.25];
+$numdursbpf = [0 length($units) 0] [1 1 -0.5];
+$numvoicesbpf = [0 1 0] [1 5 -0.125];
+for $section $id in 1...$numsections do (
+    $nt = scale($id, 1, $numsections, 0, 1);
+    $numdurs = int(
+        round(samplebpf($numdursbpf, $nt)) 
     );
-    $obj(@onset $onset @duration $dur);
-    $onset += $dur
+    $numvoices = int(
+        round(samplebpf($numvoicesbpf, $nt)) 
+    );
+    $sectionsize = int(
+        round(samplebpf($sectionsizebpf, $nt)) 
+    );
+    $durs = left($bardur * $units, round($numdurs));
+    addmarker($onset @names $id);
+    for $i in 1...$sectionsize do (
+        $dur = xchoose($durs);
+        for $v in 1...$numvoices do (
+            $obj = xchoose(
+                @choices $objects @weights rev(1...7) 
+            );
+            $obj(@onset $onset @duration $dur) 
+        );
+        $onset += $dur
+    );
+    $onset += maximum($durs) 
 );
 render(
     @play 1 @process dynamics(
@@ -251,7 +283,7 @@ render(
         @release 200
     ) normalize(-3) freeverb(
         @roomsize 0.6
-        @wet 0.0125
+        @wet [0 0.05 0] [1 0.0125 -0.125] 
         @damp 1
         @width 1
     ) normalize(-3) 
