@@ -1,19 +1,22 @@
-setseed(0);
+setseed(140);
 $events = null;
 $onsets = null;
-$N = 2;
+$N = 3;
+$M = 32;
 $unit = 130;
-for $mc $m in r2mc(($N...32) / $N, f2).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, 5)).rev() do (
+$numattacks = ($M - $N + 1);
+$numattacks = 14;
+for $mc $m in r2mc(($N...$M) / $N, b2).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, 6)).rev() do (
     $dur = $unit * 4;
     $b = ezsol(
-        @names 'sax' 'bassoon' 
+        @names 'sax' 
         @pitch $mc
         @duration $dur
         @velocity 127
-        @types 'stacc' 'slap-pitch' 'sfz' 'pizz' 'pizz-secco' 'keys' 
+        @types 'stacc' 'slap-pitch' 'sfz' 'pizz' 'pizz-secco' 'keys' (if xrand() > 0.3 then 'slap-unpitch') (if xrand() > 0.3 then 'exp-slap-pitch') 
         @useseed 1
-    );
-    for $i in (0...7) do (
+    ).process(normalize(-7));
+    for $i in 0...$numattacks do (
         $onset = $i * $unit * $m;
         $onsets _= $onset;
         $buffer = if xrand() > 0.1 then $b.setkey('duration', xrand(100, $dur)) else (
@@ -25,7 +28,7 @@ for $mc $m in r2mc(($N...32) / $N, f2).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, 
             ) 
         );
         $events _= [
-            [ 'buffer' $buffer] ['onset' $onset] ['pan' mc2pan($mc, 0.4) ] [
+            [ 'buffer' $buffer] ['onset' $onset] ['pan' mc2pan($mc, 0.2) ] [
                 'gain' [0 1 0] [1 0 xrand(-1/3, 1/3)] 
             ] 
         ] 
@@ -47,7 +50,7 @@ render(
         @release 500
     ) normalize(-3) freeverb(
         @roomsize 0.75
-        @wet 0.0125
+        @wet [0 0.0125 0] [1 0.05 0.5] 
         @damp 0.5
         @width 0.5
     ) normalize(-3) 
