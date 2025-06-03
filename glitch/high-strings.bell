@@ -2,8 +2,8 @@ setseed(20);
 FastArpeggio = (
     $onset = 0, $duration = 500 -> (
         $offset = 500;
-        $numnotes = xrandom(5, 10);
-        $onsetbpf = [0 0 0] [1 $duration 0.25];
+        $numnotes = xrandom(5, 15);
+        $onsetbpf = [0 0 0] [1 $duration xrand(1/4, 2/3) * xchoose(-1 1)];
         $onsets = for $n in 0...$numnotes collect (
             $nt = $n / $numnotes;
             $t = samplebpf($onsetbpf, $nt);
