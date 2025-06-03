@@ -1,0 +1,54 @@
+setseed(0);
+$events = null;
+$onsets = null;
+$N = 2;
+$unit = 130;
+for $mc $m in r2mc(($N...32) / $N, f2).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, 5)).rev() do (
+    $dur = $unit * 4;
+    $b = ezsol(
+        @names 'sax' 'bassoon' 
+        @pitch $mc
+        @duration $dur
+        @velocity 127
+        @types 'stacc' 'slap-pitch' 'sfz' 'pizz' 'pizz-secco' 'keys' 
+        @useseed 1
+    );
+    for $i in (0...7) do (
+        $onset = $i * $unit * $m;
+        $onsets _= $onset;
+        $buffer = if xrand() > 0.1 then $b.setkey('duration', xrand(100, $dur)) else (
+            sinewave(
+                @pitch $mc
+                @duration xrand(100, $dur) 
+                @velocity xrand(5, 64) 
+                @envelope [0 0.25 0] [1 0 -xrand(1/3, 3/4)] 
+            ) 
+        );
+        $events _= [
+            [ 'buffer' $buffer] ['onset' $onset] ['pan' mc2pan($mc, 0.4) ] [
+                'gain' [0 1 0] [1 0 xrand(-1/3, 1/3)] 
+            ] 
+        ] 
+    ) 
+);
+$maxonset = maximum($onsets);
+for $e in $events do (
+    $e.getkey('buffer').transcribe(
+        @onset $maxonset - $e.getkey('onset') 
+        @pan $e.getkey('pan') 
+        @gain $e.getkey('gain') 
+    ) 
+);
+render(
+    @play 1 @process dynamics(
+        @knee 0.2
+        @ratio 12
+        @thresh -40
+        @release 500
+    ) normalize(-3) freeverb(
+        @roomsize 0.75
+        @wet 0.0125
+        @damp 0.5
+        @width 0.5
+    ) normalize(-3) 
+)
