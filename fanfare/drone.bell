@@ -1,43 +1,44 @@
-$root = d2;
+$root = e2;
 $pcroot = mc2pc($root);
-$pcs = r2pc(1 5/4 3/2 6/5 7/4 9/4 5/3, $pcroot);
-$mcs = r2mc(1...16, $root).pcquant($pcs);
+$pcs = r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, $pcroot);
+$mcs = r2mc(2...32, $root).pcquant($pcs);
 $dur = 120;
 $t = 0;
-$types = 'ord' 'brassy-to-ord' 'sfz';
-$names = 'tuba' 'tpt' 'tromb';
+$types = 'ord' 'brassy-to-ord' 'sfz' 'stacc' 'brassy' 'keys' 'slap-pitch' 'ord-micro' 'pizz';
+$names = 'tuba' 'tpt' 'tromb' 'horn' 'sax' 'clar' 'flute';
 for $i in 1...90 do (
-    for $mc in $mcs do (
-        $in = ezinstrument(
-            @pitch $mc
-            @names $names
-            @types $types
-        );
-        $fn = $in.getkey('fn');
-        $type = $in.getkey('types');
+    for $mc in $mcs.scramble().left(15).sort() do (
         $env = xchoose(
             [hanning()] [
                 [0 1 0] [1 0 -xrand(0.1, 0.5)] 
             ] [
                 [0 0 0] [1 1 xrand(0.1, 0.5)] 
-            ] [] 
+            ] 
         )::1;
-        $fn(
+        choose(
+            ezsol choose(sinewave sawwave triwave rectwave) @weights 8 1
+        )(
             @pitch $mc
-            @type $type
-            @duration $dur
+            @names $names
+            @type $types
+            @duration $dur * exp2(rand(-1, 1)) 
             @velocity 127
-        ).transcribe(
+        ).process(dcfilter()).transcribe(
             @onset $t
-            @pan xrand() 
+            @pan mc2pan($mc, 0.707) 
             @gain $env
         ) 
     );
     $t += $dur
 );
 render(
-    @play 1 @process normalize(-3) freeverb(
-        @roomsize 0.9
+    @play 1 @process dynamics(
+        @knee 0.2
+        @ratio 12
+        @thresh -40
+        @release 500
+    ) normalize(-3) freeverb(
+        @roomsize 0.7
         @wet 0.0125
         @damp 1
         @width 1

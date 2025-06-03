@@ -1,0 +1,7 @@
+$t = 0;
+importaudio('./build-up.wav').transcribe($t);
+$t += read('./build-up.txt');
+importaudio('./drone.wav').transcribe($t);
+render(
+    @play 1 @process resample(c2r(100)) 
+)
