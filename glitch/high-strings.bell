@@ -225,7 +225,7 @@ $unitranks = (
         $rank = 0.5 - abs(
             (abs($x) % 1.) - 0.5
         );
-        $rank
+        $rank + $x * 0.01
     ) 
 );
 $unitorder = argsort($unitranks);
@@ -248,7 +248,7 @@ $objects = (
 );
 $numsections = 8;
 $sectionsizebpf = [0 20 0] [1 10 -0.25];
-$numdursbpf = [0 length($units) 0] [1 1 -0.5];
+$numdursbpf = [0 length($units) 0] [1 2 -0.5];
 $numvoicesbpf = [0 1 0] [1 5 -0.125];
 for $section $id in 1...$numsections do (
     $nt = scale($id, 1, $numsections, 0, 1);
