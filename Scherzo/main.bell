@@ -1,4 +1,6 @@
-$names = 'glitch' 'plucking' 'polyrhythm';
+$names = (
+     'polyrhythm' 'glitch' 'plucking'
+);
 $files = for $n in $names collect [
     rev(
         $folder = './' + $n;
@@ -23,4 +25,7 @@ for $file in $files do (
     $b.transcribe($t);
     $t += read($file + '.txt') 
 );
-render(@play 1)
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport()

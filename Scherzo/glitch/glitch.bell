@@ -250,7 +250,7 @@ $objects = (
 );
 $seeds = (1...8);
 $numsections = length($seeds);
-$sectionsizebpf = [0 20 0] [1 10 -0.25];
+$sectionsizebpf = [0 3 0] [1 10 0.25];
 $numdursbpf = [0 length($units) 0] [1 2 -0.5];
 $numvoicesbpf = [0 1 0] [1 5 -0.125];
 $gapgatebpf = [0 1 0] [1 0 -0.125];
@@ -285,7 +285,7 @@ for $seed $id in $seeds do (
         );
         $onset += $dur
     );
-    if $gapgate == 0 then ($onset += maximum($durs));
+    if $gapgate == 1 then ($onset += maximum($durs));
     render(
         @reset 1 @process (
             ## dynamics(
@@ -304,7 +304,7 @@ for $seed $id in $seeds do (
                 @width 1
             ) 
             ## ----
-            normalize(-3) 
+            ## normalize(-3) 
         ) 
     );
     ezexport($onset @id $id) 

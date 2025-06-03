@@ -1,5 +1,5 @@
-$seeds = 1...4;
-$numvoicesbpf = [0 1 0] [1 9 0.25];
+$seeds = 1...8;
+$numvoicesbpf = [0 2 0] [1 9 0.25];
 $bardur = 2150.;
 $totdurbpf = [0 $bardur * 3 0] [1 $bardur / 2 -0.25];
 for $seed $id in $seeds do (
