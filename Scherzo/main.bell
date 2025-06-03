@@ -1,0 +1,26 @@
+$names = 'glitch' 'plucking' 'polyrhythm';
+$files = for $n in $names collect [
+    rev(
+        $folder = './' + $n;
+        $files = sort(readfolder($folder));
+        $files = for $file in $files collect (
+            $parsed = parsepath($file);
+            $basename = $parsed.getkey('parent') + $parsed.getkey('name');
+            $parsed.getkey('name');
+            $basename
+        );
+        $files
+    ) 
+];
+$files = $files.sort(
+    ($a, $b -> length($a::1) < length($b::1)) 
+);
+$files = $files.trans(@iterationmode 1).rev().flat();
+$t = 0;
+for $file in $files do (
+    print($file);
+    $b = importaudio($file + '.wav');
+    $b.transcribe($t);
+    $t += read($file + '.txt') 
+);
+render(@play 1)

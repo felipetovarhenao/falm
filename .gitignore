@@ -9,3 +9,4 @@
 **/*.llll
 !__lib__.bell
 sol.bell
+!.placeholder

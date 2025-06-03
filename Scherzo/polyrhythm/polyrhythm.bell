@@ -1,0 +1,55 @@
+$seeds = 1...4;
+$numvoicesbpf = [0 1 0] [1 9 0.25];
+$bardur = 2150.;
+$totdurbpf = [0 $bardur * 3 0] [1 $bardur / 2 -0.25];
+for $seed $id in $seeds do (
+    $fileprog = scale($id, 1, length($seeds), 0, 1);
+    $totdur = samplebpf($totdurbpf, $fileprog);
+    $numvoices = int(
+        round(samplebpf($numvoicesbpf, $fileprog)) 
+    );
+    setseed($seed);
+    $chord = pcquant(
+        r2mc((4...32), c2), r2pc(1 5/4 9/8 15/8 3/2 5/3 7/5) 
+    );
+    $totdur = nearest(1/4 1/2 3/4 5/8 7/8 1 5/4, $totdur / $bardur) * $bardur;
+    $delay = xrand(5);
+    $mcs = $chord.xscramble().left($numvoices);
+    $units = xscramble(thin(1/8 3/16 5/16 1/4 7/16 11/16 3/4 3/8 1/12 1/20 1/16 1/32)).left($numvoices);
+    for $mc $v in $mcs, $unit in $units do (
+        $legato = exp2(xrand(-2, 0));
+        $t = 0;
+        $notedur = $unit * $bardur;
+        $del = ($v - 1) * $delay;
+        $gainbpf = [0 xrand(0.01, 0.25) 0] [1 1 xrand(1/3, 3/4)];
+        if xrand() > 0.5 then ($gainbpf = revbpf($gainbpf));
+        $b = xchoose(ezsol sinewave @weights 4 1)(
+            @pitch $mc
+            @names family('strings') 
+            @types 'stacc' 
+            @duration $notedur * $legato
+            @velocity 25
+            @useseed 1
+        ).process(
+            gain(
+                [0 1 0] [1 0 xrand(1/3, 3/4)] 
+            ) 
+        );
+        while $t < $totdur do (
+            $nt = $t / $totdur;
+            $gain = samplebpf($gainbpf, $nt);
+            $b.transcribe(
+                @onset $t + $del
+                @pan mc2pan($mc, 0.5) 
+                @gain $gain
+            );
+            $t += $notedur
+        ) 
+    );
+    render(
+        @reset 1
+        @fade 0
+        @process normalize(-9) ezverb() 
+    );
+    ezexport($totdur @id $id) 
+)
