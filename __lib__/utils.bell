@@ -233,8 +233,11 @@ ezexport(
 Simplified exporting utility for solo album
 )#
 ezexport = (
-    $data = null -> (
+    $data = null, $id = null -> (
         $filename = thispath(1).getkey('name');
+        if $id != null then (
+            $filename = $filename + '_' + tosymbol($id) 
+        );
         export('./' + $filename + '.wav');
         $data &&& write(
             @data $data @path './' + $filename + '.txt' 
