@@ -1,10 +1,11 @@
-setseed(1451);
-$N = 3;
+setseed(140);
+$N = 4;
 $M = 32;
-$unit = 110;
+$unit = 120;
+$root = e3;
+$pcroot = mc2pc($root);
 $numattacks = ($M - $N + 1);
-$numattacks = 15;
-$chord = r2mc(($N...$M) / $N, b2).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, 5));
+$chord = r2mc(($N...$M) / $N, $root).pcquant(r2pc(1 5/4 3/2 9/8 7/5 5/3 15/8, $pcroot));
 for $fn in ($l -> $l) rev do (
     $events = null;
     $onsets = null;
@@ -18,7 +19,8 @@ for $fn in ($l -> $l) rev do (
             @types 'stacc' 'slap-pitch' 'sfz' 'pizz' 'pizz-secco' 'keys' (if xrand() > 0.3 then 'slap-unpitch') (if xrand() > 0.3 then 'exp-slap-pitch') 
             @useseed 1
         ).process(normalize(-7));
-        for $i in 0...$numattacks do (
+        for $i $ii in (1...$numattacks) - 1 do (
+            $nt = scale($ii, 1, $numattacks, 0, 1);
             $onset = $i * $unit * $m;
             $onsets _= $onset;
             $buffer = if xrand() > 0.1 then $b.setkey('duration', xrand(50, $dur)) else (
@@ -30,7 +32,7 @@ for $fn in ($l -> $l) rev do (
                 ) 
             );
             $events _= [
-                [ 'buffer' $buffer] ['onset' $onset] ['pan' mc2pan($mc, 0.2) ] [
+                [ 'buffer' $buffer] ['onset' $onset] ['pan' mc2pan($mc, $nt * 0.5) ] [
                     'gain' [0 1 0] [1 0 xrand(-1/3, 1/3)] 
                 ] 
             ] 
@@ -53,7 +55,7 @@ render(
         @release 500
     ) normalize(-3) freeverb(
         @roomsize 0.75
-        @wet [0 0.0125 0] [1 0.05 0.5] 
+        @wet [0 0.01 0] [1 0.0125 0.125] 
         @damp 0.5
         @width 0.5
     ) normalize(-3) 
