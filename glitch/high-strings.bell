@@ -17,6 +17,7 @@ FastArpeggio = (
             [hanning()] [[0 1 0] [1 0 -0.25]] [[0 0 0] [1 1 0.25]] 
         )::1;
         for $t in $onsets, $dur in $durs do (
+            $dur = max(10, $dur);
             $mc = xchoose($chord);
             if xrand() > 0.25 then (
                 $b = setkey(
