@@ -28,6 +28,7 @@ FastArpeggio = (
                             @types 'ord' 
                             @velocity 128
                             @duration $dur + $offset
+                            @useseed 1
                         ), 'offset', $offset
                     ), 'duration', $dur
                 ) 
@@ -73,6 +74,7 @@ CrushedCresc = (
             @names 'violin' 'viola' 'cello' 
             @types 'crushed-to-ord' 
             @duration $duration + $offset
+            @useseed 1
         );
         $b = setkey($b, 'offset', $offset);
         $b = setkey($b, 'duration', $duration);
@@ -122,6 +124,7 @@ Strum = (
                 @types 'stacc' 'pizz' 'pizz-secco' 
                 @names 'violin' 'viola' 'cello' 'bass' 
                 @velocity xrand(127) 
+                @useseed 1
                 @duration $duration * 3
             ).transcribe(
                 @onset $onset + $t
@@ -168,6 +171,7 @@ SustainedChord = (
                 @names 'violin' 'viola' 'cello' 
                 @types 'nonvib' 
                 @duration $dur
+                @useseed 1
                 @velocity $vel
             ).process($process).transcribe(
                 @onset $onset @pan $pan
