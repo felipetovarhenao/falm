@@ -20,7 +20,6 @@ $files = $files.sort(
 $files = $files.trans(@iterationmode 1).rev().flat();
 $t = 0;
 for $file in $files do (
-    print($file);
     $b = importaudio($file + '.wav');
     $b.transcribe($t);
     $t += read($file + '.txt') 

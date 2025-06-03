@@ -253,7 +253,7 @@ $numsections = length($seeds);
 $sectionsizebpf = [0 3 0] [1 16 0.25];
 $numdursbpf = [0 length($units) 0] [1 2 -0.5];
 $numvoicesbpf = [0 1 0] [1 5 -0.125];
-$gapgatebpf = [0 1 0] [1 0 -0.125];
+$gapgatebpf = [0 1 0] [1 0 0.125];
 $wetbpf = [0 0.05 0] [1 0.0125 -0.125];
 for $seed $id in $seeds do (
     $fileprog = scale($id, 1, $numsections, 0, 1);
