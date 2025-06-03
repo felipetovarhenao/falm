@@ -285,18 +285,27 @@ for $seed $id in $seeds do (
         );
         $onset += $dur
     );
+    if $gapgate == 0 then ($onset += maximum($durs));
     render(
-        @reset 1 @process dynamics(
-            @knee 0.05
-            @ratio 12
-            @thresh -40
-            @release 200
-        ) normalize(-3) freeverb(
-            @roomsize 0.6
-            @wet $wet
-            @damp 1
-            @width 1
-        ) normalize(-3) 
+        @reset 1 @process (
+            ## dynamics(
+            ##     @knee 0.05
+            ##     @ratio 12
+            ##     @thresh -40
+            ##     @release 200
+            ## ) 
+            ## ## ----
+            ## normalize(-3) 
+            ## ----
+            freeverb(
+                @roomsize 0.6
+                @wet $wet
+                @damp 1
+                @width 1
+            ) 
+            ## ----
+            normalize(-3) 
+        ) 
     );
     ezexport($onset @id $id) 
 )
