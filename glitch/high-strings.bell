@@ -250,8 +250,12 @@ $numsections = 8;
 $sectionsizebpf = [0 20 0] [1 10 -0.25];
 $numdursbpf = [0 length($units) 0] [1 2 -0.5];
 $numvoicesbpf = [0 1 0] [1 5 -0.125];
+$gapgatebpf = [0 1 0] [1 0 -0.125];
 for $section $id in 1...$numsections do (
     $nt = scale($id, 1, $numsections, 0, 1);
+    $gapgate = int(
+        round(samplebpf($gapgatebpf, $nt)) 
+    );
     $numdurs = int(
         round(samplebpf($numdursbpf, $nt)) 
     );
@@ -273,7 +277,7 @@ for $section $id in 1...$numsections do (
         );
         $onset += $dur
     );
-    $onset += maximum($durs) 
+    $onset += maximum($durs) * $gapgate
 );
 render(
     @play 1 @process dynamics(
