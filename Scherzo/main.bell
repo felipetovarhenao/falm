@@ -1,5 +1,5 @@
 $names = (
-     'polyrhythm' 'glitch' 'plucking'
+    'glitch' 'polyrhythm' 
 );
 $files = for $n in $names collect [
     rev(
@@ -26,6 +26,11 @@ for $file in $files do (
     $t += read($file + '.txt') 
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process dynamics(
+        @knee 0.05
+        @ratio 12
+        @thresh -40
+        @release 200
+    ) normalize(-3) 
 );
 ezexport()
