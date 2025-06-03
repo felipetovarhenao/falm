@@ -244,9 +244,9 @@ for $i in 1...50 do (
 );
 render(
     @play 1 @process dynamics(
-        @knee 0.1
-        @ratio 5
-        @thresh -30
+        @knee 0.05
+        @ratio 12
+        @thresh -40
         @release 200
     ) normalize(-3) freeverb(
         @roomsize 0.6
