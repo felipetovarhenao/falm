@@ -1,4 +1,4 @@
-setseed(2);
+setseed(20);
 FastArpeggio = (
     $onset = 0, $duration = 500 -> (
         $offset = 500;
@@ -128,7 +128,15 @@ Strum = (
                 @gain [0 1 0] [1 0 0.25] 
             );
             $t += 5
-        ) 
+        );
+        $b = cycle(
+            rand(5000, 9000) @duration 20
+        ).process(
+            gain(
+                [0 rand(0.05, 0.1) 0] [1 0 -0.8] 
+            ) 
+        );
+        for $t in arithmser(0, $duration, 2150. * 1/16.) do ($b.transcribe($onset + $t @pan rand())) 
     ) 
 );
 Rest = (-> null);
