@@ -1,0 +1,25 @@
+$t = 0;
+for $i in 0...20 do (
+    $pc = xchoose(r2pc(1 4/3 3/2));
+    $chord = pcquant(r2mc(2...32, c2), r2pc(1 5/4 3/2 9/8, $pc));
+    $incr = choose(1/4 3/16 5/16 5/8 3/8 7/16 7/8 3/4 1/8) * 2000;
+    for $mc in $chord.scramble().left(6) do (
+        $b = choose(ezsol sinewave @weights 3 1)(
+            @names family('strings') 
+            @types 'stacc' 
+            @pitch $mc
+            @velocity 127
+            @envelope [0 0.01 0] [1 0 -0.8] 
+            @duration $incr * 2.5
+        );
+        $b.process(normalize(-8)).transcribe(
+            @onset $t
+            @pan mc2pan($mc, 0.25) 
+            @gain [0 1 0] [1 0 0.5] 
+        ) 
+    );
+    $t += $incr
+);
+render(
+    @play 1 @process normalize(-3) ezverb() 
+)
