@@ -39,22 +39,24 @@ cycle(
     @pan mc2pan(c3) 
     @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
-importaudio('./middle/bursts.wav').transcribe($t);
+importaudio('./bursts/bursts.wav').transcribe($t);
+$op = dynamics(
+    @attack 30
+    @release 180
+    @knee 1.0
+    @ratio 3.0
+    @thresh -28
+);
 render(
     @play 1
     @fade 0
     @process (
-        ## dynamics(
-        ##     @knee 2
-        ##     @ratio 2
-        ##     @thresh -40
-        ##     @release 10
-        ##     @attack 10
-        ## ) 
+        $op
         ## ----
         normalize(-3) 
         ## ---
-        resample(1/c2r(-400)) 
+        ## resample(1/c2r(-250)) 
+        
     ) 
 );
 ezexport()
