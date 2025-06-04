@@ -39,6 +39,8 @@ cycle(
     @pan mc2pan(c3) 
     @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
+$t += 200;
+importaudio('./middle/bursts.wav').transcribe($t);
 render(
     @play 1
     @fade 0
