@@ -44,17 +44,17 @@ render(
     @play 1
     @fade 0
     @process (
-        dynamics(
-            @knee 2
-            @ratio 2
-            @thresh -40
-            @release 10
-            @attack 10
-        ) 
+        ## dynamics(
+        ##     @knee 2
+        ##     @ratio 2
+        ##     @thresh -40
+        ##     @release 10
+        ##     @attack 10
+        ## ) 
         ## ----
         normalize(-3) 
         ## ---
-        resample(1/c2r(-200)) 
+        ## resample(1/c2r(-200)) 
     ) 
 );
 ezexport()
