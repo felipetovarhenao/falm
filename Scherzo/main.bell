@@ -19,13 +19,27 @@ $files = $files.sort(
 );
 $files = $files.trans(@iterationmode 1).rev().flat();
 $t = 0;
-for $file in $files do (
+for $file $fileid in $files do (
     $b = importaudio($file + '.wav');
     $b.transcribe($t);
-    $t += read($file + '.txt') 
+    $timestep = read($file + '.txt');
+    $t += $timestep;
+    if $fileid == length($files) then (
+        cycle(
+            @frequency mc2f(c2) 
+            @duration $timestep
+            @phase 0.012
+        ).process(fade(5, 5)).transcribe(
+            @onset $t - $timestep
+            @pan mc2pan(c3 ) 
+            @gain [0 0 0] [1 0.8 0.8] 
+        ) 
+    ) 
 );
 render(
-    @play 1 @process dynamics(
+    @play 1
+    @fade 0
+    @process dynamics(
         @knee 0.05
         @ratio 12
         @thresh -40
