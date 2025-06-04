@@ -28,7 +28,7 @@ for $file $fileid in $files do (
 importaudio('./loops/loops.wav').transcribe($t);
 $timestep = read('./loops/loops.txt');
 $t += $timestep;
-$bassdur = min(2500, $timestep);
+$bassdur = min(4500, $timestep);
 $basspeak = 0.95;
 cycle(
     @frequency mc2f(c2) 
@@ -37,15 +37,15 @@ cycle(
 ).process(fade(5, 5)).transcribe(
     @onset $t - $bassdur * $basspeak
     @pan mc2pan(c3) 
-    @gain [0 0 0] [$basspeak 0.5 0.75] [1 0 -0.2] 
+    @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
 render(
     @play 1
     @fade 0
     @process (
         ## dynamics(
-        ##     @knee 0.05
-        ##     @ratio 5
+        ##     @knee 2
+        ##     @ratio 2
         ##     @thresh -40
         ##     @release 10
         ##     @attack 10
