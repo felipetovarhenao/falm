@@ -1,4 +1,3 @@
-setseed(91);
 if FastArpeggio == null then BP_FN_ERROR(@details 'You need you run script containing gesture/object definitions first.');
 $objects = (
     ## ----
@@ -16,17 +15,22 @@ $objects = (
     ## ----
     SynthChord
 );
-$objects = xscramble($objects);
-$t = 0;
-$bardur = 2150.;
-$dur = $bardur * 1/4;
-for $i in rev(1...length($objects)) do (
-    for $j in rev(1...$i) do (
-        setseed($j * 3 + 8);
-        $obj = $objects:$j;
-        $obj(@onset $t @duration $dur);
-        $t += $dur
+for $seed $seedid in 91 98 8 do (
+    setseed($seed);
+    $objects = xscramble($objects);
+    $bardur = 2150.;
+    $dur = $bardur * 1/8;
+    $t = 0;
+    for $i in rev(1...length($objects)) do (
+        for $j in rev(1...$i) do (
+            setseed($j * 3 + 8 + ($seedid - 1) * 100);
+            $obj = $objects:$j;
+            $obj(@onset $t @duration $dur);
+            $t += $dur
+        ) 
     ) 
 );
-render(@play 1);
-ezexport()
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport($t)

@@ -23,27 +23,35 @@ for $file $fileid in $files do (
     $b = importaudio($file + '.wav');
     $b.transcribe($t);
     $timestep = read($file + '.txt');
-    $t += $timestep;
-    if $fileid == length($files) then (
-        cycle(
-            @frequency mc2f(c2) 
-            @duration $timestep
-            @phase 0.012
-        ).process(fade(5, 5)).transcribe(
-            @onset $t - $timestep
-            @pan mc2pan(c3 ) 
-            @gain [0 0 0] [1 0.8 0.8] 
-        ) 
-    ) 
+    $t += $timestep
+);
+importaudio('./loops/loops.wav').transcribe($t);
+$timestep = read('./loops/loops.txt');
+$t += $timestep;
+$bassdur = min(2500, $timestep);
+$basspeak = 0.95;
+cycle(
+    @frequency mc2f(c2) 
+    @duration $bassdur
+    @phase 0.012
+).process(fade(5, 5)).transcribe(
+    @onset $t - $bassdur * $basspeak
+    @pan mc2pan(c3) 
+    @gain [0 0 0] [$basspeak 0.5 0.75] [1 0 -0.2] 
 );
 render(
     @play 1
     @fade 0
-    @process dynamics(
-        @knee 0.05
-        @ratio 12
-        @thresh -40
-        @release 200
-    ) normalize(-3) 
+    @process (
+        ## dynamics(
+        ##     @knee 0.05
+        ##     @ratio 5
+        ##     @thresh -40
+        ##     @release 10
+        ##     @attack 10
+        ## ) 
+        ## ----
+        normalize(-3) 
+    ) 
 );
 ezexport()
