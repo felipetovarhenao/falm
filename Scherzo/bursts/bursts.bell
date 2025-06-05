@@ -9,7 +9,7 @@ $numunits = length($units);
 $unitrangesize = 5;
 $maxpos = $numunits - $unitrangesize;
 $unitposbpf = [0 1 0] [1 $maxpos 0.125];
-$gainbpf = [0 1 0] [1 0.05 0.1];
+$gainbpf = [0 1 0] [1 0.125 0.1];
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gain = samplebpf($gainbpf, $nt);
