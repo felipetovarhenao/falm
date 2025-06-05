@@ -51,7 +51,7 @@ render(
         ## ----
         normalize(-3) 
         ## ---
-        resample(1/c2r(-100)) 
+        ## resample(1/c2r(-100)) 
     ) 
 );
 ezexport()
