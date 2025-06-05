@@ -41,6 +41,8 @@ cycle(
 );
 importaudio('./trail/trail.wav').transcribe($t);
 $t += read('./trail/trail.txt');
+importaudio('./scratch/scratch.wav').transcribe($t);
+$t += read('./scratch/scratch.txt');
 importaudio('./bursts/bursts.wav').transcribe($t);
 render(
     @play 1
@@ -49,7 +51,7 @@ render(
         ## ----
         normalize(-3) 
         ## ---
-        ## resample(1/c2r(150)) 
+        resample(1/c2r(-100)) 
     ) 
 );
 ezexport()
