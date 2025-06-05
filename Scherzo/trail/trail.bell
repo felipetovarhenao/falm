@@ -14,7 +14,7 @@ for $i in 1...($N + 1) do (
                 @pitch g7 
                 @velocity 127
                 @names family('strings') 'acc' 
-                @types 'nonvib' 'harm' 'reg' 'ord' 
+                @types 'nonvib' 'harm' 'reg' 'ord' 'ord-to-crushed' 
                 @duration $dur2
                 @useseed 1
             ).transcribe(
@@ -30,8 +30,8 @@ for $i in 1...($N + 1) do (
     );
     for $rep in 1...$i do (
         $incr = $dur / $subdiv;
-        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(25, $incr * 2)).transcribe($t @pan xrand());
-        $t += $incr
+        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(45, $incr * 2)).transcribe($t @pan xrand());
+        $t += $incr * ($rep < $i) 
     ) 
 );
 $bassdur = $dur * ($N + 1);
@@ -39,7 +39,7 @@ $bass = cycle(
     @frequency mc2f(g2) @duration $bassdur
 );
 $bass.process(
-    gain([0 0 0] [1 0.5 0.5] ) panning(
+    gain([0 0 0] [1 0.5 0.5]) panning(
         [0 0 0] [0.7 1 0.25] [1 0.5 -0.125] 
     ) 
 ).view().transcribe(@onset $t - $bassdur);
@@ -47,7 +47,7 @@ addmarker($t);
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
-        @wet [0 0.0125 0] [1 0 -0.25] 
+        @wet [0 0.005 0] [1 0 -0.125] 
         @damp 1
         @width 1
     ) normalize(-3) 
