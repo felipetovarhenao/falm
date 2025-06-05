@@ -1,6 +1,7 @@
 setseed(289);
 $t = 0;
 $bardur = 2150.;
+$pcroot = r2pc(3/2);
 $waves = sinewave triwave;
 $totdur = round(50000 / $bardur) * $bardur;
 $units = sort(1/8 3/16 1/4 5/16 3/8 7/16 5/8 3/4 7/8 4/4 9/8 5/4);
@@ -13,7 +14,7 @@ while $t < $totdur do (
     $nt = $t / $totdur;
     $gain = samplebpf($gainbpf, $nt);
     $pc = xchoose(
-        r2pc((1 4/3 3/2) * (3/2)) @weights 9 1 1
+        r2pc((1 4/3 3/2), $pcroot) @weights 9 1 1
     );
     $unitpos = int(
         round(samplebpf($unitposbpf, $nt)) 
@@ -56,15 +57,6 @@ while $t < $totdur do (
 );
 render(
     @play 1 @process (
-        ## 
-        ## dynamics(
-        ##     @knee 0.1
-        ##     @ratio 4
-        ##     @thresh -20
-        ##     @release 10
-        ##     @attack 200
-        ## ) 
-        ## 
         freeverb(
             @roomsize 0.4
             @wet [0 0.0125 0] [1 0.05 0.35] 
