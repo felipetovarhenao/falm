@@ -43,7 +43,9 @@ importaudio('./trail/trail.wav').transcribe($t);
 $t += read('./trail/trail.txt');
 importaudio('./scratch/scratch.wav').transcribe($t);
 $t += read('./scratch/scratch.txt');
-importaudio('./bursts/bursts.wav').transcribe($t);
+importaudio('./climax/climax.wav').transcribe($t @gain 0.707);
+$t += read('./climax/climax.txt');
+importaudio('./bursts/bursts.wav').transcribe($t @gain 0.5);
 render(
     @play 1
     @fade 0
@@ -51,7 +53,7 @@ render(
         ## ----
         normalize(-3) 
         ## ---
-        ## resample(1/c2r(-100)) 
+        ## resample(1/c2r(200)) 
     ) 
 );
 ezexport()

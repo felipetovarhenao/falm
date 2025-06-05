@@ -1,0 +1,38 @@
+setseed(240);
+$mcs = r2mc(1...72, g2).pcquant(r2pc(1 5/4 3/2 9/8));
+$totdur = 5000;
+$t = 0;
+for $mc in $mcs.xscramble() do (
+    $pan = mc2pan($mc);
+    if xrand() > 0.9 then (
+        sinewave(
+            @pitch $mc + xrandom(-1, 4) * 1200
+            @velocity xrand(80, 127) 
+            @duration xrand(300, 2000) 
+        ).transcribe(
+            @onset $t
+            @pan $pan
+            @gain xrand(0.5, 1) 
+        ) 
+    );
+    ezsol(
+        @pitch $mc
+        @velocity 127
+        @duration null
+        @names family('strings') 
+        @types 'pizz' 'bartok' 'pizz-secco' 'stacc' 
+        @useseed 1
+    ).transcribe(
+        @onset $t @pan $pan
+    );
+    $t += xrand(20) 
+);
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.6
+        @wet 0.09
+        @width 1
+        @damp 1
+    ) normalize(-7) 
+);
+ezexport(-$t / 4)
