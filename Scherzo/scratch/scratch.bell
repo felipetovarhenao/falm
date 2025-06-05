@@ -1,4 +1,4 @@
-setseed(100);
+setseed(100 + 1234);
 $t = 0;
 $bassdur = 2150.;
 $basspeak = 0.7;

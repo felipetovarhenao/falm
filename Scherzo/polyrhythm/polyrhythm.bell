@@ -1,4 +1,4 @@
-$seeds = (1...7) * 2 + 1;
+$seeds = (1...7) * 2 + 1 + 1234;
 $numvoicesbpf = [0 2 0] [1 9 0.25];
 $bardur = 2150.;
 $totdurbpf = [0 $bardur * 3 0] [1 $bardur / 2 -0.25];

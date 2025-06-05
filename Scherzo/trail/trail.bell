@@ -1,4 +1,4 @@
-setseed(1000);
+setseed(1000 + 1234);
 $t = 0;
 $b = importaudio('../loops/loops.wav');
 $bardur = 2150.;
@@ -10,14 +10,16 @@ for $i in 1...($N + 1) do (
     $dur2 = ($N + 1 - $i) * $dur;
     if $dur2 > 10 then (
         for $v in 1...4 do (
+            $resbpf = [0 1 0] [1 1/c2r(-50) xrand(2/3, 7/8)];
+            $durfactor = integrate($resbpf):(-1 2);
             ezsol(
                 @pitch g7 
                 @velocity 127
                 @names family('strings') 'acc' 
                 @types 'nonvib' 'harm' 'reg' 'ord' 'ord-to-crushed' 
-                @duration $dur2
+                @duration $dur2 / $durfactor
                 @useseed 1
-            ).transcribe(
+            ).process(resample($resbpf)).transcribe(
                 @onset $t
                 @pan mc2pan($mc) 
                 @gain [0 0 0] [1 1 0.5] 

@@ -248,7 +248,7 @@ $objects = (
     ## ----
     SynthChord
 );
-$seeds = (1...8) + 10;
+$seeds = (1...8) + 10 + 1234;
 $numsections = length($seeds);
 $sectionsizebpf = [0 3 0] [1 16 0.25];
 $numdursbpf = [0 length($units) 0] [1 2 -0.5];

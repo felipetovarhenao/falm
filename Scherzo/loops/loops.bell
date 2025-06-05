@@ -15,7 +15,7 @@ $objects = (
     ## ----
     SynthChord
 );
-for $seed $seedid in 91 98 8 do (
+for $seed $seedid in (91 98 8) + 1234 do (
     setseed($seed);
     $objects = xscramble($objects);
     $bardur = 2150.;

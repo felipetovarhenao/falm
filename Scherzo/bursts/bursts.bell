@@ -1,4 +1,4 @@
-setseed(289);
+setseed(289 + 1234);
 $t = 0;
 $bardur = 2150.;
 $pcroot = r2pc(3/2);
