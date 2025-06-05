@@ -1,3 +1,4 @@
+$t = 0;
 $names = (
     'glitch' 'polyrhythm' 
 );
@@ -18,7 +19,6 @@ $files = $files.sort(
     ($a, $b -> length($a::1) < length($b::1)) 
 );
 $files = $files.trans(@iterationmode 1).rev().flat();
-$t = 0;
 for $file $fileid in $files do (
     $b = importaudio($file + '.wav');
     $b.transcribe($t);
@@ -39,24 +39,17 @@ cycle(
     @pan mc2pan(c3) 
     @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
+importaudio('./trail/trail.wav').transcribe($t);
+$t += read('./trail/trail.txt');
 importaudio('./bursts/bursts.wav').transcribe($t);
-$op = dynamics(
-    @attack 30
-    @release 180
-    @knee 1.0
-    @ratio 3.0
-    @thresh -28
-);
 render(
     @play 1
     @fade 0
     @process (
-        $op
         ## ----
         normalize(-3) 
         ## ---
-        ## resample(1/c2r(-250)) 
-        
+        ## resample(1/c2r(150)) 
     ) 
 );
 ezexport()

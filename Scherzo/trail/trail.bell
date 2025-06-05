@@ -1,0 +1,55 @@
+setseed(1000);
+$t = 0;
+$b = importaudio('../loops/loops.wav');
+$bardur = 2150.;
+$dur = 1/8 * $bardur;
+$end = read('../loops/loops.txt');
+$N = 12;
+for $i in 1...($N + 1) do (
+    $mc = g7;
+    $dur2 = ($N + 1 - $i) * $dur;
+    if $dur2 > 10 then (
+        for $v in 1...4 do (
+            ezsol(
+                @pitch g7 
+                @velocity 127
+                @names family('strings') 'acc' 
+                @types 'nonvib' 'harm' 'reg' 'ord' 
+                @duration $dur2
+                @useseed 1
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc) 
+                @gain [0 0 0] [1 1 0.5] 
+            ) 
+        );
+        $t += $dur2
+    );
+    $subdiv = exp2(
+        int(($i - 1) / 2) 
+    );
+    for $rep in 1...$i do (
+        $incr = $dur / $subdiv;
+        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(25, $incr * 2)).transcribe($t @pan xrand());
+        $t += $incr
+    ) 
+);
+$bassdur = $dur * ($N + 1);
+$bass = cycle(
+    @frequency mc2f(g2) @duration $bassdur
+);
+$bass.process(
+    gain([0 0 0] [1 0.5 0.5] ) panning(
+        [0 0 0] [0.7 1 0.25] [1 0.5 -0.125] 
+    ) 
+).view().transcribe(@onset $t - $bassdur);
+addmarker($t);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet [0 0.0125 0] [1 0 -0.25] 
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport($t)
