@@ -9,15 +9,22 @@ $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
 $mcsminmax = minmax($mcs);
 $minmc = $mcsminmax:1;
 $maxmc = $mcsminmax:3;
-$velbpf = [0 0 0] [1 127 -0.125];
-$rangebpf = [0 3 0] [1 length($mcs) -1/3];
-$revgatebpf = [0 1 0] [1 0.75 0.25];
-$streamsizebpf = [0 1 0] [1 round(5000 / $beat) 0.125];
-$legatobpf = [0 0.125 0] [1 2 -0.25];
-$wavegatebpf = [0 0.15 0] [1 0.01 -0.125];
-$numvoicesbpf = [0 1 0] [1 3 0.125];
-$subdivgatebpf = [0 0 0] [1 0.1 0.125];
-$panspreadbpf = [0 0 0] [1 1 0.125];
+$climaxst = 0.61803398875;
+$climaxend = $climaxst * 1.1;
+PointToClimax = (
+    $y, $slope -^ $climaxst, $climaxend -> (for $x in $climaxst $climaxend collect [$x $y $slope] ) 
+);
+$velbpf = [0 0 0] PointToClimax(127, -0.125) [1 0 0.125];
+$rangebpf = [0 3 0] PointToClimax(length($mcs), -1/3) [1 length($mcs) -1/3];
+$rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 3 -1/4];
+$revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
+$maxstreamsize = round(5000 / $beat);
+$streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
+$legatobpf = [0 0.25 0] PointToClimax(2, -0.25) [1 1 -0.25];
+$wavegatebpf = [0 0.15 0] PointToClimax(0.01, -0.125) [1 0.01 -0.125];
+$numvoicesbpf = [0 1 0] PointToClimax(3, 0.125) [1 1 -0.125];
+$subdivgatebpf = [0 0 0] PointToClimax(0.1, 0.125) [1 0.1 0.125];
+$panspreadbpf = [0 0 0] PointToClimax(1, 0.125) [1 1 0.125];
 $solgroups = (
     ## ----------
     [[
@@ -40,12 +47,18 @@ $solgroups = (
     ## ---------- 
     [
         ['names' family('woodwinds')] [
-            'types' 'pizz' 'stacc' 'keys' 
+            'types' 'pizz' 'stacc' 'keys' 'slap-pitch' 'tongue-ram' 
         ] 
     ] 
     ## ----------
     [
         ['names' family('brass')] [
+            'types' 'stacc' 
+        ] 
+    ] 
+    ## ----------
+    [
+        ['names' 'acc'] [
             'types' 'stacc' 
         ] 
     ] 
@@ -57,10 +70,14 @@ GenSolBuf = (
             ezsol pno @weights ($numgroups 1) / ($numgroups + 1.) 
         );
         if $fn == ezsol then (
-            $numgroups = int(
-                round(scale($nt ||| 0, 0, 1, 1, $numgroups, 0.125) ) 
+            $maxgroups = int(
+                round(
+                    samplebpf(
+                        [0 1 0] PointToClimax($numgroups, 0.125) [1 1 0.25], $nt
+                    ) 
+                ) 
             );
-            $groups = choose(left($solgroups, $numgroups));
+            $groups = choose(left($solgroups, $maxgroups));
             $names = $groups.getkey('names');
             $types = $groups.getkey('types') 
         );
@@ -89,6 +106,7 @@ while $t < $totdur do (
     );
     $vel = samplebpf($velbpf, $nt);
     $subdivgate = samplebpf($subdivgatebpf, $nt);
+    $rangesize = samplebpf($rangesizebpf, $nt);
     $wavegate = samplebpf($wavegatebpf, $nt);
     $legato = samplebpf($legatobpf, $nt);
     $panspread = samplebpf($panspreadbpf, $nt);
@@ -98,7 +116,9 @@ while $t < $totdur do (
     );
     for $v in 1...$numvoices do (
         $iswave = rand() < $wavegate;
-        $mc = choose(right($mcs, -$range));
+        $mc = choose(
+            left(right($mcs, -$range), $rangesize) 
+        );
         $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
         if $iswave == 0 then (
             $b = GenSolBuf(
