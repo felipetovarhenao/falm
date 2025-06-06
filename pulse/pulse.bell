@@ -184,6 +184,6 @@ render(
         @wet 0.025
         @damp 1
         @width 1
-    ) 
+    ) normalize(-3) 
 );
 ezexport((0 $climaxst $climaxend 1) * $totdur)
