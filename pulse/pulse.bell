@@ -14,9 +14,10 @@ $climaxend = $climaxst * 1.1;
 PointToClimax = (
     $y, $slope -^ $climaxst, $climaxend -> (for $x in $climaxst $climaxend collect [$x $y $slope] ) 
 );
-$velbpf = [0 0 0] PointToClimax(127, -0.125) [1 0 0.125];
+$velvar = 25;
+$velbpf = [0 0 0] PointToClimax(127, -0.125) [1 $velvar * 0.5 0.125];
 $rangebpf = [0 3 0] PointToClimax(length($mcs), -1/3) [1 length($mcs) -1/3];
-$rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 3 -1/5];
+$rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 2 -1/5];
 $revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
 $maxstreamsize = round(5000 / $beat);
 $streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
@@ -47,7 +48,7 @@ $solgroups = (
     ## ---------- 
     [
         ['names' family('woodwinds')] [
-            'types' 'pizz' 'stacc' 'keys' 'slap-pitch' 'tongue-ram' 
+            'types' 'pizz' 'stacc' 'slap-pitch' 'tongue-ram' 'keys' 
         ] 
     ] 
     ## ----------
@@ -66,9 +67,11 @@ $solgroups = (
 GenSolBuf = (
     $pitch, $velocity, $nt = 0 -^ $solgroups -> (
         $numgroups = length($solgroups);
-        $fn = choose(
-            ezsol pno @weights ($numgroups 1) / ($numgroups + 1.) 
-        );
+        $solweightbpf = [0 0 0] PointToClimax(1, 0.05) [1 1 0];
+        $solweight = samplebpf($solweightbpf, $nt);
+        $baseweights = ($numgroups 1) / ($numgroups + 1.);
+        $weights = (1 - $solweight) * (0 1) + $solweight * $baseweights;
+        $fn = choose(ezsol pno @weights $weights);
         if $fn == ezsol then (
             $maxgroups = int(
                 round(
@@ -123,7 +126,9 @@ while $t < $totdur do (
         if $iswave == 0 then (
             $b = GenSolBuf(
                 @pitch $mc
-                @velocity $vel + rand(-1, 1) * 25
+                @velocity min(
+                    max(0, $vel + rand(-1, 1) * $velvar), 127
+                ) 
                 @nt $nt
             ) 
         ) else (
@@ -141,7 +146,7 @@ while $t < $totdur do (
         for $s in scramble($segs) do (
             $segdur = $s.getkey('duration');
             if $segdur > 10 then (
-                if $t + $tshift < $totdur then (
+                if ($t + $tshift) < ($totdur + $streamsize * $beat) then (
                     $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
                     $process = gain($env);
                     $revshift = 0;
