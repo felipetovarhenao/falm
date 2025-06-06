@@ -2,7 +2,7 @@ $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
-$minutes = 4;
+$minutes = 1;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -16,7 +16,7 @@ PointToClimax = (
 );
 $velbpf = [0 0 0] PointToClimax(127, -0.125) [1 0 0.125];
 $rangebpf = [0 3 0] PointToClimax(length($mcs), -1/3) [1 length($mcs) -1/3];
-$rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 3 -1/4];
+$rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 3 -1/5];
 $revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
 $maxstreamsize = round(5000 / $beat);
 $streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
@@ -178,4 +178,4 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport()
+ezexport(0 $climaxst $climaxend $totdur)
