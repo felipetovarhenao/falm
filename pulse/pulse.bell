@@ -15,14 +15,14 @@ PointToClimax = (
     $y, $slope -^ $climaxst, $climaxend -> (for $x in $climaxst $climaxend collect [$x $y $slope] ) 
 );
 $velvar = 25;
-$maxstreamsize = round(5000 / $beat);
+$maxstreamsize = round(5000. / $beat);
 $velbpf = [0 0 0] PointToClimax(127, -0.125) [1 0 0.125];
 $rangebpf = [0 3 0] PointToClimax(length($mcs), -1/3) [1 length($mcs) -1/3];
 $rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 2 -1/5];
 $revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
 $streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
-$legatobpf = [0 0.25 0] PointToClimax(2, -0.25) [1 1 -0.25];
-$wavegatebpf = [0 0.2 0] PointToClimax(0.01, -0.125) [1 0.005 -0.125];
+$legatobpf = [0 1 0] [$climaxst 0.25 -0.25] [$climaxend 2 0.125] [1 0.25 -0.125];
+$wavegatebpf = [0 1 0] PointToClimax(0.001, -0.75) [1 0.001 -0.125];
 $numvoicesbpf = [0 1 0] PointToClimax(3, 0.125) [1 1 -0.125];
 $subdivgatebpf = [0 0 0] PointToClimax(0.1, 0.125) [1 0.1 0.125];
 $panspreadbpf = [0 0 0] PointToClimax(1, 0.125) [1 0.125 0.125];
@@ -120,11 +120,11 @@ while $t < $totdur do (
         round(samplebpf($numvoicesbpf, $nt)) 
     );
     for $v in 1...$numvoices do (
-        $iswave = rand() < $wavegate;
         $mc = choose(
             left(right($mcs, -$range), $rangesize) 
         );
         $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
+        $iswave = rand() < $wavegate;
         if $iswave == 0 then (
             $b = GenSolBuf(
                 @pitch $mc
@@ -142,7 +142,7 @@ while $t < $totdur do (
                 @phase rand() 
             ) 
         );
-        $segs = $b.splitbuf(@split $beat @partials 0).left($streamsize);
+        $segs = $b.splitbuf(@split $beat @partials 1).left($streamsize);
         $tshift = 0;
         $pan = mc2pan($mc, $panspread);
         for $s in scramble($segs) do (
