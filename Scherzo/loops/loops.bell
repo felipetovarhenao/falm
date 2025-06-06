@@ -15,15 +15,16 @@ $objects = (
     ## ----
     SynthChord
 );
-for $seed $seedid in (91 98 8) + 1234 do (
+$numobjects = 9;
+for $seed $seedid in (91 98 8) + 8934 do (
     setseed($seed);
     $objects = xscramble($objects);
     $bardur = 2150.;
     $dur = $bardur * 1/8;
     $t = 0;
-    for $i in rev(1...length($objects)) do (
+    for $i in rev(1...$numobjects) do (
         for $j in rev(1...$i) do (
-            setseed($j * 3 + 8 + ($seedid - 1) * 100);
+            setseed($j * 31 + 99 + ($seedid - 1) * 20);
             $obj = $objects:$j;
             $obj(@onset $t @duration $dur);
             $t += $dur

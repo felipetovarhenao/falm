@@ -391,12 +391,12 @@ WAVESYNTH = (
             @phase $phase
             @duty $phase
         );
+        $process = dcfilter();
         $envelope &&& (
-            $b = $b.process(
-                gain(
-                    bpf($envelope @yfunc $y -^ $velocity -> $y * ($velocity / 127.)) 
-                ) 
-            ) 
+            $process _= gain(
+                bpf($envelope @yfunc $y -^ $velocity -> $y * ($velocity / 127.)) 
+            );
+            $b = $b.process($process) 
         );
         $b
     ) 

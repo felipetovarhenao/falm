@@ -44,7 +44,7 @@ $bass.process(
     gain([0 0 0] [1 0.5 0.5]) panning(
         [0 0 0] [0.7 1 0.25] [1 0.5 -0.125] 
     ) 
-).view().transcribe(@onset $t - $bassdur);
+).transcribe(@onset $t - $bassdur);
 addmarker($t);
 render(
     @play 1 @process freeverb(
