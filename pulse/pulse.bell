@@ -2,7 +2,7 @@ $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
-$minutes = 4;
+$minutes = 2;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -17,6 +17,7 @@ $legatobpf = [0 0.125 0] [1 2 -0.25];
 $wavegatebpf = [0 0.15 0] [1 0.01 -0.125];
 $numvoicesbpf = [0 1 0] [1 3 0.125];
 $subdivgatebpf = [0 0 0] [1 0.1 0.125];
+$panspreadbpf = [0 0 0] [1 1 0.125];
 $solgroups = (
     ## ----------
     [[
@@ -90,6 +91,7 @@ while $t < $totdur do (
     $subdivgate = samplebpf($subdivgatebpf, $nt);
     $wavegate = samplebpf($wavegatebpf, $nt);
     $legato = samplebpf($legatobpf, $nt);
+    $panspread = samplebpf($panspreadbpf, $nt);
     $revgate = samplebpf($revgatebpf, $nt);
     $numvoices = int(
         round(samplebpf($numvoicesbpf, $nt)) 
@@ -115,7 +117,7 @@ while $t < $totdur do (
         );
         $segs = $b.splitbuf(@split $beat @partials 0).left($streamsize);
         $tshift = 0;
-        $pan = mc2pan($mc, 0.5);
+        $pan = mc2pan($mc, $panspread);
         for $s in scramble($segs) do (
             $segdur = $s.getkey('duration');
             if $segdur > 10 then (
