@@ -4,7 +4,7 @@ $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
 $mindurthresh = 10;
-$minutes = 2;
+$minutes = 4.25;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -25,9 +25,10 @@ $revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
 $streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
 $legatobpf = [0 0.5 0] PointToClimax(2 0.125) [1 0.25 -0.125];
 $wavegatebpf = [0 1 0] PointToClimax(0.001, -0.75) [1 0.001 -0.125];
-$numvoicesbpf = [0 1 0] PointToClimax(3, 0.125) [1 1 -0.125];
+$numvoicesbpf = [0 1 0] PointToClimax(4, 0.125) [1 1 -0.15];
 $subdivgatebpf = [0 0 0] PointToClimax(0.1, 0.125) [1 0.1 0.125];
 $panspreadbpf = [0 0 0] PointToClimax(1, 0.125) [1 0.125 0.125];
+$headsizebpf = [0 0 0] PointToClimax(3, 1/3) [1 0 -0.25];
 $solgroups = (
     ## ----------
     [[
@@ -111,6 +112,9 @@ while $t < $totdur do (
     $streamsize = int(
         round(samplebpf($streamsizebpf, $nt)) 
     );
+    $headsize = int(
+        round(samplebpf($headsizebpf, $nt)) 
+    );
     $vel = samplebpf($velbpf, $nt);
     $subdivgate = samplebpf($subdivgatebpf, $nt);
     $rangesize = samplebpf($rangesizebpf, $nt);
@@ -147,7 +151,10 @@ while $t < $totdur do (
         $segs = $b.splitbuf(@split $beat @partials 1).left($streamsize);
         $tshift = 0;
         $pan = mc2pan($mc, $panspread);
-        for $s in xscramble($segs) do (
+        $head = $segs:[0...$headsize];
+        $tail = $segs:[($headsize + 1)...length($segs)];
+        $segs = $head ($tail &&& xscramble($tail));
+        for $s in $segs do (
             $segdur = $s.getkey('duration');
             if $segdur > $mindurthresh then (
                 if ($t + $tshift) < ($totdur + $streamsize * $beat) then (
