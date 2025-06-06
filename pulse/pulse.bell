@@ -2,7 +2,7 @@ $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
-$minutes = 3;
+$minutes = 4;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -15,32 +15,34 @@ $revgatebpf = [0 1 0] [1 0.75 0.25];
 $streamsizebpf = [0 1 0] [1 round(5000 / $beat) 0.125];
 $legatobpf = [0 0.125 0] [1 2 -0.25];
 $wavegatebpf = [0 0.15 0] [1 0.01 -0.125];
+$numvoicesbpf = [0 1 0] [1 3 0.125];
+$subdivgatebpf = [0 0 0] [1 0.1 0.125];
 $solgroups = (
-    ## -----
+    ## ----------
     [[
         'names' 'harp' 'guitar' 
     ] [
         'types' 'ord' 'harm' 
     ]] 
-    ## -----
+    ## ----------
     [
         ['names' family('strings')] [
             'types' 'pizz' 
         ] 
     ] 
-    ## -----
+    ## ----------
     [
         ['names' family('strings')] [
             'types' 'stacc' 
         ] 
     ] 
-    ## ----- 
+    ## ---------- 
     [
         ['names' family('woodwinds')] [
             'types' 'pizz' 'stacc' 'keys' 
         ] 
     ] 
-    ## ----- 
+    ## ----------
     [
         ['names' family('brass')] [
             'types' 'stacc' 
@@ -84,50 +86,62 @@ while $t < $totdur do (
     $streamsize = int(
         round(samplebpf($streamsizebpf, $nt)) 
     );
-    $mc = choose(right($mcs, -$range));
-    $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
     $vel = samplebpf($velbpf, $nt);
+    $subdivgate = samplebpf($subdivgatebpf, $nt);
     $wavegate = samplebpf($wavegatebpf, $nt);
     $legato = samplebpf($legatobpf, $nt);
     $revgate = samplebpf($revgatebpf, $nt);
-    $iswave = rand() < $wavegate;
-    if $iswave == 0 then (
-        $b = GenSolBuf(
-            @pitch $mc
-            @velocity $vel + rand(-1, 1) * 25
-            @nt $nt
-        ) 
-    ) else (
-        ## 
-        $b = sinewave(
-            @pitch $mc
-            @velocity $vel * 0.3 + 1
-            @duration $streamsize * $beat
-            @phase rand() 
-        ) 
+    $numvoices = int(
+        round(samplebpf($numvoicesbpf, $nt)) 
     );
-    $segs = $b.splitbuf(@split $beat @partials 0).left($streamsize);
-    $tshift = 0;
-    $pan = mc2pan($mc, 0.5);
-    for $s in scramble($segs) do (
-        $onset = $t + $tshift;
-        $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
-        $segdur = $s.getkey('duration');
-        if $segdur > 10 then (
-            $process = gain($env);
-            $revshift = 0;
-            $grain = $s.setkey('duration', $beat * $durmul * $legato);
-            if rand() > $revgate then (
-                $process _= reverse();
-                $grain = $grain.process($process);
-                $revshift -= $grain.getkey('duration') 
-            );
-            $grain.transcribe(
-                @onset $onset + $revshift
-                @pan $pan
-                @detune if $iswave == 1 then xrandom(-1, 3) * 1200
-            );
-            $tshift += $beat
+    for $v in 1...$numvoices do (
+        $iswave = rand() < $wavegate;
+        $mc = choose(right($mcs, -$range));
+        $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
+        if $iswave == 0 then (
+            $b = GenSolBuf(
+                @pitch $mc
+                @velocity $vel + rand(-1, 1) * 25
+                @nt $nt
+            ) 
+        ) else (
+            ## ----------
+            $b = sinewave(
+                @pitch $mc
+                @velocity $vel * 0.3 + 1
+                @duration $streamsize * $beat
+                @phase rand() 
+            ) 
+        );
+        $segs = $b.splitbuf(@split $beat @partials 0).left($streamsize);
+        $tshift = 0;
+        $pan = mc2pan($mc, 0.5);
+        for $s in scramble($segs) do (
+            $segdur = $s.getkey('duration');
+            if $segdur > 10 then (
+                $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
+                $process = gain($env);
+                $revshift = 0;
+                $grain = $s.setkey('duration', $beat * $durmul * $legato);
+                if rand() > $revgate then (
+                    $process _= reverse();
+                    $grain = $grain.process($process);
+                    $revshift -= $grain.getkey('duration') 
+                );
+                $subdivs = 1;
+                if $revshift == 0 && rand() < $subdivgate then ($subdivs = 2);
+                $trudur = $grain.getkey('duration');
+                for $sd in 1...$subdivs do (
+                    $tshiftstep = $beat / $subdivs;
+                    $onset = $t + $tshift;
+                    $grain.setkey('duration', if $sd == $subdivs then $trudur else $tshiftstep).transcribe(
+                        @onset $onset + $revshift
+                        @pan $pan
+                        @detune if $iswave == 1 then xrandom(-1, 3) * 1200
+                    );
+                    $tshift += $tshiftstep
+                ) 
+            ) 
         ) 
     );
     $t += $beat
@@ -139,4 +153,5 @@ render(
         @damp 1
         @width 1
     ) normalize(-3) 
-)
+);
+ezexport()
