@@ -1,0 +1,36 @@
+$mcroot = f#2;
+$pcroot = mc2pc($mcroot);
+$tuning = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
+importaudio('./pulse.wav').transcribe();
+$pcs = r2pc($tuning, $pcroot);
+$mcs = r2mc(1...64, $mcroot).pcquant($pcs).scramble();
+$markers = read('./pulse.txt');
+$climaxst = $markers:2;
+$climaxend = $markers:3;
+$totdur = ($climaxend - $climaxst) + 5000;
+$t = 0;
+$beat = 133.3;
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $mc = choose($mcs);
+    $b = ezsol(
+        @pitch $mc
+        @names family('brass') family('woodwinds') family('strings') 
+        @types 'cresc-to-dim' 'stacc' 
+        @duration null
+        @velocity 127
+    ).analyze(effectiveduration(@thresholdratio 0.001));
+    $b = $b.setkey('duration', $b.getkey('effectiveduration'));
+    $b.transcribe(
+        @onset $t + $climaxst @pan mc2pan($mc) 
+    );
+    $t += random(1, 3) * $beat
+);
+render(
+    @play 1 @process (
+        normalize(-3) 
+        ## 
+        ##  crop(@start $climaxst - 15000 @end $climaxend + 15000) 
+        
+    ) 
+)
