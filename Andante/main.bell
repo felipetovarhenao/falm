@@ -1,0 +1,9 @@
+$t = 0;
+importaudio('./pulse/pulse.wav').transcribe($t);
+$markers = read('./pulse/pulse.txt');
+$t += $markers:2;
+importaudio('./layers/layers.wav').transcribe($t);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport()
