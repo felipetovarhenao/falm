@@ -4,7 +4,7 @@ $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
 $mindurthresh = 10;
-$minutes = 4.25;
+$minutes = 2;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -29,6 +29,7 @@ $numvoicesbpf = [0 1 0] PointToClimax(4, 0.125) [1 1 -0.15];
 $subdivgatebpf = [0 0 0] PointToClimax(0.1, 0.125) [1 0.1 0.125];
 $panspreadbpf = [0 0 0] PointToClimax(1, 0.125) [1 0.125 0.125];
 $headsizebpf = [0 0 0] PointToClimax(3, 1/3) [1 0 -0.25];
+$sortweightbpf = [0 0 0] PointToClimax(1, 1/2.) [1 0 -1/3];
 $solgroups = (
     ## ----------
     [[
@@ -104,6 +105,7 @@ GenSolBuf = (
         $b
     ) 
 );
+$count = 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     $range = int(
@@ -116,6 +118,7 @@ while $t < $totdur do (
         round(samplebpf($headsizebpf, $nt)) 
     );
     $vel = samplebpf($velbpf, $nt);
+    $sortweight = samplebpf($sortweightbpf, $nt);
     $subdivgate = samplebpf($subdivgatebpf, $nt);
     $rangesize = samplebpf($rangesizebpf, $nt);
     $wavegate = samplebpf($wavegatebpf, $nt);
@@ -125,10 +128,11 @@ while $t < $totdur do (
     $numvoices = int(
         round(samplebpf($numvoicesbpf, $nt)) 
     );
+    $submcs = left(right($mcs, -$range), $rangesize);
+    $numsubmcs = length($submcs);
     for $v in 1...$numvoices do (
-        $mc = xchoose(
-            left(right($mcs, -$range), $rangesize) 
-        );
+        $mcid = $count % $numsubmcs + 1;
+        $mc = if xrand() > $sortweight then xchoose($submcs) else $submcs:$mcid;
         $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
         $iswave = xrand() < $wavegate;
         if $iswave == 0 then (
@@ -182,7 +186,8 @@ while $t < $totdur do (
                     ) 
                 ) 
             ) 
-        ) 
+        );
+        $count += 1
     );
     $t += $beat
 );
