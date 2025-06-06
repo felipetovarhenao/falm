@@ -35,7 +35,7 @@ render(
     @play 1 @process (
         freeverb(
             @roomsize 0.9
-            @wet 0.025
+            @wet 0.05
             @damp 1
             @width 1
         ) normalize(-3) 
