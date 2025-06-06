@@ -1,9 +1,10 @@
+setseed(4321);
 $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
 $mindurthresh = 10;
-$minutes = 3;
+$minutes = 2;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -18,7 +19,7 @@ PointToClimax = (
 $velvar = 25;
 $maxstreamsize = round(5000. / $beat);
 $velbpf = [0 0 0] PointToClimax(127, -0.125) [1 0 0.125];
-$rangebpf = [0 3 0] PointToClimax(length($mcs), -1/3) [1 length($mcs) -1/3];
+$rangebpf = [0 3 0] PointToClimax(length($mcs), 1/5) [1 length($mcs) -1/3];
 $rangesizebpf = [0 length($mcs) 0] PointToClimax(length($mcs), 0) [1 2 -1/5];
 $revgatebpf = [0 1 0] PointToClimax(0.75, 0.25) [1 0.75 0.25];
 $streamsizebpf = [0 1 0] PointToClimax($maxstreamsize, 0.125) [1 $maxstreamsize * 0.25 -0.125];
@@ -66,7 +67,7 @@ GenSolBuf = (
         $solweight = samplebpf($solweightbpf, $nt);
         $baseweights = ($numgroups 1) / ($numgroups + 1.);
         $weights = (1 - $solweight) * (0 1) + $solweight * $baseweights;
-        $fn = choose(ezsol pno @weights $weights);
+        $fn = xchoose(ezsol pno @weights $weights);
         if $fn == ezsol then (
             $maxgroups = int(
                 round(
@@ -75,7 +76,7 @@ GenSolBuf = (
                     ) 
                 ) 
             );
-            $groups = choose(left($solgroups, $maxgroups));
+            $groups = xchoose(left($solgroups, $maxgroups));
             $names = $groups.getkey('names');
             $types = $groups.getkey('types');
             $numtypes = int(
@@ -92,7 +93,7 @@ GenSolBuf = (
             @velocity $velocity
             @gain 0.125
             @duration null
-            @useseed 0
+            @useseed 1
             @names $names
             @types $types
             @norm 1
@@ -121,16 +122,16 @@ while $t < $totdur do (
         round(samplebpf($numvoicesbpf, $nt)) 
     );
     for $v in 1...$numvoices do (
-        $mc = choose(
+        $mc = xchoose(
             left(right($mcs, -$range), $rangesize) 
         );
         $durmul = exp2(scale($mc, $minmc, $maxmc, 2, 0));
-        $iswave = rand() < $wavegate;
+        $iswave = xrand() < $wavegate;
         if $iswave == 0 then (
             $b = GenSolBuf(
                 @pitch $mc
                 @velocity min(
-                    max(0, $vel + rand(-1, 1) * $velvar), 127
+                    max(0, $vel + xrand(-1, 1) * $velvar), 127
                 ) 
                 @nt $nt
             ) 
@@ -140,27 +141,27 @@ while $t < $totdur do (
                 @pitch $mc
                 @velocity scale($vel, 0, 127, 5, 80) 
                 @duration $streamsize * $beat + $mindurthresh
-                @phase rand() 
+                @phase xrand() 
             ) 
         );
         $segs = $b.splitbuf(@split $beat @partials 1).left($streamsize);
         $tshift = 0;
         $pan = mc2pan($mc, $panspread);
-        for $s in scramble($segs) do (
+        for $s in xscramble($segs) do (
             $segdur = $s.getkey('duration');
             if $segdur > $mindurthresh then (
                 if ($t + $tshift) < ($totdur + $streamsize * $beat) then (
-                    $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
+                    $env = [0 1 0] [1 0 xrand(1/5, 3/4) * xchoose(-1 1)];
                     $process = gain($env);
                     $revshift = 0;
                     $grain = $s.setkey('duration', $beat * $durmul * $legato);
-                    if rand() > $revgate then (
+                    if xrand() > $revgate then (
                         $process _= reverse();
                         $grain = $grain.process($process);
                         $revshift -= $grain.getkey('duration') 
                     );
                     $subdivs = 1;
-                    if $revshift == 0 && rand() < $subdivgate then ($subdivs = choose(2...3));
+                    if $revshift == 0 && xrand() < $subdivgate then ($subdivs = xchoose(2...3));
                     $trudur = $grain.getkey('duration');
                     for $sd in 1...$subdivs do (
                         $tshiftstep = $beat / $subdivs;
