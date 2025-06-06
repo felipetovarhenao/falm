@@ -2,29 +2,73 @@ $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
-$totdur = 15000;
+$minutes = 3;
+$totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
 $mcsminmax = minmax($mcs);
 $minmc = $mcsminmax:1;
 $maxmc = $mcsminmax:3;
-$velbpf = [0 0 0] [1 127 0.125];
-$rangebpf = [0 3 0] [1 length($mcs) -0.25];
-$revgatebpf = [0 1 0] [1 0.8 0.25];
+$velbpf = [0 0 0] [1 127 -0.125];
+$rangebpf = [0 3 0] [1 length($mcs) -1/3];
+$revgatebpf = [0 1 0] [1 0.75 0.25];
 $streamsizebpf = [0 1 0] [1 round(5000 / $beat) 0.125];
-$legatobpf = [0 0.125 0] [1 1 -0.25];
-$wavegatebpf = [0 0.05 0] [1 0.25 0.25];
+$legatobpf = [0 0.125 0] [1 2 -0.25];
+$wavegatebpf = [0 0.15 0] [1 0.01 -0.125];
+$solgroups = (
+    ## -----
+    [[
+        'names' 'harp' 'guitar' 
+    ] [
+        'types' 'ord' 'harm' 
+    ]] 
+    ## -----
+    [
+        ['names' family('strings')] [
+            'types' 'pizz' 
+        ] 
+    ] 
+    ## -----
+    [
+        ['names' family('strings')] [
+            'types' 'stacc' 
+        ] 
+    ] 
+    ## ----- 
+    [
+        ['names' family('woodwinds')] [
+            'types' 'pizz' 'stacc' 'keys' 
+        ] 
+    ] 
+    ## ----- 
+    [
+        ['names' family('brass')] [
+            'types' 'stacc' 
+        ] 
+    ] 
+);
 GenSolBuf = (
-    $pitch, $velocity -> (
-        $fn = choose(ezsol pno);
+    $pitch, $velocity, $nt = 0 -^ $solgroups -> (
+        $numgroups = length($solgroups);
+        $fn = choose(
+            ezsol pno @weights ($numgroups 1) / ($numgroups + 1.) 
+        );
+        if $fn == ezsol then (
+            $numgroups = int(
+                round(scale($nt ||| 0, 0, 1, 1, $numgroups, 0.125) ) 
+            );
+            $groups = choose(left($solgroups, $numgroups));
+            $names = $groups.getkey('names');
+            $types = $groups.getkey('types') 
+        );
         $b = $fn(
             @pitch $pitch
             @velocity $velocity
             @gain 0.125
             @duration null
             @useseed 0
-            @names 'harp' 'guitar' 
-            @types 'ord' 'harm' 
+            @names $names
+            @types $types
             @norm 1
         );
         $b = $b.analyze(effectiveduration(@thresholdratio 0.005));
@@ -49,7 +93,9 @@ while $t < $totdur do (
     $iswave = rand() < $wavegate;
     if $iswave == 0 then (
         $b = GenSolBuf(
-            @pitch $mc @velocity $vel + rand(-1, 1) * 20
+            @pitch $mc
+            @velocity $vel + rand(-1, 1) * 25
+            @nt $nt
         ) 
     ) else (
         ## 
