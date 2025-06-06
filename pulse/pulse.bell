@@ -2,7 +2,7 @@ $t = 0;
 $mcroot = f#2;
 $pcroot = mc2pc($mcroot);
 $beat = 133.3;
-$minutes = 2;
+$minutes = 4;
 $totdur = 60 * 1000 * $minutes;
 $pcs = r2pc(1 5/4 3/2 10/9 9/8 5/3 7/5 13/7, $pcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant($pcs);
@@ -121,27 +121,29 @@ while $t < $totdur do (
         for $s in scramble($segs) do (
             $segdur = $s.getkey('duration');
             if $segdur > 10 then (
-                $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
-                $process = gain($env);
-                $revshift = 0;
-                $grain = $s.setkey('duration', $beat * $durmul * $legato);
-                if rand() > $revgate then (
-                    $process _= reverse();
-                    $grain = $grain.process($process);
-                    $revshift -= $grain.getkey('duration') 
-                );
-                $subdivs = 1;
-                if $revshift == 0 && rand() < $subdivgate then ($subdivs = 2);
-                $trudur = $grain.getkey('duration');
-                for $sd in 1...$subdivs do (
-                    $tshiftstep = $beat / $subdivs;
-                    $onset = $t + $tshift;
-                    $grain.setkey('duration', if $sd == $subdivs then $trudur else $tshiftstep).transcribe(
-                        @onset $onset + $revshift
-                        @pan $pan
-                        @detune if $iswave == 1 then xrandom(-1, 3) * 1200
+                if $t + $tshift < $totdur then (
+                    $env = [0 1 0] [1 0 rand(1/5, 3/4) * choose(-1 1)];
+                    $process = gain($env);
+                    $revshift = 0;
+                    $grain = $s.setkey('duration', $beat * $durmul * $legato);
+                    if rand() > $revgate then (
+                        $process _= reverse();
+                        $grain = $grain.process($process);
+                        $revshift -= $grain.getkey('duration') 
                     );
-                    $tshift += $tshiftstep
+                    $subdivs = 1;
+                    if $revshift == 0 && rand() < $subdivgate then ($subdivs = choose(2...3));
+                    $trudur = $grain.getkey('duration');
+                    for $sd in 1...$subdivs do (
+                        $tshiftstep = $beat / $subdivs;
+                        $onset = $t + $tshift;
+                        $grain.setkey('duration', if $sd == $subdivs then $trudur else $tshiftstep).transcribe(
+                            @onset $onset + $revshift
+                            @pan $pan
+                            @detune if $iswave == 1 then xrandom(-1, 3) * 1200
+                        );
+                        $tshift += $tshiftstep
+                    ) 
                 ) 
             ) 
         ) 
