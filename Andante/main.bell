@@ -1,4 +1,12 @@
 $t = 0;
+$mc = r2mc(64, f#2);
+pno(
+    @pitch $mc
+    @duration null
+    @velocity 127
+).transcribe(
+    @pan mc2pan($mc) 
+);
 importaudio('./pulse/pulse.wav').transcribe($t);
 $markers = read('./pulse/pulse.txt');
 $t += $markers:2;
