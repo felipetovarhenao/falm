@@ -12,7 +12,9 @@ $climaxst = $markers:2;
 $climaxend = $markers:3;
 $totdur = ($climaxend - $climaxst);
 $t = 0;
-$beat = 133.3;
+$bpm = 112;
+$unit = 1/16.;
+$beat = (240000/$bpm) * $unit;
 while $t < $totdur do (
     $nt = $t / $totdur;
     $id = urn() + 1;
