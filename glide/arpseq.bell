@@ -10,7 +10,7 @@ getchord = (
 );
 GlideArp = (
     $onset = 0, $duration = 5000, $velocity = 65, $n = 5, $useseed = 1 -> (
-        $chord = getchord();
+        $chord = getchord(1...32);
         $t = 0;
         for $mc in $chord.xscramble().left(4) do (
             pno(
@@ -26,11 +26,12 @@ GlideArp = (
             );
             $t += xrand(50) 
         );
+        $chord = getchord(8...16);
         $t = 0;
         $seq = randomseq(
-            @llll $chord.right(6) 
+            @llll $chord
             @length $n
-            @steps 2 -1
+            @steps 2 -1 -3
             @useseed $useseed
         );
         $beat = 100;
