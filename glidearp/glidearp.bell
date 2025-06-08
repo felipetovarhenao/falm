@@ -1,0 +1,25 @@
+$N = 4;
+$x = cartesianprod(
+    @llll for $i in (0...$N) * 2 + 1 collect [-$i $i] 
+);
+$numlimits = length($x::1);
+$limits = primeser(@maxcount $numlimits + 1);
+$x = thin(
+    octreduce(
+        for $monzo in float($x) with @unwrap 1 collect reduce($limits ** $monzo, #*) 
+    ).sort() 
+) 2;
+print($x);
+$pcs = r2pc($x);
+$chord = r2mc(1...48, 2400).pcquant($pcs);
+$t = 0;
+$seq = randomseq($chord, 150, 3 -2 1 -4);
+for $mc in $seq with @unwrap 1 do (
+    pno(
+        $mc @duration 1000 @velocity 0
+    ).transcribe($t @pan mc2pan($mc));
+    $t += 60
+);
+render(
+    @play 1 @process normalize(-3) 
+)
