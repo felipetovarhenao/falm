@@ -1,0 +1,76 @@
+getroot = (-> b2 );
+getpcroot = (
+    -> getroot().mc2pc() 
+);
+getchord = (
+    -> r2mc(1...16, getroot()).pcquant(r2pc(1 7/5 3/2 9/8 5/4, getpcroot())) 
+);
+GlideArp = (
+    $onset = 0, $duration = 5000, $velocity = 65, $n = 5, $useseed = 1 -> (
+        $chord = getchord();
+        $t = 0;
+        for $mc in $chord.xscramble().left(4) do (
+            pno(
+                @pitch $mc
+                @duration $duration * 1.25
+                @velocity 0
+                @gain 0.125
+                @norm 1
+            ).transcribe(
+                @onset $t + $onset
+                @gain [0 1 0] [1 0 0.5] 
+                @pan pan2mc($mc) 
+            );
+            $t += xrand(50) 
+        );
+        $t = 0;
+        $seq = randomseq(
+            @llll $chord.right(6) 
+            @length $n
+            @steps 2 -1
+            @useseed $useseed
+        );
+        $beat = 100;
+        $count = 0;
+        $velbpf = bpf($velocity);
+        while $t < $duration do (
+            $nt = $t / $duration;
+            $vel = samplebpf($velbpf, $nt);
+            $id1 = ($count % $n) + 1;
+            $count += 1;
+            $id2 = ($count % $n) + 1;
+            $mc1 = $seq:$id1;
+            $mc2 = $seq:$id2;
+            ezsol(
+                @pitch $mc1
+                @duration $beat + 25
+                @types ('ord' 'ord-micro') 
+                @names 'flute' 'clar' 'sax' 
+                @velocity $vel + xrand(-15, 15) 
+                @useseed $useseed
+            ).process(
+                resample(
+                    [0 1 0] [1 1/c2r($mc2 - $mc1) xrand(0.7, 0.9)] 
+                ) 
+            ).transcribe(
+                @onset $onset + $t @pan mc2pan($mc1 $mc2, 0.15) 
+            );
+            $t += $beat
+        ) 
+    ) 
+);
+$t = 0;
+setseed(1);
+for $i in 1...8 do (
+    $dur = 2000 * choose(3/4 1/4 5/8 1/2 3/8) * 5;
+    GlideArp(
+        @onset $t
+        @duration $dur
+        @n 12
+        @velocity [0 127 0] [1 0 0.25] 
+    );
+    $t += $dur
+);
+render(
+    @play 1 @process ezverb() normalize(-3) 
+)
