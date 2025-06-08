@@ -500,4 +500,25 @@ sawwave = (
         @phase $phase
         @fn 'saw' 
     )) 
+);
+#(
+```bell
+partition(
+    @llll ## int/llll (required)
+    @mode 0
+    @distinct 0
+) -> llll
+```
+
+Computes the integer partition of the incoming non-negative number or the partition of the incoming set. 
+
+Integer partition are often displayed in Young diagrams. The integer partition algorithm is inspired by the iterative algorithm exposed in [Jerome Kelleher](http://jeromekelleher.net/generating-integer-partitions.html).
+)#
+partition = (
+    $llll = 5, $mode = 0, $distinct = 0 -> (
+        init $partition = {bach.partition};
+        $msgs = ['mode' $mode] ['distinct' $distinct];
+        for $msg in $msgs with @unwrap 1 do $partition($msg @out 'm');
+        $partition($llll) 
+    ) 
 )
