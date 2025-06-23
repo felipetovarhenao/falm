@@ -1,4 +1,4 @@
-setseed(0);
+setseed(10);
 $t = 0;
 $mcroot = c#2;
 $pcroot = mc2pc($mcroot);
@@ -74,7 +74,7 @@ for $n in rev(1...length($chords)) do (
         );
         $t += $gap;
         $wetbpf _= [
-            $t xrand().scale(0, 1, 0.005, 0.025, 0.125) xrand(1/3, 3/4) * choose(-1 1) 
+            $t xrand().scale(0, 1, 0.005, 0.025, 0.125) xrand(1/3, 3/4) * xchoose(-1 1) 
         ] 
     ) 
 );
