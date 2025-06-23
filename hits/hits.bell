@@ -1,0 +1,71 @@
+setseed(0);
+$t = 0;
+$mcroot = ab2;
+$pcroot = mc2pc($mcroot);
+$rawchord = r2mc(1...32, eb2);
+$chords = r2pc(
+    ## -----------------
+    [1 5/4 3/2] 
+    ## -----------------
+    [1 5/4 3/2 15/8] 
+    ## -----------------
+    [1 4/3 3/2 15/8] 
+    ## -----------------
+    [1 4/3 3/2 6/5] 
+    ## -----------------
+    [1 6/5 4/3 3/2 7/4] 
+    ## -----------------
+    [1 5/4 7/5 5/3] 
+    ## -----------------
+    [16/15 4/3 8/5 6/5] 
+    ## -----------------
+    [8/5 7/4 1 6/5] 
+    ## -----------------
+    @pc $pcroot
+);
+$bardur = 3000;
+for $chord in $chords.scramble() with @unwrap 1 do (
+    $peaks = null;
+    $chord = $rawchord.pcquant($chord);
+    $bufs = for $mc in $chord collect (
+        $b = ezsol(
+            @pitch $mc
+            @duration 300
+            @names family('woodwinds') 
+            @types 'stacc' 
+            @velocity 127
+            @useseed 1
+        ).process(normalize(-3));
+        $peak = $b.setkey('duration', 100).analyze(envmaxtime()).getkey('envmaxtime');
+        $peaks _= $peak;
+        $b.setkey('envmaxtime', $peak, @mode 1) 
+    );
+    $maxpeak = maximum($peaks);
+    for $b in $bufs do (
+        $b.transcribe(
+            @onset $maxpeak - $b.getkey('envmaxtime') + $t
+            @pan mc2pan($b.getkey('pitch'), 0.3) 
+            @gain [0 1 0] [1 0 -0.25] 
+        ) 
+    );
+    $t += $bardur * xchoose(1/4 1/8 3/16) 
+);
+for $onset in arithmser(0, $t, $bardur * 1/16) do (
+    ezsol(
+        @pitch $mcroot + 1200 * 2
+        @names family('strings') 
+        @types 'pizz' 
+        @velocity 127
+    ).transcribe(
+        @onset $onset @pan (rand() - 0.5) * 0.5 + 0.5
+    ) 
+);
+render(
+    @play 1 @process repeat(4) normalize(-3) freeverb(
+        @roomsize 0.7
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+);
+ezexport()
