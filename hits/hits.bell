@@ -30,6 +30,7 @@ $chords = r2pc(
 $bardur = 3000;
 $croplist = ($list, $n -> left($list, $n));
 $gaps = for $x in 1...length($chords) collect $bardur * xchoose(1/4 1/8 3/16 5/16 7/16);
+$wetbpf = [0 0 0];
 for $n in 1...length($chords) do (
     for $chord in $chords.$croplist($n), $gap in $gaps.$croplist($n) with @unwrap 1 do (
         $peaks = null;
@@ -64,7 +65,10 @@ for $n in 1...length($chords) do (
                 @onset $maxpeak - $b.getkey('envmaxtime') + $t + $shift @pan mc2pan($b.getkey('pitch'), 0.3) 
             ) 
         );
-        $t += $gap
+        $t += $gap;
+        $wetbpf _= [
+            $t xrand().scale(0, 1, 0.001, 0.0125, 0.125) xrand(1/3, 3/4) * choose(-1 1) 
+        ] 
     ) 
 );
 for $onset in arithmser(0, $t, $bardur * 1/16) do (
@@ -87,7 +91,7 @@ $b = render(
         @knee 1
     ) normalize(-3) freeverb(
         @roomsize 0.8
-        @wet 0.0125
+        @wet $wetbpf
         @damp 1
         @width 1
     ) 
