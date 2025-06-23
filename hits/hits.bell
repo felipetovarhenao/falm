@@ -1,5 +1,6 @@
 setseed(10);
-$t = 0;
+$t = 2000;
+$head = $t;
 $mcroot = c#2;
 $pcroot = mc2pc($mcroot);
 $rawchord = r2mc(1...32, $mcroot);
@@ -28,19 +29,31 @@ $chords = r2pc(
     @pc $pcroot
 );
 $bardur = 3000;
-$croplist = ($list, $n -> left($list, $n));
-$gaps = for $x in 1...length($chords) collect $bardur * xchoose(1/4 1/16 3/16 5/16 7/16);
+$croplist = ($list, $n -> left($list, $n).rev());
+$gaps = for $x in 1...length($chords) collect $bardur * xchoose(1/4 3/16 5/16 7/16);
 $wetbpf = [0 0 0];
 for $n in rev(1...length($chords)) do (
     for $chord in $chords.$croplist($n), $gap in $gaps.$croplist($n) with @unwrap 1 do (
         $peaks = null;
         $chord = $rawchord.pcquant($chord);
+        $mcbass = $chord.sort().left(3).xchoose();
+        ezsol(
+            @pitch $mcbass
+            @names family('strings') family('plucked') 
+            @types 'pizz' 'stacc' 
+            @velocity 127
+            @duration $gap * 2
+        ).transcribe(
+            @onset $t
+            @pan 0.5
+            @gain [0 1 0] [1 0 0.5] 
+        );
         $bufs = for $mc in $chord collect (
             $fn = xchoose(ezsol sinewave triwave rectwave sawwave @weights 100 4 3 2 1);
             $normop = dcfilter() if $fn == ezsol then normalize(-3);
             $b = $fn(
                 @pitch max($mcroot, $mc + if $fn != ezsol then xrandom(-1, 5) * 1200 else 0) 
-                @duration if $fn != ezsol then xrand(100, 900) else xrand(200, 400) 
+                @duration if $fn != ezsol then xrand(100, 900) else xrand(200, 800) 
                 @names family('winds') 'acc' 
                 @types 'stacc' 
                 @velocity if $fn != ezsol then xrandom(10, 100) else 127
@@ -90,8 +103,10 @@ for $n in rev(1...length($chords)) do (
 ##     ) 
 ## );
 render(
-    @play 1 @process normalize(-3) freeverb(
-        @roomsize 0.5
+    @play 1
+    @fade 2
+    @process crop(@start $head @end -1) fade(5, 5) normalize(-3) freeverb(
+        @roomsize 0.6
         @wet $wetbpf
         @damp 1
         @width 1
