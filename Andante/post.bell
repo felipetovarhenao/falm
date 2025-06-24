@@ -5,7 +5,7 @@ $durs = arithmser(0, 1, null, 30).scale(0, 1, 250, 5, -0.25);
 $b.setkey('duration', $peak).transcribe(@onset $t);
 $t = $peak;
 for $dur in $durs do (
-    $seg = $b.setkey('offset', $peak - 500).setkey('duration', $dur);
+    $seg = $b.setkey('offset', $peak - $dur).setkey('duration', $dur);
     $seg.process(normalize(-3)).transcribe($t);
     $t += $dur
 );
