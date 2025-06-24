@@ -56,10 +56,10 @@ for $n in rev(1...length($chords)) do (
                 @duration if $fn != ezsol then xrand(100, 900) else xrand(200, 800) 
                 @names family('winds') 'acc' 
                 @types 'stacc' 
-                @velocity if $fn != ezsol then xrandom(10, 100) else 127
+                @velocity if $fn != ezsol then xrandom(40, 100) else 127
                 @phase xrand() 
                 @envelope [0 0 0] [
-                    xrand(0.001, 0.5) xrand(0.005, 0.125) xrand(1/3, 3/4) 
+                    xrand(0.001, 0.5) xrand(0.05, 0.25) xrand(1/3, 3/4) 
                 ] [1 0 -xrand(1/3, 6/7)] 
                 @useseed 1
             ).process($normop);
