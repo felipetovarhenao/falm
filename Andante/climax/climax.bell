@@ -1,0 +1,59 @@
+setseed(10);
+$metadata =read('../pulse/pulse.txt');
+$beat = $metadata.'beat';
+$beatnum = int(round($metadata.'sections':2 / $beat));
+$event = $metadata.'chords':$beatnum;
+$chord = $event.getkey('chord');
+$t = 0;
+$groups = (
+    [
+        ['names' family('plucked')] [
+            'types' 'ord' 'harm' 
+        ] 
+    ] 
+    ## 
+    [
+        ['names' family('strings')] ['types' 'pizz'] 
+    ] 
+);
+for $mc in $chord.xscramble() do (
+    $group = xchoose($groups);
+    $pan = mc2pan($mc);
+    ezsol(
+        @pitch $mc
+        @names $group.getkey('names') 
+        @types $group.getkey('types') 
+        @duration null
+        @velocity 127
+    ).transcribe(
+        @onset $t @pan $pan
+    );
+    $vibsign = xchoose(-1 1);
+    $vib = for $x in 0...xrandom(0, 3) collect xrand(2) * $vibsign;
+    sinewave(
+        @pitch $mc + 1200
+        @duration xrand(1000, 9000) 
+        @velocity xrand(40, 127) 
+    ).process(
+        ## ----
+        freqshift(
+            @shift $vib @negative 1
+        ) 
+    ).transcribe(
+        @onset $t
+        @gain 0.0125
+        @pan 1 - $pan
+    );
+    $t += xrand(20) 
+);
+render(
+    @play 1
+    @panmode 1
+    @process normalize(-3) dynamics(@knee 2 @ratio 3) freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+);
+ezexport()
