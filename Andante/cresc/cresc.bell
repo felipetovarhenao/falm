@@ -1,7 +1,32 @@
 $metadata =read('../pulse/pulse.txt');
-$sections = $metadata.'sections';
-$event = $metadata.'chords':-1;
+$beat = $metadata.'beat';
+$beatnum = int(round($metadata.'sections':2 / $beat));
+$event = $metadata.'chords':$beatnum;
 $chord = $event.getkey('chord');
+$t = 0;
+$velbpf = [0 1 0] [1 127 0.125];
+$incrbpf = [0 $beat * 5 0] [1 $beat / 2 -0.5];
+$gainbpf = [0 0.1 0] [1 1 0.125];
+for $mc $mci in $chord.rev() do (
+    $nt = $mci.scale(1, length($chord), 0, 1);
+    $vel = samplebpf($velbpf, $nt);
+    $gain = samplebpf($gainbpf, $nt);
+    $incr = samplebpf($incrbpf, $nt);
+    $incr = xrandom(1, round($incr / $beat)) * $beat;
+    pno(
+        @pitch $mc
+        @gain 0.125
+        @norm 1
+        @velocity $vel
+        @duration null
+        @useseed 1
+    ).transcribe(
+        @onset $t
+        @pan mc2pan($mc, 0.25) 
+        @gain $gain
+    );
+    $t += $incr
+);
 $mc = minimum($chord);
 $duration = 6000;
 $phasor = phasor(
@@ -10,21 +35,27 @@ $phasor = phasor(
 $b = triangle(
     @phase $phasor @offset [0 0 0] [1 1 0.25] 
 );
-$b.transcribe(
+$bassop = (
+    ## --------
+    gain([0 1 0] [1 20 0.5]) 
+    ## --------
+    pong() 
+    ## --------
+    onepole(300) 
+    ## --------
+    fade(5, 5) 
+    ## --------
+    gain([0 0 0] [1 1 0.5]) 
+);
+$b.process($bassop).transcribe(
+    @onset $t - $duration
     @pan xrand() xrand() 
+    @gain 0.25
 );
 render(
-    @play 1 @process (
-        ## --------
-        gain([0 1 0] [1 20 0.5]) 
-        ## --------
-        pong() 
-        ## --------
-        onepole(300) 
-        ## --------
-        fade(5, 5) 
-        ## --------
-        gain([0 0 0] [1 1 0.5]) 
+    @play 1
+    @panmode 1
+    @process (
         ## --------
         normalize(-3) 
         ## --------
@@ -36,4 +67,4 @@ render(
         ) 
     ) 
 );
-ezexport($duration)
+ezexport($t)
