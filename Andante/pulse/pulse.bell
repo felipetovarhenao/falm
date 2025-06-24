@@ -112,6 +112,10 @@ GenSolBuf = (
     ) 
 );
 $count = 0;
+$metadata = (
+    ## -----
+    ['chords'] 
+);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $range = int(
@@ -138,6 +142,9 @@ while $t < $totdur do (
         round(samplebpf($numvoicesbpf, $nt)) 
     );
     $submcs = left(right($mcs, -$range), $rangesize);
+    $metadata.'chords' _= [
+        ['onset' $t] ['chord' $submcs] 
+    ];
     $numsubmcs = length($submcs);
     for $v in 1...$numvoices do (
         $mcid = $count % $numsubmcs + 1;
@@ -209,4 +216,5 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport((0 $climaxst $climaxend 1) * $totdur)
+$metadata _= ['sections' (0 $climaxst $climaxend 1) * $totdur];
+ezexport($metadata)
