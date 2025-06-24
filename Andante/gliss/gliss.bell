@@ -1,0 +1,66 @@
+setseed(300);
+$metadata = read('../pulse/pulse.txt');
+$beat = $metadata.'beat';
+$sections = $metadata.'sections';
+$events = $metadata.'chords';
+$numglisses = 40;
+$totdur = $sections:2;
+$markers = arithmser(0, 1, null, $numglisses + 1).scale(0, 1, 0, $totdur, -0.33).right(1);
+$beatnums = int(round($markers / $beat));
+$velbpf = [0 0 0] [1 127 0.125];
+$durbpf = [0 280 0] [0.61833 4000 -0.125] [1 500 -0.125];
+$delaybpf = [0 900 0] [1 50 -0.125];
+$sizebpf = [0 3 0] [1 10 -0.125];
+for $beatnum in $beatnums do (
+    $event = $events:$beatnum;
+    $onset = $event.getkey('onset');
+    $nt = $onset / $totdur;
+    ## ----- BPF sampling -----
+    $delay = samplebpf($delaybpf, $nt);
+    $vel = samplebpf($velbpf, $nt);
+    $duration = samplebpf($durbpf, $nt);
+    ## ------------------------
+    $mcs = $event.getkey('chord');
+    $size = int(
+        round(samplebpf($sizebpf, $nt)) 
+    );
+    $mcs = scramble(
+        group(sort($mcs), 2, 1) 
+    );
+    $mcs = $mcs.left($size);
+    $rev = xrand() > 0.5;
+    $slope = xrand(1/10, 3/4);
+    for $pair in $mcs with @unwrap 1 do (
+        if $rev == 1 then ($pair = rev($pair));
+        ## $pair -= 1200;
+        $pitch = $pair:1;
+        $diff = pitchdiff($pitch, $pair:2);
+        for $v $vi in 1...xrandom(1, 4) do (
+            ezsol(
+                @pitch $pitch + (if $vi == 1 then 0 else random(-1, 1) * 1200) 
+                @types 'ord' 'nonvib' 'micro' 'harm' 'flz' 'bisb' 
+                @velocity $vel
+                @names family('strings' ) family('woodwinds') 'acc' 
+                @duration $duration
+                @useseed 1
+            ).process(
+                resample(
+                    [0 1 0] [1 1/c2r($diff) $slope] 
+                ) window() 
+            ).transcribe(
+                @onset $onset @pan xrand() 
+            ) 
+        );
+        $onset += xrand($delay) 
+    ) 
+);
+$bg = importaudio('../main.wav').setkey('duration', $onset + 5000);
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.95
+        @wet [0 0.0125 0] [1 0.05 0.125] 
+        @dry [0 0.25 0] [1 1 0.125] 
+        @damp 1
+        @width 1
+    ) mix($bg) 
+)

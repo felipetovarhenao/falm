@@ -521,4 +521,42 @@ partition = (
         for $msg in $msgs with @unwrap 1 do $partition($msg @out 'm');
         $partition($llll) 
     ) 
+);
+#(
+```bell
+maxabs(
+    @x ## int/float/llll (required)
+    @y ## int/float/llll (required)
+) -> llll
+```
+
+Maximum value between the absolute values of `@x` and `@y`.
+)#
+maxabs = (
+    $x, $y -> (
+        $sgn = sgn($x);
+        $sgn += 1 - abs($sgn);
+        $x = abs($x);
+        $y = abs($y);
+        max($x, $y) * $sgn
+    ) 
+);
+#(
+```bell
+minabs(
+    @x ## int/float/llll (required)
+    @y ## int/float/llll (required)
+) -> llll
+```
+
+Minimum value between the absolute values of `@x` and `@y`.
+)#
+minabs = (
+    $x, $y -> (
+        $sgn = sgn($x);
+        $sgn += 1 - abs($sgn);
+        $x = abs($x);
+        $y = abs($y);
+        min($x, $y) * $sgn
+    ) 
 )
