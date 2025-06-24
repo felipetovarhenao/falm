@@ -113,6 +113,7 @@ GenSolBuf = (
 );
 $count = 0;
 $metadata = (
+    ['beat' $beat]
     ## -----
     ['chords'] 
 );
