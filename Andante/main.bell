@@ -4,6 +4,8 @@ pno(
     @pitch $mc
     @duration null
     @velocity 127
+    @gain 0.125
+    @norm 1
 ).transcribe(
     @pan mc2pan($mc) 
 );
@@ -14,6 +16,6 @@ $t += $markers:2;
 importaudio('./layers/layers.wav').transcribe(@onset $t);
 importaudio('./cresc/cresc.wav').transcribe(@onset $t - read('./cresc/cresc.txt'));
 render(
-    @play 1 @process resample(1/c2r(-125)) normalize(-3) 
+    @play 1 @process normalize(-3) 
 );
 ezexport()
