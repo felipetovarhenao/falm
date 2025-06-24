@@ -1,0 +1,39 @@
+$metadata =read('../pulse/pulse.txt');
+$sections = $metadata.'sections';
+$event = $metadata.'chords':-1;
+$chord = $event.getkey('chord');
+$mc = minimum($chord);
+$duration = 6000;
+$phasor = phasor(
+    @frequency mc2f($mc) @duration $duration
+);
+$b = triangle(
+    @phase $phasor @offset [0 0 0] [1 1 0.25] 
+);
+$b.transcribe(
+    @pan xrand() xrand() 
+);
+render(
+    @play 1 @process (
+        ## --------
+        gain([0 1 0] [1 20 0.5]) 
+        ## --------
+        pong() 
+        ## --------
+        onepole(300) 
+        ## --------
+        fade(5, 5) 
+        ## --------
+        gain([0 0 0] [1 1 0.5]) 
+        ## --------
+        normalize(-3) 
+        ## --------
+        freeverb(
+            @roomsize 0.9
+            @wet [0 0 0] [1 0.0125 0.5] 
+            @damp 1
+            @width 1
+        ) 
+    ) 
+);
+ezexport($duration)

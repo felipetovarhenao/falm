@@ -12,6 +12,7 @@ importaudio('./gliss/gliss.wav').transcribe(@onset $t);
 $markers = read('./pulse/pulse.txt').'sections';
 $t += $markers:2;
 importaudio('./layers/layers.wav').transcribe(@onset $t);
+importaudio('./cresc/cresc.wav').transcribe(@onset $t - read('./cresc/cresc.txt'));
 render(
     @play 1 @process resample(c2r(25)) normalize(-3) 
 );
