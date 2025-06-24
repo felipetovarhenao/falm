@@ -17,6 +17,12 @@ importaudio('./layers/layers.wav').transcribe(@onset $t);
 importaudio('./climax/climax.wav').transcribe(@onset $t);
 importaudio('./cresc/cresc.wav').transcribe(@onset $t - read('./cresc/cresc.txt'));
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process dynamics(
+        @attack 500
+        @release 1000
+        @knee 4
+        @ratio 10
+        @thresh -25
+    ) resample(1/c2r(20)) normalize(-3) 
 );
 ezexport()

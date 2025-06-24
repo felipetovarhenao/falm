@@ -14,7 +14,7 @@ $durbpf = [0 280 0] [0.61833 4000 -0.125] [1 500 -0.125];
 $delaybpf = [0 900 0] [1 50 -0.125];
 $sizebpf = [0 3 0] [1 10 -0.125];
 $family = family('strings') family('woodwinds') 'acc';
-$types = 'ord' 'nonvib' 'micro' 'harm' 'flz' 'bisb';
+$types = 'ord' 'nonvib' 'ord-micro' 'ord-high' 'harm' 'flz' 'bisb' 'harm-trem';
 for $beatnum in $beatnums do (
     $event = $events:$beatnum;
     $onset = $event.getkey('onset');
