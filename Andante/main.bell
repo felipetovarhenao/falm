@@ -8,10 +8,11 @@ pno(
     @pan mc2pan($mc) 
 );
 importaudio('./pulse/pulse.wav').transcribe($t);
-$markers = read('./pulse/pulse.txt');
+importaudio('./gliss/gliss.wav').transcribe($t);
+$markers = read('./pulse/pulse.txt').'sections';
 $t += $markers:2;
 importaudio('./layers/layers.wav').transcribe($t);
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process resample(c2r(100)) normalize(-3) 
 );
 ezexport()

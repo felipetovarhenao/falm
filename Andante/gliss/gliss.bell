@@ -1,11 +1,11 @@
-setseed(300);
+setseed(1010);
 $metadata = read('../pulse/pulse.txt');
 $beat = $metadata.'beat';
 $sections = $metadata.'sections';
 $events = $metadata.'chords';
-$numglisses = 40;
+$numglisses = 45;
 $totdur = $sections:2;
-$markers = arithmser(0, 1, null, $numglisses + 1).scale(0, 1, 0, $totdur, -0.33).right(1);
+$markers = arithmser(0, 1, null, $numglisses + 1).scale(0, 1, 0, $totdur, -0.4).right(1);
 $beatnums = int(round($markers / $beat));
 $velbpf = [0 0 0] [1 127 0.125];
 $durbpf = [0 280 0] [0.61833 4000 -0.125] [1 500 -0.125];
@@ -24,7 +24,7 @@ for $beatnum in $beatnums do (
     $size = int(
         round(samplebpf($sizebpf, $nt)) 
     );
-    $mcs = scramble(
+    $mcs = xscramble(
         group(sort($mcs), 2, 1) 
     );
     $mcs = $mcs.left($size);
@@ -37,7 +37,7 @@ for $beatnum in $beatnums do (
         $diff = pitchdiff($pitch, $pair:2);
         for $v $vi in 1...xrandom(1, 4) do (
             ezsol(
-                @pitch $pitch + (if $vi == 1 then 0 else random(-1, 1) * 1200) 
+                @pitch $pitch + (if $vi == 1 then 0 else xrandom(-1, 1) * 1200) 
                 @types 'ord' 'nonvib' 'micro' 'harm' 'flz' 'bisb' 
                 @velocity $vel
                 @names family('strings' ) family('woodwinds') 'acc' 
@@ -54,13 +54,13 @@ for $beatnum in $beatnums do (
         $onset += xrand($delay) 
     ) 
 );
-$bg = importaudio('../main.wav').setkey('duration', $onset + 5000);
 render(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.95
-        @wet [0 0.0125 0] [1 0.05 0.125] 
-        @dry [0 0.25 0] [1 1 0.125] 
+        @wet 0.0125
+        @dry [0 1/3 0] [1 1 0.1] 
         @damp 1
         @width 1
-    ) mix($bg) 
-)
+    ) 
+);
+ezexport()
