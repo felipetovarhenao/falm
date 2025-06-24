@@ -41,12 +41,11 @@ for $beatnum in $beatnums do (
     );
     for $pair in $mcs with @unwrap 1 do (
         if $rev == 1 then ($pair = rev($pair));
-        ## $pair -= 1200;
         $pitch = $pair:1;
         $diff = pitchdiff($pitch, $pair:2);
         for $v $vi in 1...xrandom(1, 4) do (
             ezsol(
-                @pitch $pitch + (if $vi == 1 then 0 else xrandom(-1, 1) * 1200) 
+                @pitch $pitch
                 @types $types
                 @velocity $vel
                 @names $family
@@ -66,7 +65,7 @@ for $beatnum in $beatnums do (
 render(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.925
-        @wet 0.0125
+        @wet [0 0.012 0] [1 0.05 0.8] 
         @dry [0 1/3 0] [1 1 0.1] 
         @damp 1
         @width 1
