@@ -2,7 +2,7 @@ $metadata = read('./pulse/pulse.txt');
 $beat = $metadata.'beat';
 $peak = $metadata.'sections':2;
 $b = importaudio('./main.wav');
-$durs = arithmser(0, 1, null, 8).scale(0, 1, $beat * 2, 5, -0.125);
+$durs = arithmser(0, 1, null, 16).scale(0, 1, $beat * 2, 5, -0.125);
 $t = 0;
 $b.setkey('duration', $peak).transcribe(@onset $t);
 $t = $peak;
@@ -24,7 +24,7 @@ render(
             @thresh -25
         ) 
         ## ----
-        ## resample(1/c2r(-60)) 
+        ## resample(1/c2r(-160)) 
         
     ) 
 );
