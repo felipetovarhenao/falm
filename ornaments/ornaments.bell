@@ -1,7 +1,7 @@
-setseed(190);
+setseed(12348);
 $mcroot = db1;
 $pcroot = mc2pc($mcroot);
-$pcs = r2pc(1 5/4 3/2 9/8 15/8 8/7 12/7 7/5, $pcroot);
+$pcs = r2pc(1 5/4 3/2 15/8 9/8 8/7 12/7 7/5, $pcroot);
 $chord = r2mc(2...64, $mcroot).pcquant($pcs);
 GetPitch = (
     $i = 1 -^ $chord -> (
@@ -19,7 +19,7 @@ Trill = (
         $t = 0;
         $i = LastPitch ||| xrandom(4, 40);
         $count = 0;
-        $maxincr = xrand().scale(@outmin 0.02 @slope 0.125) * $duration;
+        $maxincr = xrand().scale(@outmin 0.1 @slope 0.125) * $duration;
         $compression = exp2(xrand(-3, 0));
         $incrbpf = [0 $maxincr * $compression 0] [0.5 $maxincr 0.125] [1 $maxincr * $compression -0.125];
         if xrand() > 0.666 then ($incrbpf = $incrbpf.left(-1) );
@@ -31,11 +31,13 @@ Trill = (
             $i + (0...($size - 1)) * $step
         );
         LastPitch = $ids:-1;
-        $mcs = (GetPitch($ids) );
-        $vel = xrand(10, 120);
+        $mcs = GetPitch($ids);
+        $vel = xrand(10, 90);
         $groups = (
             [
-                ['names' family('strings')] ['types' 'pizz'] 
+                ['names' family('strings')] [
+                    'types' 'pizz' 
+                ] 
             ] [
                 ['names' family('plucked')] [
                     'types' 'harm' 'ord' 'ord-high' 'pizz' 'tasto' 'pont' 
@@ -63,13 +65,40 @@ Trill = (
             );
             $t += $incr;
             $count += 1
-        ) 
+        );
+        $duration
+    ) 
+);
+Strum = (
+    $onset = 0, $duration = 1000 -> (
+        $n = xrandom(1, 64);
+        $step = xrandom(1, 4);
+        $n = $n + (0...xrandom(3, 9)) * $step;
+        $n = xscramble($n);
+        LastPitch = $n:-1;
+        $mcs = GetPitch($n).thin();
+        $t = 0;
+        for $mc in $mcs do (
+            ezsol(
+                @pitch $mc
+                @duration $duration
+                @velocity xrand(127) 
+                @names family('plucked') 
+                @useseed 1
+                @types 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'ten' 'tasto' 
+            ).transcribe(
+                @onset $t + $onset @pan mc2pan($mc , 0.1) 
+            );
+            $t += xrand(50) 
+        );
+        $t
     ) 
 );
 $t = 0;
-for $i in 1...30 do (
-    $dur = xrand(500, 5000);
-    Trill($t, $dur);
+for $i in 1...32 do (
+    $dur = xrand(250, 4000);
+    $fn = xchoose(Trill Strum @weights 4 1);
+    $dur = $fn($t, $dur);
     $t += $dur * xrand(0, 0.5).exp2() 
 );
 render(
@@ -78,4 +107,5 @@ render(
         @wet 0.0125
         @damp 1
     ) normalize(-3) 
-)
+);
+ezexport()
