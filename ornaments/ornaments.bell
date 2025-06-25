@@ -1,4 +1,4 @@
-setseed(12348);
+setseed(4040);
 $mcroot = db1;
 $pcroot = mc2pc($mcroot);
 $pcs = r2pc(1 5/4 3/2 15/8 9/8 8/7 12/7 7/5, $pcroot);
@@ -96,7 +96,7 @@ Strum = (
     ) 
 );
 $t = 0;
-for $i in 1...32 do (
+for $i in 1...42 do (
     $dur = xrand(250, 4000);
     $fn = xchoose(Trill Strum @weights 4 1);
     $dur = $fn($t, $dur);
