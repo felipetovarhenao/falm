@@ -78,6 +78,7 @@ Strum = (
         LastPitch = $n:-1;
         $mcs = GetPitch($n).thin();
         $t = 0;
+        $duration *= exp2(xrand(0, 1));
         for $mc in $mcs do (
             ezsol(
                 @pitch $mc
