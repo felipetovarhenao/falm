@@ -1,14 +1,15 @@
-setseed(4510);
-$mcroot = a1;
+setseed(1518);
+$mcroot = ab1;
 $pcroot = mc2pc($mcroot);
 $ratios = 1 5/4 3/2 5/3 15/8;
 $pcs = r2pc($ratios @pc $pcroot);
 $fullchord = r2mc(4...24, $mcroot).pcquant($pcs);
-$chordsize = 4;
+$chordsize = 6;
 $panspread = 0.5;
 $chords = $fullchord.group($chordsize, $chordsize - 1).group(2, 1).xscramble();
 $t = 0;
 $unit = 180;
+$mindb = -12;
 $types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'bartok';
 $names = family('plucked');
 for $chordpair in $chords with @unwrap 1 do (
@@ -34,7 +35,6 @@ for $chordpair in $chords with @unwrap 1 do (
             @velocity $vel
             @useseed 1
         ).process(resample($env) trim(@threshold 0.0025 @end 0));
-        $mindb = -16;
         if $b.getkey('maxabs') > 0 then (
             if $b.getkey('maxabs').atodb() < $mindb then (
                 $b = $b.process(normalize($mindb)) 
