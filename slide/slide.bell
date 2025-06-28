@@ -38,4 +38,5 @@ for $chordpair in $chords with @unwrap 1 do (
 );
 render(
     @play 1 @process normalize(-3) repeat(4) freeverb(@roomsize 0.7 @damp 1) 
-)
+);
+ezexport()
