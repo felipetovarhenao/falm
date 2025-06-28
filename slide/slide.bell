@@ -1,4 +1,4 @@
-setseed(4510);
+setseed(45100);
 $op = normalize(-3);
 $mcroot = ab1;
 $pcroot = mc2pc($mcroot);
@@ -76,10 +76,10 @@ for $chordsize in 1...7 collect (
     ] 
 );
 $t = 0;
-for $event in $events do (
+for $event $eventid in $events do (
     $b = getkey($event, 'buffer');
     $dur = getkey($event, 'duration');
-    for $i in 1...1 do (
+    for $i in 1...$eventid do (
         transcribe($b, $t);
         $t += $dur
     ) 
