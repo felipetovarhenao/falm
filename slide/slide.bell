@@ -1,5 +1,11 @@
-$fullchord = r2mc(4...48, e1).pcquant(r2pc(1 5/4 3/2 15/8));
+setseed(20);
+$mcroot = e1;
+$pcroot = mc2pc($mcroot);
+$ratios = 1 5/4 3/2 15/8;
+$pcs = r2pc($ratios @pc $pcroot);
+$fullchord = r2mc(4...48, $mcroot).pcquant($pcs);
 $chordsize = 4;
+$panspread = 0.5;
 $chords = $fullchord.group($chordsize, $chordsize - 1).group(2, 1).xscramble();
 $t = 0;
 for $chordpair in $chords with @unwrap 1 do (
@@ -19,18 +25,20 @@ for $chordpair in $chords with @unwrap 1 do (
         ):(-1 2);
         $b = ezsol(
             @pitch $mc1
-            @types 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 
+            @types 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 
             @names family('plucked') 
             @duration $dur / $durmul
             @velocity $vel
-        ).process(trim(@threshold 0.001) resample($env));
+            @useseed 1
+        ).process(trim(@threshold 0.0025 @end 0) resample($env));
         $mindb = -16;
         if $b.getkey('maxabs').atodb() < $mindb then (
             $b = $b.process(normalize($mindb)) 
         );
+        $pan = [0 mc2pan($mc1, $panspread) 0] [1 mc2pan($mc2, $panspread) $slope];
         $b.transcribe(
             @onset $t
-            @pan mc2pan($mc1 $mc2) 
+            @pan $pan
             @gain [0 1 0] [1 0 0.9] 
         ) 
     );
