@@ -1,20 +1,23 @@
-setseed(20);
-$mcroot = e1;
+setseed(4510);
+$mcroot = a1;
 $pcroot = mc2pc($mcroot);
-$ratios = 1 5/4 3/2 15/8;
+$ratios = 1 5/4 3/2 5/3 15/8;
 $pcs = r2pc($ratios @pc $pcroot);
-$fullchord = r2mc(4...48, $mcroot).pcquant($pcs);
+$fullchord = r2mc(4...24, $mcroot).pcquant($pcs);
 $chordsize = 4;
 $panspread = 0.5;
 $chords = $fullchord.group($chordsize, $chordsize - 1).group(2, 1).xscramble();
 $t = 0;
+$unit = 180;
+$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'bartok';
+$names = family('plucked');
 for $chordpair in $chords with @unwrap 1 do (
-    $dur = 180 * xchoose(1 2 4 3);
+    $dur = $unit * xchoose(1 2 3);
     $glisses = $chordpair.trans();
     $rev = xrand() > 0.5;
     $slope = xrand(1/3, 6/7) * xchoose(-1 1);
     for $gliss in $glisses with @unwrap 1 do (
-        $vel = xrand(50, 127);
+        $vel = xrand(10, 127);
         if $rev == 1 then ($gliss = rev($gliss) );
         $mc1 = $gliss:1;
         $mc2 = $gliss:2;
@@ -25,26 +28,33 @@ for $chordpair in $chords with @unwrap 1 do (
         ):(-1 2);
         $b = ezsol(
             @pitch $mc1
-            @types 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 
-            @names family('plucked') 
+            @types $types
+            @names $names
             @duration $dur / $durmul
             @velocity $vel
             @useseed 1
-        ).process(trim(@threshold 0.0025 @end 0) resample($env));
+        ).process(resample($env) trim(@threshold 0.0025 @end 0));
         $mindb = -16;
-        if $b.getkey('maxabs').atodb() < $mindb then (
-            $b = $b.process(normalize($mindb)) 
-        );
-        $pan = [0 mc2pan($mc1, $panspread) 0] [1 mc2pan($mc2, $panspread) $slope];
-        $b.transcribe(
-            @onset $t
-            @pan $pan
-            @gain [0 1 0] [1 0 0.9] 
+        if $b.getkey('maxabs') > 0 then (
+            if $b.getkey('maxabs').atodb() < $mindb then (
+                $b = $b.process(normalize($mindb)) 
+            );
+            $pan = [0 mc2pan($mc1, $panspread) 0] [1 mc2pan($mc2, $panspread) $slope];
+            $b.transcribe(
+                @onset $t
+                @pan $pan
+                @gain [0 1 0] [1 0 0.9] 
+            ) 
         ) 
     );
     $t += $dur
 );
 render(
-    @play 1 @process normalize(-3) repeat(4) freeverb(@roomsize 0.7 @damp 1) 
+    @play 1 @process normalize(-3) repeat(4) freeverb(
+        @roomsize 0.9
+        @damp 1
+        @width 1
+        @wet 0.0125
+    ) 
 );
 ezexport()
