@@ -533,4 +533,21 @@ sigmoid(
 )#
 sigmoid = (
     $x -> 1 / (1 - exp(-$x)) 
+) 
+#( 
+```bell
+randn(
+    @mean 0
+    @std 1
+) -> float
+```
+Samples a number from a normal distribution with a given mean and standard deviation.
+)#
+randn = (
+    $mean = 0, $std = 1 -> (
+        $u1 = rand();
+        $u2 = rand();
+        $z0 = sqrt(-2 * log($u1)) * cos(2 * pi * $u2);
+        $mean + $std * $z0
+    ) 
 )
