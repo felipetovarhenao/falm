@@ -13,7 +13,7 @@ $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-or
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
 $units = rev(
-    sort((1...12) / 16) 
+    sort((1 1...12) / 16) 
 );
 ## -------------------------
 ## BPFs
