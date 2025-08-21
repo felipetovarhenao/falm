@@ -4,10 +4,11 @@ $totdur = 30 * 1000;
 $bardur = 2000;
 $i = 1;
 $fullchord = r2mc(1...21, c4).pcquant(r2pc(1 9/8 5/4 3/2 5/3)).sort();
+$units = 3/16 1/8 3/8 1/4 3/4 1;
 while $t < $totdur do (
     $nt = $t / $totdur;
     $chordsize = $nt.scale(0, 1, 1, length($fullchord), -0.125).round().int();
-    $maxdur = $bardur * xchoose(3/16 1/8 3/8 1/4 3/4 1);
+    $maxdur = $bardur * xchoose($units);
     $vel = xrand(50, 127);
     $chord = $fullchord.left($chordsize);
     $i += 1;
@@ -43,7 +44,7 @@ while $t < $totdur do (
         ) 
     );
     $t += $maxdur;
-    if xrand() > 0.9 then ($t += $bardur * xchoose(1/4 3/16 1/8 5/16) ) 
+    if xrand() > 0.9 then ($t += $bardur * xchoose($units)) 
 );
 render(
     @play 1 @process normalize(-9) freeverb(
