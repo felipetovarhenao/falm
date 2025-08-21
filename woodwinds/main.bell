@@ -1,8 +1,8 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(30);
-$tempo = 120;
+setseed(390);
+$tempo = 112;
 $beatdur = 72000 / $tempo;
 $bardur = $beatdur * 4;
 $root = g3;
@@ -212,17 +212,13 @@ PianoRoll = (
 ## Main loop
 ## ----------------------
 $objects = Arpeggi TremChord Melody;
-$stweights = 0.7 0 1;
+$stweights = 1/3 0 2/3;
 $weightsbpf = (
     [0 [$stweights] 0] 
     ## 
-    [
-        0.8 [0.1 reduce($stweights, #+) 0] 0.125
-    ] 
+    [0.8 [0.2 0.8 0] 0.125] 
     ## 
-    [
-        1 [0 reduce($stweights, #+) 0] -0.125
-    ] 
+    [1 [0 1 0] -0.125] 
 );
 while $t < $totdur do (
     $nt = $t / $totdur;
