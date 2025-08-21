@@ -126,6 +126,7 @@ Arpeggi = (
                 @names 'clar' 
                 @types 'ord' 'ord-and-air' 'sfz' 'stacc' 
                 @velocity 127
+                @useseed 1
             ).process(normalize(-7)).transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
