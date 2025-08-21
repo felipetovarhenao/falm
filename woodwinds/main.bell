@@ -129,7 +129,7 @@ Arpeggi = (
                 @pitch $mc
                 @duration $unit + $legato
                 @names 'clar' 
-                @types 'ord' 'ord-and-air' 'sfz' 'stacc' 
+                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 
                 @velocity 127
                 @useseed 1
             ).process(normalize(-7)).transcribe(
@@ -193,7 +193,7 @@ PianoRoll = (
         for $mc in $chord do (
             pno(
                 @pitch $mc + xrandom(-1, 2) * 1200
-                @duration $duration + 200
+                @duration $duration * 1.5
                 @velocity $vel
                 @useseed 1
             ).transcribe(
