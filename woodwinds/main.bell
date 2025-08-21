@@ -2,7 +2,7 @@
 ## Global setup and variables
 ## -------------------------
 setseed(490);
-$tempo = 107;
+$tempo = 112;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $root = d#4;
