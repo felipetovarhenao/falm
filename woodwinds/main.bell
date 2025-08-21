@@ -132,7 +132,7 @@ Arpeggi = (
                 @pitch $mc
                 @duration $unit + $legato
                 @names 'clar' 
-                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 
+                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 
                 @velocity 127
                 @useseed 1
             ).process(normalize(-7)).transcribe(
@@ -161,7 +161,8 @@ Melody = (
         $t = $onset;
         $legato = 50;
         $pairs = group($chord $chord:-1, 2, 1);
-        $onsets = $onset + arithmser(0, 1, null, length($pairs) + 1).scale(0, 1, 0, $duration, @slope xrand(-1/3, 1/3));
+        $slope = xrand(1/10, 1/3) * xchoose(-1 1);
+        $onsets = $onset + arithmser(0, 1, null, length($pairs) + 1).scale(0, 1, 0, $duration, @slope $slope);
         $incrs = x2dx($onsets);
         $onsets = $onsets.left(-1);
         ## iterate through note pairs
