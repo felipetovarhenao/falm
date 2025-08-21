@@ -1,11 +1,25 @@
-setseed(1);
-$chord = r2mc(1 5/4 3/2 15/8 9/4 3/4 1/2 5/2, c4);
+setseed(10);
 $t = 0;
 $totdur = 30 * 1000;
 $bardur = 2000;
+$i = 1;
+$fullchord = r2mc(1 5/4 3/2 15/8 9/4 3/4 1/2 5/2, c4).sort();
 while $t < $totdur do (
-    $maxdur = $bardur * xchoose(1/16 1/8 3/8 1/4 3/4 1);
+    $nt = $t / $totdur;
+    $chordsize = $nt.scale(0, 1, 1, length($fullchord), -0.125).round().int();
+    $maxdur = $bardur * xchoose(3/16 1/8 3/8 1/4 3/4 1);
     $vel = xrand(127);
+    $chord = $fullchord.left($chordsize);
+    $i += 1;
+    cycle(
+        @frequency xchoose($chord).mc2f() / 4
+        @duration $maxdur
+        @phase xrand() 
+    ).transcribe(
+        @onset $t
+        @pan mc2pan($mc) 
+        @gain [0 rand(0.1, 0.5) 0] [1 0 -0.25] 
+    );
     for $mc in $chord do (
         $oct = xrandom(-6, -9) * xchoose(1 -1);
         $b = ezsol(
@@ -13,7 +27,7 @@ while $t < $totdur do (
             @pitch $mc
             @duration null
             @types 'vib' 'ord' 'ord-micro' 'sfz' 
-            @velocity $vel
+            ## @velocity $vel
             @useseed 1
         );
         $dur = min($maxdur, $b.getkey('duration')) + 100;
@@ -22,7 +36,7 @@ while $t < $totdur do (
             @duration $dur
             @phase xrand() 
         ).process(scaling(-1, 1, 0, 1) rampsmooth(64, 64));
-        $b.process(multiply($trem)).transcribe(
+        $b.process(multiply($trem) normalize(-6)).transcribe(
             @onset $t
             @pan mc2pan($mc) 
             @gain [0 1 0] [0.5 xrand(0.1, 0.5) -0.25] [1 1 0.125] 
@@ -33,7 +47,7 @@ while $t < $totdur do (
 );
 render(
     @play 1 @process normalize(-9) freeverb(
-        @roomsize 0.4
+        @roomsize 0.8
         @wet 0.0125
         @damp 1
         @width 1
