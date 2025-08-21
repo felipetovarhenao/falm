@@ -89,6 +89,7 @@ PercGap = (
             @useseed 1
         );
         $mcs = sort(thin($mcs));
+        $onsetvar = xrand().scale(@slope 0.25) * 90;
         for $mc in $mcs do (
             ezsol(
                 @pitch $mc
@@ -101,7 +102,8 @@ PercGap = (
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
                 @gain [0 1 0] [1 0 0.7] 
-            ) 
+            );
+            $onset += $onsetvar
         ) 
     ) 
 );
@@ -214,7 +216,9 @@ $endweights = 0.05 reduce($stweights, #+) 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
-    $w = samplebpf([0 0 0] [1 1 -0.025], $nt);
+    $w = samplebpf(
+        [0 0 0] [0.8 0.9 0.125] [1 1 -0.45], $nt
+    );
     $weights = (1 - $w) * $stweights + $w * $endweights;
     $object = xchoose(
         @choices $objects @weights $weights
