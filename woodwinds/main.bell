@@ -1,14 +1,14 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
+setseed(490);
 $tempo = 107;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-setseed(49);
-$root = c#4;
+$root = d#4;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 60 * 1000;
+$totdur = 30 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
@@ -76,6 +76,34 @@ TremChord = (
     ) 
 );
 ## ----------------------
+## Function: Gap
+## ----------------------
+PercGap = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $mcs = randomseq(
+            @llll $chord
+            @length xrandom(4, 9) 
+            @steps -2 -3 3
+            @useseed 1
+        );
+        $mcs = sort(thin($mcs));
+        for $mc in $mcs do (
+            ezsol(
+                @pitch $mc
+                @names 'sax' 'flute' 'clar' family('strings') 'harp' 
+                @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 
+                @velocity xrandom(60, 127) 
+                @useseed 1
+                @duration $duration * 2
+            ).process(normalize(-5)).transcribe(
+                @onset $onset
+                @pan mc2pan($mc, 0.5) 
+                @gain [0 1 0] [1 0 0.7] 
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
 ## Function: Arpeggi
 ## ----------------------
 Arpeggi = (
@@ -101,7 +129,6 @@ Arpeggi = (
             $mc2 = $mcs:2;
             $gliss = float(c2r($mc2 - $mc1));
             $res = [0 1 0] [1 1/$gliss xrand(0.65, 0.9)];
-            ## perform with sax/flute articulations
             ezsol(
                 @pitch $mc1
                 @duration $incr + $legato
@@ -146,7 +173,15 @@ while $t < $totdur do (
     );
     ## advance time and occasionally insert a gap
     $t += $maxdur;
-    if xrand() < $gap then ($t += $bardur * xchoose($units)) 
+    if xrand() < $gap then (
+        $gapdur = $bardur * xchoose($units);
+        PercGap(
+            @onset $t
+            @duration $gapdur
+            @chord $chord
+        );
+        $t += $gapdur
+    ) 
 );
 ## ----------------------
 ## Rendering and export
