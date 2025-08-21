@@ -104,9 +104,9 @@ PercGap = (
     ) 
 );
 ## ----------------------
-## Function: Arpeggi
+## Function: Melody
 ## ----------------------
-Arpeggi = (
+Melody = (
     $onset, $duration, $chord -> (
         $maxnotes = int(round($duration / 90));
         ## randomized arpeggiated sequence
@@ -151,7 +151,7 @@ while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
     $object = xchoose(
-        Arpeggi TremChord @weights abs($nt - (1 0)) 
+        Melody TremChord @weights abs($nt - (1 0)) 
     );
     ## sample global breakpoint functions
     $gap = samplebpf($gapbpf, $nt);
@@ -164,7 +164,7 @@ while $t < $totdur do (
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
     $chord = $fullchord.left($chordsize);
-    ## invoke chosen object (Arpeggi or TremChord)
+    ## invoke chosen object (Melody or TremChord)
     $object(
         @onset $t
         @duration $maxdur
