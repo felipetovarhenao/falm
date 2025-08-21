@@ -8,7 +8,7 @@ $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 20 * 1000;
+$totdur = 70 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
@@ -208,15 +208,16 @@ PianoRoll = (
 ## ----------------------
 ## Main loop
 ## ----------------------
+$objects = Arpeggi TremChord Melody;
 $stweights = 0.7 0 1;
-$endweights = 0.1 reduce($stweights, #+) 0.1;
+$endweights = 0.05 reduce($stweights, #+) 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
     $w = samplebpf([0 0 0] [1 1 -0.025], $nt);
     $weights = (1 - $w) * $stweights + $w * $endweights;
     $object = xchoose(
-        @choices Arpeggi TremChord Melody @weights $weights
+        @choices $objects @weights $weights
     );
     ## sample global breakpoint functions
     $gap = samplebpf($gapbpf, $nt);
