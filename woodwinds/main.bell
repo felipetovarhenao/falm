@@ -5,7 +5,7 @@ $t = 0;
 $totdur = 4 * 1000;
 $bardur = 2200;
 $i = 1;
-$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air';
+$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...21, $root).pcquant(r2pc(1 9/8 5/4 3/2 5/3, $pcroot)).sort();
 $units = rev(sort(1/16 1/8 3/16 1/4 5/16 3/8 1/2));
 $gapbpf = [0 1 0] [1 0.1 -0.25];
@@ -21,15 +21,19 @@ $ampmod = (
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord' -^ $ampmod -> (
         $vel = xrand(50, 127);
-        $mc = xchoose($chord);
-        cycle(
-            @frequency $mc.mc2f() / 4
-            @duration $duration
-            @phase xrand() 
-        ).transcribe(
-            @onset $onset
-            @pan mc2pan($mc) 
-            @gain [0 rand(0.1, 0.5) 0] [1 0 -0.25] 
+        for $sign in -1 1 do (
+            $mc = xchoose($chord);
+            $env = [0 rand(0.05, 0.35) 0] [1 0 -0.25];
+            if $sign == 1 then ($env = revbpf($env) );
+            cycle(
+                @frequency $mc.mc2f() * exp2(xrandom(0, 3) * $sign) 
+                @duration $duration
+                @phase xrand() 
+            ).transcribe(
+                @onset $onset
+                @pan abs(mc2pan($mc, 0.25) - (0 1)) 
+                @gain $env
+            ) 
         );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
