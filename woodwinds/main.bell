@@ -1,12 +1,13 @@
-setseed(20);
-$root = d4;
+setseed(21);
+$root = b3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 4 * 1000;
+$totdur = 60 * 1000;
 $bardur = 2200;
 $i = 1;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
-$fullchord = r2mc(1...21, $root).pcquant(r2pc(1 9/8 5/4 3/2 5/3, $pcroot)).sort();
+$ratios = 1 9/8 5/4 3/2 5/3 15/8;
+$fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
 $units = rev(sort(1/16 1/8 3/16 1/4 5/16 3/8 1/2));
 $gapbpf = [0 1 0] [1 0.1 -0.25];
 $chordsizebpf = [0 1 0] [1 length($fullchord) 0];
@@ -40,12 +41,11 @@ TremChord = (
             $b = ezsol(
                 @names family('woodwinds') 
                 @pitch $mc
-                @duration null
+                @duration $duration + 50
                 @types $types
                 @velocity $vel
                 @useseed 1
             );
-            $duration = min($duration, $b.getkey('duration')) + 100;
             $mod = xchoose(rect saw cycle tri)(
                 @frequency $mc.mc2f() * exp2($oct) * xchoose(-1 1) 
                 @duration $duration
@@ -59,6 +59,34 @@ TremChord = (
         ) 
     ) 
 );
+Arpeggi = (
+    $onset, $duration, $chord -> (
+        $chord = $chord.mc2pc().thin().xscramble() * 100 + 7200;
+        $numnotes= length($chord);
+        $incr = $duration / $numnotes;
+        $t = $onset;
+        $legato = 50;
+        for $mcs in group($chord $chord:-1, 2, 1) with @unwrap 1 do (
+            $mc1 = $mcs:1;
+            $mc2 = $mcs:2;
+            $gliss = float(c2r($mc2 - $mc1));
+            $res = [0 1 0] [1 1/$gliss xrand(0.65, 0.9)];
+            ezsol(
+                @pitch $mc1
+                @duration $incr + $legato
+                @types 'ord' 'vib' 'air-and-ord' 'ord-to-air' 'sfz' 
+                @names 'sax' 'flute' 
+                @velocity 90
+                @useseed 1
+            ).process(
+                resample($res) fade(0, $legato) normalize(-3) 
+            ).transcribe(
+                @onset $t @pan mc2pan($mc1, 0.125) 
+            );
+            $t += $incr
+        ) 
+    ) 
+);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt);
@@ -67,9 +95,10 @@ while $t < $totdur do (
     $chordsize = samplebpf($chordsizebpf, $nt).round().int();
     $subunits = right(left($units, $numunits), -$maxunits);
     $maxdur = $bardur * xchoose($subunits);
+    $maxdur = max(50, min($maxdur, $totdur - $t));
     $chord = $fullchord.left($chordsize);
     $i += 1;
-    TremChord(
+    xchoose(Arpeggi TremChord)(
         @onset $t
         @duration $maxdur
         @chord $chord
