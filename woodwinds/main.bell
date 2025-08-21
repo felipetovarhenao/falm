@@ -12,7 +12,9 @@ $totdur = 30 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
-$units = rev(sort(1/16 1/16 1/8 3/16 1/4 5/16 3/8 1/2));
+$units = rev(
+    sort((1...12) / 16) 
+);
 ## -------------------------
 ## BPFs
 ## -------------------------
@@ -104,6 +106,36 @@ PercGap = (
     ) 
 );
 ## ----------------------
+## Function: Arpeggi
+## ----------------------
+Arpeggi = (
+    $onset = 0, $duration = 1000, $chord = null -^ $bardur -> (
+        $unit = $bardur * xchoose(1/16 1/24 1/20);
+        $chord = xscramble($chord).left(xrandom(3, 7));
+        $chordsize = length($chord);
+        $numnotes = max(1, $duration / $unit);
+        $legato = $unit * 0.25;
+        $panoffset = xrand(-1, 1);
+        for $i in 1...$numnotes do (
+            $mc = $chord:(
+                (($i - 1) % $chordsize) + 1
+            );
+            ezsol(
+                @pitch $mc
+                @duration $unit + $legato
+                @names 'clar' 
+                @types 'ord' 'ord-and-air' 'sfz' 'stacc' 
+                @velocity 127
+            ).process(normalize(-7)).transcribe(
+                @onset $onset
+                @gain [0 1 0] [1 0 0.5] 
+                @pan fold(mc2pan($mc, 0.125) + $panoffset) 
+            );
+            $onset += $unit
+        ) 
+    ) 
+);
+## ----------------------
 ## Function: Melody
 ## ----------------------
 Melody = (
@@ -147,11 +179,15 @@ Melody = (
 ## ----------------------
 ## Main loop
 ## ----------------------
+$stweights = 0.7 0 1;
+$endweights = 0 reduce($stweights, #+) 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
+    $w = samplebpf([0 0 0] [1 1 0.125], $nt);
+    $weights = (1 - $w) * $stweights + $w * $endweights;
     $object = xchoose(
-        Melody TremChord @weights abs($nt - (1 0)) 
+        @choices Arpeggi TremChord Melody @weights $weights
     );
     ## sample global breakpoint functions
     $gap = samplebpf($gapbpf, $nt);
