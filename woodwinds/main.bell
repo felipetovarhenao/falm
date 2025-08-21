@@ -1,4 +1,7 @@
-$tempo = 100;
+## -------------------------
+## Global setup and variables
+## -------------------------
+$tempo = 107;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 setseed(49);
@@ -10,19 +13,29 @@ $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-or
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
 $units = rev(sort(1/16 1/8 3/16 1/4 5/16 3/8 1/2));
+## -------------------------
+## BPFs
+## -------------------------
 $gapbpf = [0 1 0] [1 0 -0.35];
 $chordsizebpf = [0 6 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [1 1 -0.125];
 $numunitsbpf = [0 1 0] [1 length($units) 0.125];
+## ----------------------
+## Helpers
+## ----------------------
 $ampmod = (
     $c, $m -> (
         $m = $m.process(scaling(-1, 1, 0, 1) rampsmooth(16, 16));
         $c.process(multiply($m) normalize(-6)) 
     ) 
 );
+## ----------------------
+## Function: TremChord
+## ----------------------
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord' -^ $ampmod -> (
         $vel = xrand(50, 127);
+        ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
             $env = [0 rand(0.05, 0.35) 0] [1 0 -0.25];
@@ -37,6 +50,7 @@ TremChord = (
                 @gain $env
             ) 
         );
+        ## woodwind layer with modulation
         $dip = xrand(0.2, 0.8);
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
@@ -61,26 +75,33 @@ TremChord = (
         ) 
     ) 
 );
+## ----------------------
+## Function: Arpeggi
+## ----------------------
 Arpeggi = (
     $onset, $duration, $chord -> (
         $maxnotes = int(round($duration / 90));
+        ## randomized arpeggiated sequence
         $chord = randomseq(
             @llll $chord
             @length xrandom(3, $maxnotes) 
             @steps -1 1 2
             @useseed 1
         );
+        ## compute onset times and legato values
         $t = $onset;
         $legato = 50;
         $pairs = group($chord $chord:-1, 2, 1);
         $onsets = $onset + arithmser(0, 1, null, length($pairs) + 1).scale(0, 1, 0, $duration, @slope xrand(-1/3, 1/3));
         $incrs = x2dx($onsets);
         $onsets = $onsets.left(-1);
+        ## iterate through note pairs
         for $mcs in $pairs, $t in $onsets, $incr in $incrs with @unwrap 1 do (
             $mc1 = $mcs:1;
             $mc2 = $mcs:2;
             $gliss = float(c2r($mc2 - $mc1));
             $res = [0 1 0] [1 1/$gliss xrand(0.65, 0.9)];
+            ## perform with sax/flute articulations
             ezsol(
                 @pitch $mc1
                 @duration $incr + $legato
@@ -96,28 +117,40 @@ Arpeggi = (
         ) 
     ) 
 );
+## ----------------------
+## Main loop
+## ----------------------
 while $t < $totdur do (
     $nt = $t / $totdur;
+    ## probabilistically choose between objects
     $object = xchoose(
         Arpeggi TremChord @weights abs($nt - (1 0)) 
     );
+    ## sample global breakpoint functions
     $gap = samplebpf($gapbpf, $nt);
     $numunits = samplebpf($numunitsbpf, $nt);
     $maxunits = samplebpf($maxunitsbpf, $nt).round().int();
     $chordsize = samplebpf($chordsizebpf, $nt).round().int();
+    ## determine max event duration
     $subunits = right(left($units, $numunits), -$maxunits);
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
+    ## choose chord slice
     $chord = $fullchord.left($chordsize);
+    ## invoke chosen object (Arpeggi or TremChord)
     $object(
         @onset $t
         @duration $maxdur
         @chord $chord
         @types $types
     );
+    ## advance time and occasionally insert a gap
     $t += $maxdur;
     if xrand() < $gap then ($t += $bardur * xchoose($units)) 
 );
+## ----------------------
+## Rendering and export
+## ----------------------
 render(
     @play 1 @process normalize(-9) freeverb(
         @roomsize 0.75
