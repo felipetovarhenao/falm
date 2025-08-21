@@ -3,12 +3,12 @@ $t = 0;
 $totdur = 30 * 1000;
 $bardur = 2000;
 $i = 1;
-$fullchord = r2mc(1 5/4 3/2 15/8 9/4 3/4 1/2 5/2, c4).sort();
+$fullchord = r2mc(1...21, c4).pcquant(r2pc(1 9/8 5/4 3/2 5/3)).sort();
 while $t < $totdur do (
     $nt = $t / $totdur;
     $chordsize = $nt.scale(0, 1, 1, length($fullchord), -0.125).round().int();
     $maxdur = $bardur * xchoose(3/16 1/8 3/8 1/4 3/4 1);
-    $vel = xrand(127);
+    $vel = xrand(50, 127);
     $chord = $fullchord.left($chordsize);
     $i += 1;
     cycle(
@@ -26,8 +26,8 @@ while $t < $totdur do (
             @names family('woodwinds') 
             @pitch $mc
             @duration null
-            @types 'vib' 'ord' 'ord-micro' 'sfz' 
-            ## @velocity $vel
+            @types 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 
+            @velocity $vel
             @useseed 1
         );
         $dur = min($maxdur, $b.getkey('duration')) + 100;
@@ -38,7 +38,7 @@ while $t < $totdur do (
         ).process(scaling(-1, 1, 0, 1) rampsmooth(64, 64));
         $b.process(multiply($trem) normalize(-6)).transcribe(
             @onset $t
-            @pan mc2pan($mc) 
+            @pan mc2pan($mc, 1/3) 
             @gain [0 1 0] [0.5 xrand(0.1, 0.5) -0.25] [1 1 0.125] 
         ) 
     );
