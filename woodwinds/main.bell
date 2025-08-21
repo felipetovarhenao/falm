@@ -14,6 +14,7 @@ while $t < $totdur do (
             @duration null
             @types 'vib' 'ord' 'ord-micro' 'sfz' 
             @velocity $vel
+            @useseed 1
         );
         $dur = min($maxdur, $b.getkey('duration')) + 100;
         $trem = xchoose(rect saw cycle tri)(
