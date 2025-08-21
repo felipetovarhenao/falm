@@ -3,7 +3,7 @@
 ## -------------------------
 setseed(390);
 $tempo = 112;
-$beatdur = 72000 / $tempo;
+$beatdur = 90000 / $tempo;
 $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
@@ -216,7 +216,7 @@ $stweights = 1/3 0 2/3;
 $weightsbpf = (
     [0 [$stweights] 0] 
     ## 
-    [0.8 [0.2 0.8 0] 0.125] 
+    [0.75 [0.2 0.8 0] 0.125] 
     ## 
     [1 [0 1 0] -0.125] 
 );
