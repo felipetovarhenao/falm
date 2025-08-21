@@ -8,7 +8,7 @@ $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 70 * 1000;
+$totdur = 90 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
@@ -169,7 +169,9 @@ Melody = (
         for $mcs in $pairs, $t in $onsets, $incr in $incrs with @unwrap 1 do (
             $mc1 = $mcs:1;
             $mc2 = $mcs:2;
-            $gliss = float(c2r($mc2 - $mc1));
+            $gliss = float(
+                c2r(minabs($mc2 - $mc1, 350)) 
+            );
             $res = [0 1 0] [1 1/$gliss xrand(0.65, 0.9)];
             ezsol(
                 @pitch $mc1
