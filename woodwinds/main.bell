@@ -1,14 +1,14 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(490);
-$tempo = 112;
-$beatdur = 60000 / $tempo;
+setseed(1490);
+$tempo = 120;
+$beatdur = 72000 / $tempo;
 $bardur = $beatdur * 4;
 $root = bb3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 30 * 1000;
+$totdur = 60 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
@@ -169,7 +169,7 @@ Melody = (
                 @velocity 90
                 @useseed 1
             ).process(
-                resample($res) fade(0, $legato) normalize(-3) 
+                resample($res) fade(0, $legato) normalize(-7) 
             ).transcribe(
                 @onset $t @pan mc2pan($mc1, 0.125) 
             ) 
@@ -184,7 +184,7 @@ $endweights = 0 reduce($stweights, #+) 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
-    $w = samplebpf([0 0 0] [1 1 0.125], $nt);
+    $w = samplebpf([0 0 0] [1 1 -0.125], $nt);
     $weights = (1 - $w) * $stweights + $w * $endweights;
     $object = xchoose(
         @choices Arpeggi TremChord Melody @weights $weights
