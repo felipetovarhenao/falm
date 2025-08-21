@@ -1,14 +1,14 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(1490);
+setseed(30);
 $tempo = 120;
 $beatdur = 72000 / $tempo;
 $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 60 * 1000;
+$totdur = 20 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
@@ -53,7 +53,7 @@ TremChord = (
             ) 
         );
         ## woodwind layer with modulation
-        $dip = xrand(0.2, 0.8);
+        $dip = xrand(0.05, 2/3);
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
             $b = ezsol(
@@ -116,6 +116,11 @@ Arpeggi = (
         $numnotes = max(1, $duration / $unit);
         $legato = $unit * 0.25;
         $panoffset = xrand(-1, 1);
+        PianoRoll(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+        );
         for $i in 1...$numnotes do (
             $mc = $chord:(
                 (($i - 1) % $chordsize) + 1
@@ -178,10 +183,33 @@ Melody = (
     ) 
 );
 ## ----------------------
+## Function: PianoRoll
+## ----------------------
+PianoRoll = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $t = $onset;
+        $vel = xrand(20, 100);
+        $incr = xrand(50);
+        for $mc in $chord do (
+            pno(
+                @pitch $mc + xrandom(-1, 2) * 1200
+                @duration $duration + 200
+                @velocity $vel
+                @useseed 1
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc, 0.1) 
+                @gain [0 1 0] [1 0 0.7] 
+            );
+            $t += $incr
+        ) 
+    ) 
+);
+## ----------------------
 ## Main loop
 ## ----------------------
 $stweights = 0.7 0 1;
-$endweights = 0 reduce($stweights, #+) 0;
+$endweights = 0.1 reduce($stweights, #+) 0.1;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
