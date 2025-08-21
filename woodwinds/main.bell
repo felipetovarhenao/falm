@@ -265,7 +265,7 @@ while $t < $totdur do (
 ## Rendering and export
 ## ----------------------
 render(
-    @play 1 @process normalize(-9) freeverb(
+    @play 1 @process normalize(-3) freeverb(
         @roomsize 0.75
         @wet 0.01
         @damp 1
