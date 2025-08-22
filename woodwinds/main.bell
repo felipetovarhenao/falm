@@ -41,7 +41,7 @@ TremChord = (
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
-            $env = [0 rand(0.05, 0.35) 0] [1 0 -0.25];
+            $env = [0 xrand(0.05, 0.35) 0] [1 0 -0.25];
             if $sign == 1 then ($env = revbpf($env) );
             cycle(
                 @frequency $mc.mc2f() * exp2(xrandom(0, 3) * $sign) 
