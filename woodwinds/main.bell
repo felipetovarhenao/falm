@@ -212,6 +212,26 @@ PianoRoll = (
     ) 
 );
 ## ----------------------
+## GetHarmony
+## ----------------------
+GetHarmony = (
+    -> (
+        init $r = 1.;
+        init $i = 1;
+        init $steps = 5/3 4/5 10/9 2/3;
+        init $harms = float(
+            [1 5/4 3/2 5/3] [1 6/5 3/2 4/3] [1 5/4 3/2 10/9] [1 5/4 3/2 7/4] 
+        );
+        $id = ($i - 1) % length($steps) + 1;
+        $step = $steps:$id;
+        $harm = $harms:$id;
+        $chord = $r * $harm;
+        keep $r *= $step;
+        keep $i += 1;
+        $chord::1
+    ) 
+);
+## ----------------------
 ## Main loop
 ## ----------------------
 $objects = Arpeggi TremChord Melody;
@@ -223,6 +243,7 @@ $weightsbpf = (
     ## 
     [1 [0 1 0] -0.125] 
 );
+$count = 0;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
@@ -240,7 +261,11 @@ while $t < $totdur do (
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
-    $chord = $fullchord.left($chordsize);
+    if $count % 6 == 0 then (
+        $pcs = GetHarmony().r2pc() 
+    );
+    $count += 1;
+    $chord = $fullchord.pcquant($pcs).left($chordsize);
     ## invoke chosen object (Melody or TremChord)
     $object(
         @onset $t
@@ -265,8 +290,8 @@ while $t < $totdur do (
 ## ----------------------
 render(
     @play 1 @process normalize(-3) freeverb(
-        @roomsize 0.75
-        @wet 0.01
+        @roomsize 0.85
+        @wet 0.0125
         @damp 1
         @width 1
     ) 
