@@ -263,7 +263,7 @@ while $t < $totdur do (
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
     if $count % 6 == 0 then (
-        $pcs = GetHarmony().r2pc() 
+        $pcs = GetHarmony().r2pc($pcroot) 
     );
     $count += 1;
     $chord = $fullchord.pcquant($pcs).left($chordsize);
