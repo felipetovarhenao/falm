@@ -8,9 +8,8 @@ $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 120 * 1000;
+$totdur = 150 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
-## $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).sort();
 $units = rev(
     sort((1 1 1...12) / 16) 
@@ -146,10 +145,35 @@ Arpeggi = (
     ) 
 );
 ## ----------------------
+## Function: Thump
+## ----------------------
+Thump = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $mc = xchoose($chord) % 2400 + 2100;
+        ezsol(
+            @pitch $mc
+            @duration max(1000, $duration * 2) 
+            @types 'pizz' 
+            @names 'bass' 'cello' 
+            @velocity xrandom(50) 
+            @useseed 1
+        ).transcribe(
+            @onset $onset
+            @gain [0 1 0] [1 0 0.8] 
+            @pan mc2pan($mc, 0.125) 
+        ) 
+    ) 
+);
+## ----------------------
 ## Function: Melody
 ## ----------------------
 Melody = (
     $onset, $duration, $chord -> (
+        Thump(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+        );
         $maxnotes = int(round($duration / 90));
         ## randomized arpeggiated sequence
         $chord = randomseq(
