@@ -157,7 +157,7 @@ Thump = (
             @names 'bass' 'cello' 
             @velocity xrandom(50) 
             @useseed 1
-        ).transcribe(
+        ).clipnorm(@minlevel -12 @maxlevel -3).transcribe(
             @onset $onset
             @gain [0 1 0] [1 0 0.8] 
             @pan mc2pan($mc, 0.125) 

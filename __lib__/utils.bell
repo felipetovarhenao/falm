@@ -550,4 +550,33 @@ randn = (
         $z0 = sqrt(-2 * log($u1)) * cos(2 * pi * $u2);
         $mean + $std * $z0
     ) 
+);
+#( 
+```bell
+clipnorm(
+    @buffer ## required
+    @minlevel -25
+    @maxlevel -3
+    @ampunit 1
+) -> float
+```
+Normalizes a buffer only if it's peak amplitude is outside the `@minlevel` and `@maxlevel` range.
+)#
+clipnorm = (
+    $buffer = null, $minlevel = -25, $maxlevel = -3, $ampunit = 1 -> (
+        $maxabs = $buffer.getkey('maxabs');
+        if $ampunit == 0 then (
+            $minlevel = dbtoa($minlevel);
+            $maxlevel = dbtoa($maxlevel) 
+        ) else ($maxabs = atodb($maxabs) );
+        $process = null if $maxabs < $minlevel then (
+            ## 
+            $process = normalize(@level $minlevel @ampunit $ampunit) 
+        ) else if $maxabs > $maxlevel then (
+            ## 
+            $process = normalize(@level $maxlevel @ampunit $ampunit) 
+        );
+        if $process != null then ($buffer = $buffer.process($process));
+        $buffer
+    ) 
 )
