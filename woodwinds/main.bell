@@ -3,12 +3,12 @@
 ## -------------------------
 setseed(390);
 $tempo = 112;
-$beatdur = 90000 / $tempo;
+$beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $root = g3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 90 * 1000;
+$totdur = 100 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $ratios = 1 9/8 5/4 3/2 5/3 15/8;
 $fullchord = r2mc(1...21, $root).pcquant(r2pc($ratios, $pcroot)).sort();
