@@ -1,7 +1,7 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(200);
+setseed(1001);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
@@ -14,10 +14,11 @@ $fullchord = r2mc(1...21, $root).sort();
 $units = rev(
     sort((1 1 1...14) / 16) 
 );
+$gapunits = thin($units).sort().right(3);
 ## -------------------------
 ## BPFs
 ## -------------------------
-$peak = 0.6180339;
+$peak = 0.75;
 $gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
 $chordsizebpf = [0 6 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
@@ -333,7 +334,7 @@ while $t < $totdur do (
     ## advance time and occasionally insert a gap
     $t += $maxdur;
     if xrand() < $gap then (
-        $gapdur = $bardur * xchoose($units);
+        $gapdur = $bardur * xchoose($gapunits);
         PercGap(
             @onset $t
             @duration $gapdur
