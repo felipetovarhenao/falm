@@ -1,11 +1,12 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(1093);
+setseed(7);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-$root = g3;
+$harmonicpulse = $bardur * (3/4);
+$root = f3;
 $pcroot = $root.mc2pc();
 $t = 0;
 $totdur = 125 * 1000;
@@ -15,7 +16,7 @@ $maxunitsize = 14;
 $units = rev(
     sort((1 1 1...$maxunitsize) / 16) 
 );
-$gapunits = thin($units).sort().right(-$maxunitsize + 2);
+$gapunits = thin($units).sort().right(-$maxunitsize + 3);
 ## -------------------------
 ## BPFs
 ## -------------------------
@@ -37,7 +38,7 @@ $ampmod = (
 ## Function: TremChord
 ## ----------------------
 TremChord = (
-    $onset = 0, $duration = 1000, $chord = null, $types = 'ord' -^ $ampmod -> (
+    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0 -^ $ampmod, $peak -> (
         $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
@@ -56,6 +57,9 @@ TremChord = (
         );
         ## woodwind layer with modulation
         $dip = xrand(0.05, 2/3);
+        $envmix = samplebpf(
+            [0 0 0] [$peak 0 0] [1 1 0], $nt
+        );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
             $b = ezsol(
@@ -71,10 +75,13 @@ TremChord = (
                 @duration $duration
                 @phase xrand() 
             );
+            $env1 = [0 1 0] [$dip xrand(0.1, 0.5) -0.25] [1 1 0.125];
+            $env2 = [0 1 0] [0.001 1 0.25] [1 0 -0.125];
+            $env = (1 - $envmix) * $env1 + $env2 * $envmix;
             $b.$ampmod($mod).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 1/3) 
-                @gain [0 1 0] [$dip xrand(0.1, 0.5) -0.25] [1 1 0.125] 
+                @gain $env
             ) 
         ) 
     ) 
@@ -316,7 +323,7 @@ UpdateHarmony = (
 ## Main loop
 ## ----------------------
 $objects = Arpeggi TremChord Melody Pluck;
-$stweights = 1/4 0 2/4 1/4;
+$stweights = float(2/9 0 5/9 2/9);
 $weightsbpf = (
     [0 [$stweights] 0] 
     ## 
@@ -325,10 +332,15 @@ $weightsbpf = (
     [1 [0 1 0 0] -0.125] 
 );
 $count = 0;
+$markers = $t;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
     $weights = samplebpf($weightsbpf, $nt);
+    if $t == 0 then (
+        $weights *= 0;
+        $weights:3 = 1
+    );
     $object = xchoose(
         @choices $objects @weights $weights
     );
@@ -342,7 +354,7 @@ while $t < $totdur do (
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
-    if UpdateHarmony(@delta $maxdur @threshold $bardur * 3/2) == 1 then (
+    if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
         $pcs = GetHarmony().r2pc($pcroot) 
     );
     $count += 1;
@@ -353,9 +365,11 @@ while $t < $totdur do (
         @duration $maxdur
         @chord $chord
         @types $types
+        @nt $nt
     );
     ## advance time and occasionally insert a gap
     $t += $maxdur;
+    $markers _= $t;
     if xrand() < $gap then (
         $gapdur = $bardur * xchoose($gapunits);
         PercGap(
@@ -363,7 +377,8 @@ while $t < $totdur do (
             @duration $gapdur
             @chord $chord
         );
-        $t += $gapdur
+        $t += $gapdur;
+        $markers _= $t
     ) 
 );
 ## ----------------------
@@ -377,4 +392,12 @@ render(
         @width 1
     ) 
 );
-ezexport()
+$metadata = (
+    ## 
+    ['tempo' $tempo] 
+    ## 
+    ['peak' $peak] 
+    ## 
+    ['markers' $markers] 
+);
+ezexport(@data $metadata)
