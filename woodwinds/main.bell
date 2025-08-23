@@ -1,15 +1,15 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(7);
+setseed(8);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $harmonicpulse = $bardur * (3/4);
-$root = f3;
+$root = f#3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 125 * 1000;
+$totdur = 145 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...21, $root).sort();
 $maxunitsize = 14;
@@ -308,11 +308,10 @@ UpdateHarmony = (
         init $time = 0;
         init $count = 0;
         $test = 0;
-        $prevtime = $time;
         if $count % $period == 0 || $time % $threshold < $time then (
             $test = 1;
-            $time = 0;
-            $count = 0
+            keep $time = 0;
+            keep $count = 0
         );
         keep $time += $delta;
         keep $count += 1;
