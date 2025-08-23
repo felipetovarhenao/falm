@@ -134,7 +134,10 @@ Arpeggi = (
             @duration $duration
             @chord $chord
         );
-        for $i in 1...$numnotes do (
+        $onsets = $onset + arithmser(0, 1, null, $numnotes + 1).scale(
+            @outmax $duration @slope xrand(-0.1, 0.1) 
+        ).left(-1);
+        for $onset $i in $onsets do (
             $mc = $chord:(
                 (($i - 1) % $chordsize) + 1
             );
@@ -149,8 +152,7 @@ Arpeggi = (
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
                 @pan fold(mc2pan($mc, 0.125) + $panoffset) 
-            );
-            $onset += $unit
+            ) 
         ) 
     ) 
 );
