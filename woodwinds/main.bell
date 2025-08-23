@@ -32,7 +32,7 @@ $numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
 $ampmod = (
     $c, $m -> (
         $m = $m.process(scaling(-1, 1, 0, 1) rampsmooth(16, 16));
-        $c.process(multiply($m) normalize(-6)) 
+        $c.process(multiply($m)).clipnorm(@minlevel -12 @maxlevel -6) 
     ) 
 );
 ## ----------------------
@@ -109,7 +109,7 @@ PercGap = (
                 @velocity xrandom(60, 127) 
                 @useseed 1
                 @duration $duration * 2
-            ).process(normalize(-5)).transcribe(
+            ).clipnorm(@minlevel -10 @maxlevel -5).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
                 @gain [0 1 0] [1 0 0.7] 
@@ -148,7 +148,7 @@ Arpeggi = (
                 @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 
                 @velocity 127
                 @useseed 1
-            ).process(normalize(-7)).transcribe(
+            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
                 @pan fold(mc2pan($mc, 0.125) + $panoffset) 
@@ -218,8 +218,8 @@ Melody = (
                 @velocity 90
                 @useseed 1
             ).process(
-                resample($res) fade(0, $legato) normalize(-7) 
-            ).transcribe(
+                resample($res) fade(0, $legato) 
+            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
                 @onset $t @pan mc2pan($mc1, 0.125) 
             ) 
         ) 
