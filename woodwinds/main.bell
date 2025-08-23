@@ -1,7 +1,7 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(1001);
+setseed(1093);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
@@ -11,10 +11,11 @@ $t = 0;
 $totdur = 125 * 1000;
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...21, $root).sort();
+$maxunitsize = 14;
 $units = rev(
-    sort((1 1 1...14) / 16) 
+    sort((1 1 1...$maxunitsize) / 16) 
 );
-$gapunits = thin($units).sort().right(3);
+$gapunits = thin($units).sort().right(-$maxunitsize + 2);
 ## -------------------------
 ## BPFs
 ## -------------------------
@@ -238,7 +239,7 @@ PianoRoll = (
     ) 
 );
 ## ----------------------
-## GetHarmony
+## Function: GetHarmony
 ## ----------------------
 GetHarmony = (
     -> (
@@ -257,6 +258,9 @@ GetHarmony = (
         $chord::1
     ) 
 );
+## ----------------------
+## Function: Pluck
+## ----------------------
 Pluck = (
     $onset = 0, $duration = 1000, $chord = null -> (
         $size = xrandom(1, 3);
@@ -290,6 +294,25 @@ Pluck = (
     ) 
 );
 ## ----------------------
+## Function: UpdateHarmony
+## ----------------------
+UpdateHarmony = (
+    $delta = 0, $period = 6, $threshold = 3000 -> (
+        init $time = 0;
+        init $count = 0;
+        $test = 0;
+        $prevtime = $time;
+        if $count % $period == 0 || $time % $threshold < $time then (
+            $test = 1;
+            $time = 0;
+            $count = 0
+        );
+        keep $time += $delta;
+        keep $count += 1;
+        $test
+    ) 
+);
+## ----------------------
 ## Main loop
 ## ----------------------
 $objects = Arpeggi TremChord Melody Pluck;
@@ -319,7 +342,7 @@ while $t < $totdur do (
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
-    if $count % 6 == 0 then (
+    if UpdateHarmony(@delta $maxdur @threshold $bardur * 3/2) == 1 then (
         $pcs = GetHarmony().r2pc($pcroot) 
     );
     $count += 1;
