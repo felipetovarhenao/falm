@@ -258,23 +258,32 @@ GetHarmony = (
 );
 Pluck = (
     $onset = 0, $duration = 1000, $chord = null -> (
-        $dyad = randomseq(
+        $size = xrandom(1, 3);
+        $maxplucks = ceil($duration / 180);
+        $numplucks = xrandom(1, $maxplucks);
+        $dyads = randomseq(
             @llll $chord
-            @steps (1...3) * xchoose(-1 1) 
-            @length xrandom(2, 4) 
-        ).thin();
-        for $mc in $dyad do (
-            ezsol(
-                @pitch $mc
-                @duration $duration * 2
-                @names 'harp' 'guitar' 
-                @types 'harm' 
-                @velocity xrandom(127) 
-                @useseed 1
-            ).clipnorm(@minlevel -18).transcribe(
-                @onset $onset
-                @pan mc2pan($mc, 0.33) 
-                @gain [0 1 0] [1 0 0.5] 
+            @steps 1...3 (1...3) * -1
+            @length $size * $numplucks
+        );
+        $dyads = $dyads.group(@modulos $numplucks).trans();
+        $onsets = $onset + arithmser(0, 1, null, $numplucks + 1).scale(
+            @outmax $duration @slope xrand(0, 0.25) * xchoose(-1 1) 
+        ).left(-1);
+        for $dyad in $dyads, $onset in $onsets with @unwrap 1 do (
+            for $mc in thin($dyad) do (
+                ezsol(
+                    @pitch $mc
+                    @duration $duration * 2
+                    @names 'harp' 'guitar' 
+                    @types 'harm' 'harm-in-wood' 'ord-high' 
+                    @velocity xrand().scale(@outmax 127 @slope 0.2) 
+                    @useseed 1
+                ).clipnorm(@minlevel -14).transcribe(
+                    @onset $onset
+                    @pan mc2pan($mc, 0.33) 
+                    @gain [0 1 0] [1 0 0.5] 
+                ) 
             ) 
         ) 
     ) 
