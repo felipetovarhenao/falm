@@ -9,7 +9,8 @@ $harmonicpulse = $bardur * (3/4);
 $root = f#3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totdur = 145 * 1000;
+$totalbars = 165;
+$totdur = $totalbars * ($bardur * 3/8);
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...21, $root).sort();
 $maxunitsize = 14;
@@ -58,7 +59,7 @@ TremChord = (
         ## woodwind layer with modulation
         $dip = xrand(0.05, 2/3);
         $envmix = samplebpf(
-            [0 0 0] [$peak 0 0] [1 1 0], $nt
+            [0 0 0] [$peak 0 0] [1 1 -0.125], $nt
         );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
@@ -332,6 +333,7 @@ $weightsbpf = (
 );
 $count = 0;
 $markers = $t;
+$harmony = null;
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
@@ -354,7 +356,8 @@ while $t < $totdur do (
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
     if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
-        $pcs = GetHarmony().r2pc($pcroot) 
+        $pcs = GetHarmony().r2pc($pcroot);
+        $harmony _= [$t $pcs] 
     );
     $count += 1;
     $chord = $fullchord.pcquant($pcs).left($chordsize);
@@ -396,6 +399,8 @@ $metadata = (
     ['tempo' $tempo] 
     ## 
     ['peak' $peak] 
+    ## 
+    ['harmony' $harmony] 
     ## 
     ['markers' $markers] 
 );
