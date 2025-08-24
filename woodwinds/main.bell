@@ -59,7 +59,7 @@ TremChord = (
         ## woodwind layer with modulation
         $dip = xrand(0.05, 2/3);
         $envmix = samplebpf(
-            [0 0 0] [$peak 0 0] [1 1 -0.125], $nt
+            [0 0 0] [$peak 0 0] [1 1 -0.25], $nt
         );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
@@ -135,7 +135,7 @@ Arpeggi = (
             @chord $chord
         );
         $onsets = $onset + arithmser(0, 1, null, $numnotes + 1).scale(
-            @outmax $duration @slope xrand(-0.1, 0.1) 
+            @outmax $duration @slope xrand(-0.125, 0.125) 
         ).left(-1);
         for $onset $i in $onsets do (
             $mc = $chord:(
@@ -252,7 +252,7 @@ PianoRoll = (
 ## Function: GetHarmony
 ## ----------------------
 GetHarmony = (
-    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 5/3] [1 5/4 3/2 10/9] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
+    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 15/8] [1 5/4 3/2 10/9] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
         init $r = $st;
         init $i = 1;
         init $steps = $steps;
@@ -278,6 +278,7 @@ Pluck = (
             @llll $chord
             @steps 1...3 (1...3) * -1
             @length $size * $numplucks
+            @useseed 1
         );
         $dyads = $dyads.group(@modulos $numplucks).trans();
         $onsets = $onset + arithmser(0, 1, null, $numplucks + 1).scale(
