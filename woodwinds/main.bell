@@ -263,7 +263,7 @@ GetHarmony = (
         $chord = $r * $harm;
         keep $r *= $step;
         keep $i += 1;
-        $chord::1
+        [['ratios' $chord::1] ['index' $id]] 
     ) 
 );
 ## ----------------------
@@ -357,8 +357,9 @@ while $t < $totdur do (
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
     if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
-        $pcs = GetHarmony().r2pc($pcroot);
-        $harmony _= [$t $pcs] 
+        $cycle = GetHarmony();
+        $pcs = $cycle.getkey('ratios').r2pc($pcroot);
+        $index = $cycle.getkey('index') 
     );
     $count += 1;
     $chord = $fullchord.pcquant($pcs).left($chordsize);
@@ -371,8 +372,10 @@ while $t < $totdur do (
         @nt $nt
     );
     ## advance time and occasionally insert a gap
+    $markers _= [
+        ['onset' $t] ['pcs' $pcs] ['index' $index] 
+    ];
     $t += $maxdur;
-    $markers _= $t;
     if xrand() < $gap then (
         $gapdur = $bardur * xchoose($gapunits);
         PercGap(
@@ -380,10 +383,15 @@ while $t < $totdur do (
             @duration $gapdur
             @chord $chord
         );
-        $t += $gapdur;
-        $markers _= $t
+        $markers _= [
+            ['onset' $t] ['pcs' $pcs] ['index' $index] 
+        ];
+        $t += $gapdur
     ) 
 );
+$markers _= [
+    ['onset' $t] ['pcs' $pcs] ['index' $index] 
+];
 ## ----------------------
 ## Rendering and export
 ## ----------------------
@@ -402,8 +410,6 @@ $metadata = (
     ['peak' $peak * $totdur] 
     ## 
     ['totdur' $totdur] 
-    ## 
-    ['harmony' $harmony] 
     ## 
     ['markers' $markers] 
 );
