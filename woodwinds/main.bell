@@ -252,13 +252,11 @@ PianoRoll = (
 ## Function: GetHarmony
 ## ----------------------
 GetHarmony = (
-    -> (
-        init $r = 1.;
+    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 5/3] [1 5/4 3/2 10/9] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
+        init $r = $st;
         init $i = 1;
-        init $steps = 5/3 4/5 10/9 2/3;
-        init $harms = float(
-            [1 5/4 3/2 5/3] [1 6/5 3/2 4/3] [1 5/4 3/2 10/9] [1 5/4 3/2 7/4] 
-        );
+        init $steps = $steps;
+        init $harms = float($chords);
         $id = ($i - 1) % length($steps) + 1;
         $step = $steps:$id;
         $harm = $harms:$id;
