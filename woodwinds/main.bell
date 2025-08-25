@@ -9,7 +9,7 @@ $harmonicpulse = $bardur * (3/4);
 $root = f#3;
 $pcroot = $root.mc2pc();
 $t = 0;
-$totalbars = 165;
+$totalbars = 200;
 $totdur = $totalbars * ($bardur * 3/8);
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...21, $root).sort();
@@ -21,7 +21,7 @@ $gapunits = thin($units).sort().right(-$maxunitsize + 3);
 ## -------------------------
 ## BPFs
 ## -------------------------
-$peak = 0.75;
+$peak = 0.7;
 $gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
 $chordsizebpf = [0 6 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
