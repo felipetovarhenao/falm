@@ -373,7 +373,7 @@ while $t < $totdur do (
     );
     ## advance time and occasionally insert a gap
     $markers _= [
-        ['onset' $t] ['pcs' $pcs] ['index' $index] 
+        ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
     ];
     $t += $maxdur;
     if xrand() < $gap then (
@@ -384,13 +384,13 @@ while $t < $totdur do (
             @chord $chord
         );
         $markers _= [
-            ['onset' $t] ['pcs' $pcs] ['index' $index] 
+            ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
         ];
         $t += $gapdur
     ) 
 );
 $markers _= [
-    ['onset' $t] ['pcs' $pcs] ['index' $index] 
+    ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
 ];
 ## ----------------------
 ## Rendering and export
