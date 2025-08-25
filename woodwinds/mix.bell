@@ -1,4 +1,4 @@
-setseed(20);
+setseed(2209);
 $t = 0;
 $meta = read('./main.txt');
 $tempo = $meta.'tempo';
@@ -10,33 +10,43 @@ $split = read('./dance.txt');
 $base = importaudio('./main.wav');
 $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
-$base1.transcribe($t);
-$t += $split;
-$t += $unit * 9;
+## $base1.transcribe($t);
+## $t += $split;
+## $t += $unit * 9;
 $tail = $base2.process(
     mix(importaudio('./dance.wav')) 
 ).setkey('duration', $totdur - $split);
 $segs = $tail.splitbuf(@split $unit);
 $numsegs = length($segs);
 $slopebpf = [0 0.999 0] [1 -0.5 -0.1];
-$maskbpf = [0 1 0] [1 0 0.8];
+$maskbpf = [0 1 0] [1 0.25 0.85];
+$stutterbpf = [0 0 0] [1 1 0.5];
+$maxnumcopies = 4;
 for $seg $segid in $segs do (
     $nt = ($segid - 1) / ($numsegs - 1);
     $mask = samplebpf($maskbpf, $nt);
     if $mask > xrand() then (
         $slope = samplebpf($slopebpf, $nt);
-        $seg.clipnorm(@minlevel -10 @maxlevel -6).transcribe(
-            @onset $t @gain [0 1 0] [1 0 $slope] 
+        $stutter = samplebpf($stutterbpf, $nt);
+        $copyweights = (1 0 :* ($maxnumcopies - 1)) * (1 - $stutter) + $stutter * rev(
+            exp2(
+                (0...($maxnumcopies - 1)) 
+            ) 
+        );
+        $copy = $seg.process(
+            gain([0 1 0] [1 0 $slope]) 
+        ).clipnorm(@minlevel -10 @maxlevel -6);
+        $numcopies = xchoose(1...4 @weights $copyweights);
+        $copydur = $copy.getkey('duration') / $numcopies;
+        $shift = 0;
+        for $c in 1...$numcopies do (
+            $copy.setkey('duration', $copydur).transcribe(@onset $t + $shift);
+            $shift += $copydur
         ) 
     );
     $t += $unit
 );
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.9
-        @wet [0 0 0] [1 0.0125 0.125] 
-        @damp 1
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process normalize(-3) 
 );
 ezexport()
