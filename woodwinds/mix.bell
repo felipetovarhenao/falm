@@ -1,0 +1,5 @@
+$t = 0;
+importaudio('./main.wav').transcribe($t);
+$t += read('./dance.txt');
+importaudio('./dance.wav').transcribe($t);
+render(@play 1)

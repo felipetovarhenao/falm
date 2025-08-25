@@ -107,4 +107,4 @@ render(
     ## mix($b) normalize(-3) 
     
 );
-ezexport()
+ezexport($peak)
