@@ -10,8 +10,8 @@ $split = read('./dance.txt');
 $base = importaudio('./main.wav');
 $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
-## $base1.transcribe($t);
-## $t += $split;
+$base1.transcribe($t);
+$t += $split;
 ## $t += $unit * 9;
 $tail = $base2.process(
     mix(importaudio('./dance.wav')) 
@@ -35,7 +35,7 @@ for $seg $segid in $segs do (
         );
         $copy = $seg.process(
             gain([0 1 0] [1 0 $slope]) 
-        ).clipnorm(@minlevel -10 @maxlevel -6);
+        ).clipnorm(@minlevel -10 @maxlevel -3);
         $numcopies = xchoose(1...4 @weights $copyweights);
         $copydur = $copy.getkey('duration') / $numcopies;
         $shift = 0;
