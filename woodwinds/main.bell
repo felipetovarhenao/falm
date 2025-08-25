@@ -252,7 +252,7 @@ PianoRoll = (
 ## Function: GetHarmony
 ## ----------------------
 GetHarmony = (
-    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 15/8] [1 5/4 3/2 10/9] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
+    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 15/8] [1 5/4 3/2 7/4] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
         init $r = $st;
         init $i = 1;
         init $steps = $steps;
@@ -404,6 +404,8 @@ render(
     ) 
 );
 $metadata = (
+    ## 
+    ['root' $root] 
     ## 
     ['tempo' $tempo] 
     ## 
