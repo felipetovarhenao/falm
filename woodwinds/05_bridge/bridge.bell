@@ -3,7 +3,7 @@ Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
         $velbpf = bpf($velocity);
-        $maxnumnotes = round($duration / 90);
+        $maxnumnotes = round($duration / 50);
         $seqlength = $length ||| xrandom(2, 5);
         $numnotes = xrandom($maxnumnotes // 2, $maxnumnotes);
         $numreps = ceil($numnotes / $seqlength);
@@ -22,13 +22,13 @@ Swirl = (
         for $mc in $seq, $onset in $onsets, $dur in $durs do (
             $nt = $t / $duration;
             $vel = samplebpf($velbpf, $nt);
-            $mindb = atodb(($vel / 127) ** 2);
+            $mindb = atodb(($vel / 127) ** 3);
             ezsol(
                 @pitch $mc
                 @names 'flute' 'sax' 'clar' 'acc' 
                 @types 'ord' 'ord-high' 'ord-micro' 
                 @velocity $vel
-                @duration $dur + 50
+                @duration $dur + 90
                 @useseed 1
             ).clipnorm(@minlevel $mindb).transcribe(
                 @onset $onset
@@ -54,21 +54,26 @@ for $vel $id in (
     [$velocity] 
 ) with @unwrap 1 do (
     for $i in 1...($numvoices * $id) do (
-        ## --—
+        $slope = xrand(0.1, 0.3) * (if $id == 1 then -1 else 1);
         Swirl(
             @chord $chord
             @duration $totdur
             @velocity $vel
             @length null
-            @slope xrand(0.1, 0.25) * (if $id == 1 then -1 else 1) 
+            @slope $slope
         ) 
     ) 
 );
-$ampenv = [0 0.5 0] [0.5 0.0125 -0.25] [1 1 0.5];
+$ampenv = [0 0.5 0] [0.25 0.005 -0.25] [1 1 0.8];
 $bassmc = $chord:1;
+$bassfq = $bassmc.mc2f() * 0.5;
 cycle(
-    @frequency $bassmc.mc2f() @duration $totdur
-).transcribe(@gain $ampenv);
+    @frequency [0 $bassfq * c2r(50) 0] [1 $bassfq -0.125] 
+    @duration $totdur
+    @phase xrand() 
+).transcribe(
+    @gain $ampenv @pan xrand() xrand() 
+);
 for $mc $mci in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
     $offset = 0;
     $bass = bass(
@@ -87,12 +92,50 @@ for $mc $mci in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
         @onset $start + $offset @pan xrand() 
     ) 
 );
+$t = 0;
+for $mc in $chord do (
+    $fn = xchoose(ezsol pno @weights 4 1);
+    $start = $totdur + $t - 200;
+    $b = $fn(
+        @pitch $mc
+        @duration 4000
+        @velocity 127
+        @names family('strings') family('plucked') 
+        @types 'pizz' 'pizz-secco' 
+    );
+    $b.clipnorm(@minlevel -19 @maxlevel -3).transcribe(
+        @onset $start
+        @gain [0 1 0] [1 0 0.5] 
+        @pan mc2pan($mc, 0.5) 
+    );
+    cycle(
+        @frequency $mc.mc2f() * xrandom(-2, 4).exp2() 
+        @duration 300 * xrand(0, 4).exp2() 
+        @phase xrand() 
+    ).transcribe(
+        @onset $start
+        @gain [0 $b.getkey('maxabs') * 0.25 0] [1 0 -xrand(1/3, 3/4)] 
+        @pan xrand() 
+    );
+    $t += xrand(40) 
+);
+$t = $totdur;
+for $o $oi in -2...0 do (
+    bass(
+        @pitch $chord:1 - $o * 1200
+        @velocity 127
+        @duration null
+        @type xchoose('pizz' 'bartok') 
+    ).process(normalize(-3)).transcribe(
+        @onset $t @pan xrand() 
+    ) 
+);
 $downbeatdur = 3000;
-## cycle(
-##     @frequency $chord:2.mc2f() / 2 @duration $downbeatdur
-## ).transcribe(
-##     @onset $totdur @gain [0 1 0] [1 0 -0.5] 
-## );
+cycle(
+    @frequency $chord:2.mc2f() / 2 @duration $downbeatdur
+).transcribe(
+    @onset $totdur @gain [0 1 0] [1 0 -0.5] 
+);
 $tail = 300;
 render(
     @play 1 @process freeverb(
