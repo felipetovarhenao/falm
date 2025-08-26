@@ -1,21 +1,20 @@
 setseed(33);
 $t = 0;
-$meta = read('./main.txt');
+$meta = read('../foreground/foreground.txt');
 $tempo = $meta.'tempo';
 $totdur = $meta.'totdur';
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $unit = $bardur * 1/16;
-$split = read('./dance.txt');
-$base = importaudio('./main.wav');
+$split = read('../percussion/percussion.txt');
+$base = importaudio('../foreground/foreground.wav');
 $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
 $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
-## $t += $unit * 9;
 $tail = $base2.process(
     mix(
-        importaudio('./dance.wav') @gains 0.707 1
+        importaudio('../percussion/percussion.wav') @gains 1 0.5
     ) normalize(-3) 
 ).setkey('duration', $totdur - $split);
 $segs = $tail.splitbuf(@split $unit);
@@ -24,8 +23,11 @@ $slopebpf = [0 0.999 0] [1 -0.5 -0.1];
 $maskbpf = [0 1 0] [1 0.25 0.85];
 $stutterbpf = [0 0 0] [1 1 0.4];
 $maxnumcopies = 4;
+$lastonset = 0;
+$speedbpf = [0 1 0] [1 2 0.85];
 for $seg $segid in $segs do (
     $nt = ($segid - 1) / ($numsegs - 1);
+    $speed = samplebpf($speedbpf, $nt);
     $mask = samplebpf($maskbpf, $nt);
     if $mask > xrand() then (
         $slope = samplebpf($slopebpf, $nt);
@@ -41,14 +43,15 @@ for $seg $segid in $segs do (
         $numcopies = xchoose(1...4 @weights $copyweights);
         $copydur = $copy.getkey('duration') / $numcopies;
         $shift = 0;
+        $lastonset = $t;
         for $c in 1...$numcopies do (
             $copy.setkey('duration', $copydur).transcribe(@onset $t + $shift);
             $shift += $copydur
         ) 
     );
-    $t += $unit
+    $t += $unit * $speed
 );
 render(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport($lastonset)

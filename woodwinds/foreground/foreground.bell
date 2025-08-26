@@ -1,0 +1,417 @@
+## -------------------------
+## Global setup and variables
+## -------------------------
+setseed(8);
+$tempo = 100;
+$beatdur = 60000 / $tempo;
+$bardur = $beatdur * 4;
+$harmonicpulse = $bardur * (3/4);
+$root = f#3;
+$pcroot = $root.mc2pc();
+$t = 0;
+$totalbars = 200;
+$totdur = $totalbars * ($bardur * 3/8);
+$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
+$fullchord = r2mc(1...21, $root).sort();
+$maxunitsize = 14;
+$units = rev(
+    sort((1 1 1...$maxunitsize) / 16) 
+);
+$gapunits = thin($units).sort().right(-$maxunitsize + 3);
+## -------------------------
+## BPFs
+## -------------------------
+$peak = 0.7;
+$gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
+$chordsizebpf = [0 6 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
+$maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
+$numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
+## ----------------------
+## Helpers
+## ----------------------
+$ampmod = (
+    $c, $m -> (
+        $m = $m.process(scaling(-1, 1, 0, 1) rampsmooth(16, 16));
+        $c.process(multiply($m)).clipnorm(@minlevel -12 @maxlevel -6) 
+    ) 
+);
+## ----------------------
+## Function: TremChord
+## ----------------------
+TremChord = (
+    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0 -^ $ampmod, $peak -> (
+        $vel = xrand(50, 127);
+        ## add oscillating cycles around chosen chord tones
+        for $sign in -1 1 do (
+            $mc = xchoose($chord);
+            $env = [0 xrand(0.05, 0.35) 0] [1 0 -0.25];
+            if $sign == 1 then ($env = revbpf($env) );
+            cycle(
+                @frequency $mc.mc2f() * exp2(xrandom(0, 3) * $sign) 
+                @duration $duration
+                @phase xrand() 
+            ).transcribe(
+                @onset $onset
+                @pan abs(mc2pan($mc, 0.25) - (0 1)) 
+                @gain $env
+            ) 
+        );
+        ## woodwind layer with modulation
+        $dip = xrand(0.05, 2/3);
+        $envmix = samplebpf(
+            [0 0 0] [$peak 0 0] [1 1 -0.25], $nt
+        );
+        for $mc in $chord do (
+            $oct = xrandom(-6, -9) * xchoose(1 -1);
+            $b = ezsol(
+                @names family('woodwinds') 
+                @pitch $mc
+                @duration $duration + 50
+                @types $types
+                @velocity $vel
+                @useseed 1
+            );
+            $mod = xchoose(rect saw cycle tri)(
+                @frequency $mc.mc2f() * exp2($oct) * xchoose(-1 1) 
+                @duration $duration
+                @phase xrand() 
+            );
+            $env1 = [0 1 0] [$dip xrand(0.1, 0.5) -0.25] [1 1 0.125];
+            $env2 = [0 1 0] [0.001 1 0.25] [1 0 -0.125];
+            $env = (1 - $envmix) * $env1 + $env2 * $envmix;
+            $b.$ampmod($mod).transcribe(
+                @onset $onset
+                @pan mc2pan($mc, 1/3) 
+                @gain $env
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
+## Function: Gap
+## ----------------------
+PercGap = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $mcs = randomseq(
+            @llll $chord
+            @length xrandom(4, 9) 
+            @steps -2 -3 3
+            @useseed 1
+        );
+        $mcs = sort(thin($mcs));
+        if xrand() > 0.5 then ($mcs = $mcs.rev());
+        $onsetvar = xrand().scale(@slope 0.25) * 90;
+        for $mc in $mcs do (
+            ezsol(
+                @pitch $mc
+                @names 'sax' 'flute' 'clar' family('strings') 'harp' 
+                @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 'exp-slap-pitch' 'harm-in-wood' 
+                @velocity xrandom(60, 127) 
+                @useseed 1
+                @duration $duration * 2
+            ).clipnorm(@minlevel -10 @maxlevel -5).transcribe(
+                @onset $onset
+                @pan mc2pan($mc, 0.5) 
+                @gain [0 1 0] [1 0 0.7] 
+            );
+            $onset += $onsetvar
+        ) 
+    ) 
+);
+## ----------------------
+## Function: Arpeggi
+## ----------------------
+Arpeggi = (
+    $onset = 0, $duration = 1000, $chord = null -^ $bardur -> (
+        $unit = $bardur * xchoose(1/16 1/24 1/20);
+        $chord = xscramble($chord).left(xrandom(3, 7));
+        $chordsize = length($chord);
+        $numnotes = max(1, $duration / $unit);
+        $legato = $unit * 0.25;
+        $panoffset = xrand(-1, 1);
+        PianoRoll(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+        );
+        $onsets = $onset + arithmser(0, 1, null, $numnotes + 1).scale(
+            @outmax $duration @slope xrand(-0.125, 0.125) 
+        ).left(-1);
+        for $onset $i in $onsets do (
+            $mc = $chord:(
+                (($i - 1) % $chordsize) + 1
+            );
+            ezsol(
+                @pitch $mc
+                @duration $unit + $legato
+                @names 'clar' 
+                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 
+                @velocity 127
+                @useseed 1
+            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
+                @onset $onset
+                @gain [0 1 0] [1 0 0.5] 
+                @pan fold(mc2pan($mc, 0.125) + $panoffset) 
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
+## Function: Thump
+## ----------------------
+Thump = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $mc = xchoose($chord) % 2400 + 2100;
+        ezsol(
+            @pitch $mc
+            @duration max(1000, $duration * 2) 
+            @types 'pizz' 
+            @names 'bass' 'cello' 
+            @velocity xrandom(50) 
+            @useseed 1
+        ).clipnorm(@minlevel -12 @maxlevel -3).transcribe(
+            @onset $onset
+            @gain [0 1 0] [1 0 0.8] 
+            @pan mc2pan($mc, 0.125) 
+        ) 
+    ) 
+);
+## ----------------------
+## Function: Melody
+## ----------------------
+Melody = (
+    $onset, $duration, $chord -> (
+        Thump(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+        );
+        $maxnotes = int(round($duration / 90));
+        ## randomized arpeggiated sequence
+        $chord = randomseq(
+            @llll $chord
+            @length xrandom(3, $maxnotes) 
+            @steps -1 1 2
+            @useseed 1
+        );
+        ## compute onset times and legato values
+        $t = $onset;
+        $legato = 50;
+        $pairs = group($chord $chord:-1, 2, 1);
+        $slope = xrand(1/10, 1/3) * xchoose(-1 1);
+        $onsets = $onset + arithmser(0, 1, null, length($pairs) + 1).scale(0, 1, 0, $duration, @slope $slope);
+        $incrs = x2dx($onsets);
+        $onsets = $onsets.left(-1);
+        ## iterate through note pairs
+        for $mcs in $pairs, $t in $onsets, $incr in $incrs with @unwrap 1 do (
+            $mc1 = $mcs:1;
+            $mc2 = $mcs:2;
+            $gliss = float(
+                c2r(minabs($mc2 - $mc1, 350)) 
+            );
+            $res = [0 1 0] [1 1/$gliss xrand(0.65, 0.9)];
+            ezsol(
+                @pitch $mc1
+                @duration $incr + $legato
+                @types 'ord' 'vib' 'air-and-ord' 'ord-to-air' 'sfz' 
+                @names 'sax' 'flute' 
+                @velocity 90
+                @useseed 1
+            ).process(
+                resample($res) fade(0, $legato) 
+            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
+                @onset $t @pan mc2pan($mc1, 0.125) 
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
+## Function: PianoRoll
+## ----------------------
+PianoRoll = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $t = $onset;
+        $vel = xrand(20, 100);
+        $incr = xrand(50);
+        for $mc in $chord do (
+            pno(
+                @pitch $mc + xrandom(-1, 2) * 1200
+                @duration $duration * 1.5
+                @velocity $vel
+                @useseed 1
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc, 0.1) 
+                @gain [0 1 0] [1 0 0.7] 
+            );
+            $t += $incr
+        ) 
+    ) 
+);
+## ----------------------
+## Function: GetHarmony
+## ----------------------
+GetHarmony = (
+    $st = 1.0, $steps = 3/4 6/5 14/15 6/5, $chords = [1 5/4 3/2 15/8] [1 5/4 3/2 7/4] [1 5/4 3/2 10/9] [1 6/5 3/2 9/5] -> (
+        init $r = $st;
+        init $i = 1;
+        init $steps = $steps;
+        init $harms = float($chords);
+        $id = ($i - 1) % length($steps) + 1;
+        $step = $steps:$id;
+        $harm = $harms:$id;
+        $chord = $r * $harm;
+        keep $r *= $step;
+        keep $i += 1;
+        [['ratios' $chord::1] ['index' $id]] 
+    ) 
+);
+## ----------------------
+## Function: Pluck
+## ----------------------
+Pluck = (
+    $onset = 0, $duration = 1000, $chord = null -> (
+        $size = xrandom(1, 3);
+        $maxplucks = ceil($duration / 180);
+        $numplucks = xrandom(1, $maxplucks);
+        $dyads = randomseq(
+            @llll $chord
+            @steps 1...3 (1...3) * -1
+            @length $size * $numplucks
+            @useseed 1
+        );
+        $dyads = $dyads.group(@modulos $numplucks).trans();
+        $onsets = $onset + arithmser(0, 1, null, $numplucks + 1).scale(
+            @outmax $duration @slope xrand(0, 0.25) * xchoose(-1 1) 
+        ).left(-1);
+        for $dyad in $dyads, $onset in $onsets with @unwrap 1 do (
+            for $mc in thin($dyad) do (
+                ezsol(
+                    @pitch $mc
+                    @duration $duration * 2
+                    @names 'harp' 'guitar' 
+                    @types 'harm' 'harm-in-wood' 'ord-high' 
+                    @velocity xrand().scale(@outmax 127 @slope 0.2) 
+                    @useseed 1
+                ).clipnorm(@minlevel -14).transcribe(
+                    @onset $onset
+                    @pan mc2pan($mc, 0.33) 
+                    @gain [0 1 0] [1 0 0.5] 
+                ) 
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
+## Function: UpdateHarmony
+## ----------------------
+UpdateHarmony = (
+    $delta = 0, $period = 6, $threshold = 3000 -> (
+        init $time = 0;
+        init $count = 0;
+        $test = 0;
+        if $count % $period == 0 || $time % $threshold < $time then (
+            $test = 1;
+            keep $time = 0;
+            keep $count = 0
+        );
+        keep $time += $delta;
+        keep $count += 1;
+        $test
+    ) 
+);
+## ----------------------
+## Main loop
+## ----------------------
+$objects = Arpeggi TremChord Melody Pluck;
+$stweights = float(2/9 0 5/9 2/9);
+$weightsbpf = (
+    [0 [$stweights] 0] 
+    ## 
+    [$peak [0.15 0.8 0 0.05] 0.125] 
+    ## 
+    [1 [0 1 0 0] -0.125] 
+);
+$count = 0;
+$markers = null;
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    ## probabilistically choose between objects
+    $weights = samplebpf($weightsbpf, $nt);
+    if $t == 0 then (
+        $weights *= 0;
+        $weights:3 = 1
+    );
+    $object = xchoose(
+        @choices $objects @weights $weights
+    );
+    ## sample global breakpoint functions
+    $gap = samplebpf($gapbpf, $nt);
+    $numunits = samplebpf($numunitsbpf, $nt);
+    $maxunits = samplebpf($maxunitsbpf, $nt).round().int();
+    $chordsize = samplebpf($chordsizebpf, $nt).round().int();
+    ## determine max event duration
+    $subunits = right(left($units, $numunits), -$maxunits);
+    $maxdur = $bardur * xchoose($subunits);
+    $maxdur = max(50, min($maxdur, $totdur - $t));
+    ## choose chord slice
+    if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
+        $cycle = GetHarmony();
+        $pcs = $cycle.getkey('ratios').r2pc($pcroot);
+        $index = $cycle.getkey('index') 
+    );
+    $count += 1;
+    $chord = $fullchord.pcquant($pcs).left($chordsize);
+    ## invoke chosen object (Melody or TremChord)
+    $object(
+        @onset $t
+        @duration $maxdur
+        @chord $chord
+        @types $types
+        @nt $nt
+    );
+    ## advance time and occasionally insert a gap
+    $markers _= [
+        ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
+    ];
+    $t += $maxdur;
+    if xrand() < $gap then (
+        $gapdur = $bardur * xchoose($gapunits);
+        PercGap(
+            @onset $t
+            @duration $gapdur
+            @chord $chord
+        );
+        $markers _= [
+            ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
+        ];
+        $t += $gapdur
+    ) 
+);
+$markers _= [
+    ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
+];
+## ----------------------
+## Rendering and export
+## ----------------------
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.85
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+);
+$metadata = (
+    ## 
+    ['root' $root] 
+    ## 
+    ['tempo' $tempo] 
+    ## 
+    ['peak' $peak * $totdur] 
+    ## 
+    ['totdur' $totdur] 
+    ## 
+    ['markers' $markers] 
+);
+ezexport(@data $metadata)

@@ -1,0 +1,127 @@
+PianoRoll = (
+    $onset = 0, $duration = 1000, $chord = null, $vel = 100 -> (
+        $t = $onset;
+        $vel = $vel ||| xrand(20, 100);
+        $incr = xrand(50);
+        for $mc in $chord do (
+            pno(
+                @pitch $mc + xrandom(-1, 2) * 1200
+                @duration $duration * 1.5
+                @velocity $vel
+                @useseed 1
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc, 0.1) 
+                @gain [0 1 0] [1 0 0.7] 
+            );
+            $t += $incr
+        ) 
+    ) 
+);
+PercGap = (
+    $onset = 0, $duration = 1000, $chord = null, $velocity = null -> (
+        $mcs = randomseq(
+            @llll $chord
+            @length xrandom(4, 9) 
+            @steps -2 -3 3
+            @useseed 1
+        );
+        $mcs = sort(thin($mcs));
+        if xrand() > 0.5 then ($mcs = $mcs.rev());
+        $onsetvar = xrand().scale(@slope 0.25) * 90;
+        for $mc in $mcs do (
+            ezsol(
+                @pitch $mc
+                @names 'sax' 'flute' 'clar' family('strings') 'harp' 
+                @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 'exp-slap-pitch' 'harm-in-wood' 
+                @velocity $velocity ||| xrandom(60, 127) 
+                @useseed 1
+                @duration $duration * 2
+            ).transcribe(
+                @onset $onset
+                @pan mc2pan($mc, 0.5) 
+                @gain [0 1 0] [1 0 0.7] 
+            );
+            $onset += $onsetvar
+        ) 
+    ) 
+);
+Arpeggi = (
+    $onset = 0, $duration = 10000, $chord = null, $velocity = 127, $tempo = 100 -> (
+        $bardur = 240000 / $tempo;
+        $unit = $bardur * xchoose(1/16 1/20 1/12);
+        $chord = xscramble($chord).left(xrandom(3, 7));
+        $chordsize = length($chord);
+        $numnotes = max(3, $duration / $unit);
+        $legato = $unit * 0.25;
+        $panoffset = xrand(-1, 1);
+        PianoRoll(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+            @vel $velocity
+        );
+        $onsets = $onset + arithmser(0, 1, null, $numnotes + 1).scale(
+            @outmax $duration @slope xrand(0.01, 0.25) 
+        );
+        $durs = thin($onsets).x2dx();
+        for $onset $i in $onsets, $dur in $durs do (
+            $mc = $chord:(
+                (($i - 1) % $chordsize) + 1
+            );
+            ezsol(
+                @pitch $mc
+                @duration $dur + $legato
+                @names (
+                    'clar' 'flute' 'sax' 
+                ) 
+                @types 'ord' 'ord-high' 'ord-micro' 
+                @velocity $velocity
+                @useseed 1
+            ).transcribe(
+                @onset $onset
+                @gain [0 1 0] [1 0 0.5] 
+                @pan fold(mc2pan($mc, 0.125) + $panoffset) 
+            ) 
+        ) 
+    ) 
+);
+setseed(240);
+$t = 0;
+$meta = read('../foreground/foreground.txt');
+$markers = $meta.'markers';
+$chord = ($markers:-1).getkey('chord');
+$chord = for $mc in $chord collect if $mc > 4000 && $mc < 8500 then $mc;
+$b = importaudio('../premerge/premerge.wav');
+## $t += read('../premerge/premerge.txt');
+$N = 10;
+for $i in 1...$N do (
+    $dur = scale($i, 1, $N, 3000, 7000, 0.125);
+    $tempo = scale($i, 1, $N, 150, 90, 0.125);
+    $vel = scale($i, 1, $N, 127, 1, -0.125);
+    PercGap(
+        @onset $t
+        @duration $dur
+        @chord $chord
+        @velocity $vel
+    );
+    Arpeggi(
+        @onset $t
+        @chord $chord
+        @tempo $tempo
+        @duration $dur
+        @velocity $vel
+    );
+    $t += $dur
+);
+render(
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.9
+            @wet 0.0125
+            @damp 1
+            @width 1
+        ) normalize(-3) 
+    ) 
+);
+ezexport()

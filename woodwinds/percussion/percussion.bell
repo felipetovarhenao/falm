@@ -1,5 +1,5 @@
-setseed(0);
-$meta = read('./main.txt');
+setseed(1);
+$meta = read('../foreground/foreground.txt');
 $root = $meta.getkey('root');
 $peak = $meta.'peak';
 $tempo = $meta.'tempo';
@@ -118,7 +118,7 @@ for $marker in $markers do (
     $count = ($count + 1) % length($velpattern);
     null
 );
-$b = importaudio('./main.wav').setkey('offset', $peak);
+## $b = importaudio('../foreground/foreground.wav').setkey('offset', $peak);
 render(
     @play 1 @process freeverb(
         @roomsize 0.75
@@ -127,6 +127,6 @@ render(
         @width 1
     ) normalize(-3) 
     ## -----
-    mix($b) normalize(-3) 
+    ## mix($b) normalize(-3) 
 );
 ezexport($peak)
