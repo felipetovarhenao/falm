@@ -1,0 +1,30 @@
+$data = read('../premerge/premerge.txt');
+$gates = $data.'gates';
+if length($gates) % 2 == 1 then ($gates = $gates.left(-1));
+$gates = group($gates, 2);
+$offset = $gates::(1 1 1);
+$b = importaudio('../premerge/premerge.wav').setkey('offset', $offset);
+$c = importaudio('../glide/glide.wav');
+$t = 0;
+$minlevel = -18;
+for $g in $gates with @unwrap 1 do (
+    $start = $g:(1 1);
+    $end = $g:(2 1);
+    $dur = $end - $start;
+    $start -= $offset;
+    $c.setkey('offset', max(0, $start - $dur)).setkey('duration', $dur).detach().clipnorm(@minlevel $minlevel @maxlevel -3).transcribe($start);
+    $t += $dur
+);
+$c.setkey('offset', max(0, $start - $dur)).detach().clipnorm(@minlevel $minlevel @maxlevel -3).transcribe($start);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+    ## 
+    ## mix($b @gains 1 0.5) normalize(-3) 
+    
+);
+ezexport($offset)

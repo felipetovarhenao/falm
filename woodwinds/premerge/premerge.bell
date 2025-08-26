@@ -25,11 +25,15 @@ $stutterbpf = [0 0 0] [1 1 0.4];
 $maxnumcopies = 4;
 $lastonset = 0;
 $speedbpf = [0 1 0] [1 2 0.85];
+$state = 0;
+$gates = null;
 for $seg $segid in $segs do (
     $nt = ($segid - 1) / ($numsegs - 1);
     $speed = samplebpf($speedbpf, $nt);
     $mask = samplebpf($maskbpf, $nt);
     if $mask > xrand() then (
+        if $state == 1 then ($gates _= [$t $state] );
+        $state = 0;
         $slope = samplebpf($slopebpf, $nt);
         $stutter = samplebpf($stutterbpf, $nt);
         $copyweights = (1 0 :* ($maxnumcopies - 1)) * (1 - $stutter) + $stutter * rev(
@@ -48,10 +52,13 @@ for $seg $segid in $segs do (
             $copy.setkey('duration', $copydur).transcribe(@onset $t + $shift);
             $shift += $copydur
         ) 
+    ) else (
+        if $state == 0 then ($gates _= [$t $state]);
+        $state = 1
     );
     $t += $unit * $speed
 );
 render(
     @play 1 @process normalize(-3) 
 );
-ezexport($lastonset)
+ezexport(['totdur' $lastonset] ['gates' $gates])

@@ -91,10 +91,8 @@ $t = 0;
 $meta = read('../foreground/foreground.txt');
 $markers = $meta.'markers';
 $chord = ($markers:-1).getkey('chord');
-$chord = for $mc in $chord collect if $mc > 4000 && $mc < 8500 then $mc;
-$b = importaudio('../premerge/premerge.wav');
-## $t += read('../premerge/premerge.txt');
-$N = 10;
+$chord = for $mc in $chord collect if $mc > 3600 && $mc < 8500 then $mc;
+$N = 12;
 for $i in 1...$N do (
     $dur = scale($i, 1, $N, 3000, 7000, 0.125);
     $tempo = scale($i, 1, $N, 150, 90, 0.125);
