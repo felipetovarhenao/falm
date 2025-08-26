@@ -1,0 +1,68 @@
+setseed(2);
+Swirl = (
+    $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127 -> (
+        $t = 0;
+        $velbpf = bpf($velocity);
+        $maxnumnotes = round($duration / 80);
+        $seqlength = $length ||| xrandom(2, 5);
+        $numnotes = xrandom($maxnumnotes // 2, $maxnumnotes);
+        $numreps = ceil($numnotes / $seqlength);
+        $seq = randomseq(
+            @llll $chord
+            @length $seqlength
+            @steps -2 -1 1 2
+            @useseed 1
+        );
+        $seq = $seq :* $numreps;
+        $seq = $seq.left($numnotes);
+        $unit = $duration / $numnotes;
+        $panoffset = xrand();
+        for $mc in $seq do (
+            $nt = $t / $duration;
+            $vel = samplebpf($velbpf, $nt);
+            $mindb = atodb(($vel / 127) ** 3);
+            ezsol(
+                @pitch $mc
+                @names 'flute' 'sax' 'clar' 'acc' 
+                @types 'ord' 'ord-high' 'ord-micro' 
+                @velocity $vel
+                @duration $unit + 50
+                @useseed 1
+            ).clipnorm(@minlevel $mindb).transcribe(
+                @onset $t + $onset
+                @gain [0 1 0] [1 0 0.9] 
+                @pan fold(mc2pan($mc, 0.125) + $panoffset) 
+            );
+            $t += $unit
+        ) 
+    ) 
+);
+$meta = read('../03_leadup/leadup.txt');
+$chord = $meta.'chord';
+$totdur = 5000;
+$velocity = [0 1 0] [1 127 0.25];
+$numvoices = 2;
+for $vel in [$velocity] [revbpf($velocity)] with @unwrap 1 do (
+    for $i in 1...$numvoices do (Swirl(
+        @chord $chord
+        @duration $totdur
+        @velocity $vel
+        @length null
+    ) ) 
+);
+$ampenv = [0 0.5 0] [0.5 0.5 -0.125] [1 0.5 0.125];
+cycle(@frequency 80 @duration $totdur).transcribe(@gain $ampenv);
+cycle(@frequency 80 @duration 1000).transcribe(
+    @onset $totdur @gain [0 1 0] [1 0 -0.5] 
+);
+$tail = 300;
+render(
+    @play 1 @process gain($ampenv) freeverb(
+        @roomsize 0.9
+        @wet [0 0.05 0] [1 0.001 -0.125] 
+        @damp 1
+        @width 1
+        @tail $tail
+    ) fade(0, $tail) normalize(-3) 
+);
+ezexport($totdur)

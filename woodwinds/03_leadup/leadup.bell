@@ -110,4 +110,4 @@ render(
     ## ----
     mix($bass) normalize(-3) 
 );
-ezexport($peak - $totdur)
+ezexport(['onset' $peak - $totdur] ['chord' $chord])

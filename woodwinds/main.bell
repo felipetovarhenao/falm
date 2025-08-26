@@ -1,8 +1,8 @@
 $t = 0;
-$b = importaudio('./05_premerge/premerge.wav');
+$b = importaudio('./06_premerge/premerge.wav');
 $b.transcribe($t);
-$t += read('./06_tile/tile.txt');
-$b = importaudio('./06_tile/tile.wav');
+$t += read('./07_tile/tile.txt');
+$b = importaudio('./07_tile/tile.wav');
 $b.transcribe($t);
 render(
     @play 1 @process normalize(-3) 
