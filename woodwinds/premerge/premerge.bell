@@ -12,7 +12,7 @@ $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
 $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
-$t += $unit * 4;
+$t += $unit * 12;
 $tail = $base2.process(
     mix(
         importaudio('../percussion/percussion.wav') @gains 1 0.5
