@@ -1,9 +1,9 @@
-setseed(2);
+setseed(250);
 Swirl = (
-    $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127 -> (
+    $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
         $velbpf = bpf($velocity);
-        $maxnumnotes = round($duration / 80);
+        $maxnumnotes = round($duration / 90);
         $seqlength = $length ||| xrandom(2, 5);
         $numnotes = xrandom($maxnumnotes // 2, $maxnumnotes);
         $numreps = ceil($numnotes / $seqlength);
@@ -17,7 +17,9 @@ Swirl = (
         $seq = $seq.left($numnotes);
         $unit = $duration / $numnotes;
         $panoffset = xrand();
-        for $mc in $seq do (
+        $onsets = $onset + arithmser(0, 1, null, length($seq) + 1).scale(@outmax $duration @slope $slope);
+        $durs = x2dx($onsets $duration);
+        for $mc in $seq, $onset in $onsets, $dur in $durs do (
             $nt = $t / $duration;
             $vel = samplebpf($velbpf, $nt);
             $mindb = atodb(($vel / 127) ** 3);
@@ -26,40 +28,67 @@ Swirl = (
                 @names 'flute' 'sax' 'clar' 'acc' 
                 @types 'ord' 'ord-high' 'ord-micro' 
                 @velocity $vel
-                @duration $unit + 50
+                @duration $dur + 50
                 @useseed 1
             ).clipnorm(@minlevel $mindb).transcribe(
-                @onset $t + $onset
+                @onset $onset
                 @gain [0 1 0] [1 0 0.9] 
                 @pan fold(mc2pan($mc, 0.125) + $panoffset) 
             );
-            $t += $unit
+            $t += $dur
         ) 
     ) 
 );
 $meta = read('../03_leadup/leadup.txt');
-$chord = $meta.'chord';
-$totdur = 5000;
-$velocity = [0 1 0] [1 127 0.25];
-$numvoices = 2;
-for $vel in [$velocity] [revbpf($velocity)] with @unwrap 1 do (
-    for $i in 1...$numvoices do (Swirl(
-        @chord $chord
-        @duration $totdur
-        @velocity $vel
-        @length null
-    ) ) 
+$meta2 = read('../01_foreground/foreground.txt');
+$tempo = $meta2.'tempo';
+$beatdur = 60000 / $tempo;
+$bardur = $beatdur * 4;
+$chord = $meta.'chord'.sort();
+$totdur = $bardur * 3/8 * 5;
+$velocity = [0 1 0] [1 127 0.5];
+$numvoices = 1;
+for $vel $id in (
+    [$velocity] 
+    ## 
+    [revbpf($velocity)] 
+) with @unwrap 1 do (
+    for $i in 1...$numvoices do (
+        ## --—
+        Swirl(
+            @chord $chord
+            @duration $totdur
+            @velocity $vel
+            @length null
+            @slope xrand(0.1, 0.33) * (if $id == 1 then -1 else 1) 
+        ) 
+    ) 
 );
-$ampenv = [0 0.5 0] [0.5 0.5 -0.125] [1 0.5 0.125];
-cycle(@frequency 80 @duration $totdur).transcribe(@gain $ampenv);
-cycle(@frequency 80 @duration 1000).transcribe(
-    @onset $totdur @gain [0 1 0] [1 0 -0.5] 
+$ampenv = [0 0.5 0] [0.5 0.0125 -0.25] [1 0.5 0.5];
+$bassmc = $chord:1;
+cycle(
+    @frequency $bassmc.mc2f() @duration $totdur
+).transcribe(@gain $ampenv);
+for $mc in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
+    bass(
+        @pitch $mc
+        @duration null
+        @type 'bartok' 
+        @velocity 127
+        @useseed 1
+    ).process(normalize(-3)).transcribe(
+        @onset $start @pan xrand() 
+    ) 
+);
+$downbeatdur = 3000;
+cycle(@frequency 100 @duration $downbeatdur).transcribe(
+    @onset $totdur @gain [0 1 0] [1 0 -0.75] 
 );
 $tail = 300;
 render(
-    @play 1 @process gain($ampenv) freeverb(
+    @play 1 @process freeverb(
         @roomsize 0.9
-        @wet [0 0.05 0] [1 0.001 -0.125] 
+        @wet [0 0.05 0] [$totdur / ($totdur + $downbeatdur) 0.0001 -0.125] [1 0.0001 0] 
         @damp 1
         @width 1
         @tail $tail
