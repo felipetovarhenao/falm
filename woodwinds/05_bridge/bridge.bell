@@ -1,4 +1,4 @@
-setseed(9);
+setseed(4510);
 Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
@@ -47,9 +47,9 @@ $bardur = $beatdur * 8;
 $chord = $meta.'chord'.sort();
 $totdur = $bardur * 3/8 * 3;
 $velocity = [0 1 0] [1 127 0.35];
-$numvoices = 2;
+$numvoices = 3;
 for $vel $id in (
-    [revbpf($velocity)] 
+    ## [revbpf($velocity)] 
     ## 
     [$velocity] 
 ) with @unwrap 1 do (
@@ -60,32 +60,39 @@ for $vel $id in (
             @duration $totdur
             @velocity $vel
             @length null
-            @slope xrand(0.1, 0.25) * (if $id == 2 then -1 else 1) 
+            @slope xrand(0.1, 0.25) * (if $id == 1 then -1 else 1) 
         ) 
     ) 
 );
-$ampenv = [0 0.5 0] [0.5 0.0125 -0.25] [1 0.5 0.5];
+$ampenv = [0 0.5 0] [0.5 0.0125 -0.25] [1 1 0.5];
 $bassmc = $chord:1;
 cycle(
     @frequency $bassmc.mc2f() @duration $totdur
 ).transcribe(@gain $ampenv);
-for $mc in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
-    bass(
+for $mc $mci in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
+    $offset = 0;
+    $bass = bass(
         @pitch $mc
-        @duration null
+        @duration $totdur
         @type 'bartok' 
         @velocity 127
         @useseed 1
-    ).process(normalize(-3)).transcribe(
-        @onset $start @pan xrand() 
+    );
+    $process = gain([0 1 0] [1 0 0.8]);
+    if $mci == 2 then (
+        $process _= reverse();
+        $offset -= $bass.getkey('duration') 
+    );
+    $bass.process($process normalize(-3)).transcribe(
+        @onset $start + $offset @pan xrand() 
     ) 
 );
 $downbeatdur = 3000;
-cycle(
-    @frequency $chord:2.mc2f() / 2 @duration $downbeatdur
-).transcribe(
-    @onset $totdur @gain [0 1 0] [1 0 -0.5] 
-);
+## cycle(
+##     @frequency $chord:2.mc2f() / 2 @duration $downbeatdur
+## ).transcribe(
+##     @onset $totdur @gain [0 1 0] [1 0 -0.5] 
+## );
 $tail = 300;
 render(
     @play 1 @process freeverb(

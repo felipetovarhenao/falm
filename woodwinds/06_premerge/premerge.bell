@@ -12,9 +12,10 @@ $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
 $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
+## $t += $bardur * 3/16;
 importaudio('../05_bridge/bridge.wav').transcribe($t);
 $t += read('../05_bridge/bridge.txt');
-$t += $bardur * 6/16;
+## $t += $bardur * 3/16;
 $tail = $base2.process(
     mix(
         importaudio('../02_percussion/percussion.wav') @gains 1 0.5
@@ -65,6 +66,6 @@ for $seg $segid in $segs do (
     $t += $unit * $speed
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 0 @process normalize(-3) 
 );
 ezexport(['totdur' $lastonset] ['gates' $gates])
