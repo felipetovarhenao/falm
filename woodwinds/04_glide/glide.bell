@@ -88,7 +88,7 @@ Arpeggi = (
 );
 setseed(240);
 $t = 0;
-$meta = read('../foreground/foreground.txt');
+$meta = read('../01_foreground/foreground.txt');
 $markers = $meta.'markers';
 $chord = ($markers:-1).getkey('chord');
 $chord = for $mc in $chord collect if $mc > 3600 && $mc < 8500 then $mc;

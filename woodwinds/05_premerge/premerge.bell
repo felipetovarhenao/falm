@@ -1,13 +1,13 @@
 setseed(33);
 $t = 0;
-$meta = read('../foreground/foreground.txt');
+$meta = read('../01_foreground/foreground.txt');
 $tempo = $meta.'tempo';
 $totdur = $meta.'totdur';
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $unit = $bardur * 1/16;
-$split = read('../percussion/percussion.txt');
-$base = importaudio('../foreground/foreground.wav');
+$split = read('../02_percussion/percussion.txt');
+$base = importaudio('../01_foreground/foreground.wav');
 $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
 $base1.process(normalize(-3)).transcribe($t);
@@ -15,7 +15,7 @@ $t += $split;
 $t += $unit * 12;
 $tail = $base2.process(
     mix(
-        importaudio('../percussion/percussion.wav') @gains 1 0.5
+        importaudio('../02_percussion/percussion.wav') @gains 1 0.5
     ) normalize(-3) 
 ).setkey('duration', $totdur - $split);
 $segs = $tail.splitbuf(@split $unit);
@@ -28,8 +28,8 @@ $lastonset = 0;
 $speedbpf = [0 1 0] [1 2 0.85];
 $state = 0;
 $gates = null;
-$b = importaudio('../leadup/leadup.wav');
-$b.transcribe(read('../leadup/leadup.txt'));
+$b = importaudio('../03_leadup/leadup.wav');
+$b.transcribe(read('../03_leadup/leadup.txt'));
 for $seg $segid in $segs do (
     $nt = ($segid - 1) / ($numsegs - 1);
     $speed = samplebpf($speedbpf, $nt);

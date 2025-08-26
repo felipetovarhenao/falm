@@ -1,10 +1,10 @@
-$data = read('../premerge/premerge.txt');
+$data = read('../05_premerge/premerge.txt');
 $gates = $data.'gates';
 if length($gates) % 2 == 1 then ($gates = $gates.left(-1));
 $gates = group($gates, 2);
 $offset = $gates::(1 1 1);
-$b = importaudio('../premerge/premerge.wav').setkey('offset', $offset);
-$c = importaudio('../glide/glide.wav');
+$b = importaudio('../05_premerge/premerge.wav').setkey('offset', $offset);
+$c = importaudio('../04_glide/glide.wav');
 $t = 0;
 $minlevel = -18;
 for $g in $gates with @unwrap 1 do (
