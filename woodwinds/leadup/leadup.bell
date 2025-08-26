@@ -1,0 +1,113 @@
+setseed(10);
+$meta = read('../foreground/foreground.txt');
+$peak = read('../percussion/percussion.txt');
+$root = $meta.'root';
+$tempo = $meta.'tempo';
+$beatdur = 60000 / $tempo;
+$bardur = $beatdur * 4;
+$numbars = 12;
+$totdur = $bardur * 3/8 * $numbars;
+$unit = $bardur * 1/16;
+$markers = for $m in $meta.'markers' collect (
+    $onset = $m.getkey('onset');
+    if $onset >= $peak - $totdur && $onset <= $peak then $m
+);
+$velbpf = [0 0 0] [1 127 0.25];
+## guitar harp bass
+$groups = (
+    [
+        ['names' family('plucked')] [
+            'types' 'tap' 'tap-w-stick' 'perc' 'bell-effect' 
+        ] 
+    ] [
+        ['names' family('strings')] [
+            'types' 'hit-on-body' 'legno-bat' 
+        ] 
+    ] 
+);
+$minlevel = -90;
+for $m in $markers do (
+    $onset = ($m.getkey('onset') - $peak) + $totdur;
+    $nt = $onset / $totdur;
+    $vel = samplebpf($velbpf , $nt);
+    $group = xchoose($groups);
+    $chord = $m.getkey('chord').sort().left(3);
+    $mc = xchoose($chord);
+    $gain = $vel.scale(0, 127, 0.01, 1, -0.25);
+    $maxlevel = $gain.atodb();
+    $b = ezsol(
+        @pitch $mc
+        @velocity $vel
+        @names $group.getkey('names') 
+        @types $group.getkey('types') 
+        @resample 0
+        @duration $unit
+    );
+    $envpeak = $b.analyze(envmaxtime()).getkey('envmaxtime');
+    $b.clipnorm(@maxlevel $maxlevel @minlevel $minlevel).transcribe(
+        @onset $onset - $envpeak
+        @gain [0 $gain 0] [1 0 -0.5] 
+        @pan mc2pan($mc, 0.25) 
+    );
+    null;
+    ezsol(
+        @pitch $mc
+        @velocity $vel
+        @names family('strings') family('plucked') family('woodwinds') 
+        @duration $unit
+        @types 'pizz' 'pizz-secco' 'legno-bat' 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'tongue-slap' 
+    ).clipnorm(@maxlevel $maxlevel @minlevel $minlevel).transcribe(
+        @onset $onset
+        @pan mc2pan($mc, 0.25) 
+        @gain [0 1 0] [1 0 0.5] 
+    ) 
+);
+envelope(0 @duration 10).transcribe();
+$chord = ($markers:-1).getkey('chord');
+$maxdur = $totdur;
+for $mc in $chord do (
+    $b = ezsol(
+        @pitch $mc
+        @names family('plucked') family('strings') 
+        @types 'ord' 'pizz' 'harm' 
+        @duration $maxdur
+        @velocity 127
+    );
+    $st = $totdur - $b.getkey('duration');
+    $b.process(
+        reverse() gain(
+            [0 0 0] [1 1 xrand(1/4, 7/8)] 
+        ) 
+    ).clipnorm(@minlevel -10).transcribe(
+        @onset $st @pan abs(mc2pan($mc, 0.5) - (0 1)) 
+    ) 
+);
+$bassmc = $chord.sort():1;
+$bassfq = $bassmc.mc2f();
+$amp1 = 2;
+$amp2 = 2;
+$bassenv = [0 0 0] [1 $amp1 0.5];
+$smooth = 64;
+$mod = rect(
+    @frequency [0 0.1 0] [1 20 0.5] @duration $totdur
+).process(scaling(-1, 1, 0, 1) rampsmooth($smooth, $smooth));
+$bass = cycle(
+    @frequency [0 $bassfq 0] [1 $bassfq * 0.5 0.5] 
+    @duration $totdur
+    @phase xrand() 
+).process(
+    multiply($mod) gain($bassenv) arctan() gain([0 1 0] [1 $amp2 0.9]) pong() dcfilter() normalize(-3) panning(
+        [0 1 0] [0.5 0 -0.125] [1 0.5 0.125] 
+    ) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.8
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+    ## ----
+    mix($bass) normalize(-3) 
+);
+ezexport($peak - $totdur)

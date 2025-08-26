@@ -12,6 +12,7 @@ $base1 = $base.setkey('duration', $split);
 $base2 = $base.setkey('offset', $split);
 $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
+$t += $unit * 4;
 $tail = $base2.process(
     mix(
         importaudio('../percussion/percussion.wav') @gains 1 0.5
@@ -27,6 +28,8 @@ $lastonset = 0;
 $speedbpf = [0 1 0] [1 2 0.85];
 $state = 0;
 $gates = null;
+$b = importaudio('../leadup/leadup.wav');
+$b.transcribe(read('../leadup/leadup.txt'));
 for $seg $segid in $segs do (
     $nt = ($segid - 1) / ($numsegs - 1);
     $speed = samplebpf($speedbpf, $nt);
