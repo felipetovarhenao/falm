@@ -1,4 +1,4 @@
-setseed(250);
+setseed(9);
 Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
@@ -33,7 +33,7 @@ Swirl = (
             ).clipnorm(@minlevel $mindb).transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.9] 
-                @pan fold(mc2pan($mc, 0.125) + $panoffset) 
+                @pan fold(mc2pan($mc, 0.2) + $panoffset) 
             );
             $t += $dur
         ) 
@@ -45,9 +45,9 @@ $tempo = $meta2.'tempo';
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $chord = $meta.'chord'.sort();
-$totdur = $bardur * 3/8 * 5;
-$velocity = [0 1 0] [1 127 0.5];
-$numvoices = 1;
+$totdur = $bardur * 3/8 * 3;
+$velocity = [0 1 0] [1 127 0.35];
+$numvoices = 2;
 for $vel $id in (
     [$velocity] 
     ## 
@@ -60,7 +60,7 @@ for $vel $id in (
             @duration $totdur
             @velocity $vel
             @length null
-            @slope xrand(0.1, 0.33) * (if $id == 1 then -1 else 1) 
+            @slope xrand(0.1, 0.25) * (if $id == 1 then -1 else 1) 
         ) 
     ) 
 );
@@ -81,14 +81,16 @@ for $mc in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
     ) 
 );
 $downbeatdur = 3000;
-cycle(@frequency 100 @duration $downbeatdur).transcribe(
+cycle(
+    @frequency $chord:2.mc2f() / 4 @duration $downbeatdur
+).transcribe(
     @onset $totdur @gain [0 1 0] [1 0 -0.75] 
 );
 $tail = 300;
 render(
     @play 1 @process freeverb(
-        @roomsize 0.9
-        @wet [0 0.05 0] [$totdur / ($totdur + $downbeatdur) 0.0001 -0.125] [1 0.0001 0] 
+        @roomsize 0.98
+        @wet [0 0.05 0] [$totdur / ($totdur + $downbeatdur) 0 -0.125] [1 0 0] 
         @damp 1
         @width 1
         @tail $tail
