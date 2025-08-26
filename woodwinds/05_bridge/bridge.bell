@@ -22,7 +22,7 @@ Swirl = (
         for $mc in $seq, $onset in $onsets, $dur in $durs do (
             $nt = $t / $duration;
             $vel = samplebpf($velbpf, $nt);
-            $mindb = atodb(($vel / 127) ** 3);
+            $mindb = atodb(($vel / 127) ** 2);
             ezsol(
                 @pitch $mc
                 @names 'flute' 'sax' 'clar' 'acc' 
@@ -43,24 +43,24 @@ $meta = read('../03_leadup/leadup.txt');
 $meta2 = read('../01_foreground/foreground.txt');
 $tempo = $meta2.'tempo';
 $beatdur = 60000 / $tempo;
-$bardur = $beatdur * 4;
+$bardur = $beatdur * 8;
 $chord = $meta.'chord'.sort();
 $totdur = $bardur * 3/8 * 3;
 $velocity = [0 1 0] [1 127 0.35];
 $numvoices = 2;
 for $vel $id in (
-    [$velocity] 
-    ## 
     [revbpf($velocity)] 
+    ## 
+    [$velocity] 
 ) with @unwrap 1 do (
-    for $i in 1...$numvoices do (
+    for $i in 1...($numvoices * $id) do (
         ## --—
         Swirl(
             @chord $chord
             @duration $totdur
             @velocity $vel
             @length null
-            @slope xrand(0.1, 0.25) * (if $id == 1 then -1 else 1) 
+            @slope xrand(0.1, 0.25) * (if $id == 2 then -1 else 1) 
         ) 
     ) 
 );
@@ -82,9 +82,9 @@ for $mc in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
 );
 $downbeatdur = 3000;
 cycle(
-    @frequency $chord:2.mc2f() / 4 @duration $downbeatdur
+    @frequency $chord:2.mc2f() / 2 @duration $downbeatdur
 ).transcribe(
-    @onset $totdur @gain [0 1 0] [1 0 -0.75] 
+    @onset $totdur @gain [0 1 0] [1 0 -0.5] 
 );
 $tail = 300;
 render(

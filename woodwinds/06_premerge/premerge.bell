@@ -14,6 +14,7 @@ $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
 importaudio('../05_bridge/bridge.wav').transcribe($t);
 $t += read('../05_bridge/bridge.txt');
+$t += $bardur * 6/16;
 $tail = $base2.process(
     mix(
         importaudio('../02_percussion/percussion.wav') @gains 1 0.5
