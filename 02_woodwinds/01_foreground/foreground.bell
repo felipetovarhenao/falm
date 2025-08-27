@@ -408,6 +408,14 @@ while $t < $totdur do (
 $markers _= [
     ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
 ];
+$finalchord = null;
+while $finalchord == null do (
+    $cycle = GetHarmony();
+    if $cycle.getkey('index') == 1 then (
+        $pcs = $cycle.getkey('ratios').r2pc($pcroot);
+        $finalchord = $fullchord.pcquant($pcs) 
+    ) 
+);
 ## ----------------------
 ## Rendering and export
 ## ----------------------
@@ -425,5 +433,7 @@ $metadata = (
     ['totdur' $totdur] 
     ## 
     ['markers' $markers] 
+    ## 
+    ['final_chord' $finalchord] 
 );
 ezexport(@data $metadata)

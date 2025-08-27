@@ -3,12 +3,41 @@ PianoRoll = (
         $t = $onset;
         $vel = $vel ||| xrand(20, 100);
         $incr = xrand(50);
+        cycle(
+            @frequency mc2f(
+                $chord.minimum().mc2pc() * 100 + 2100
+            ) 
+            @duration $duration
+            @phase xrand() 
+        ).transcribe(
+            @onset $t
+            @gain [
+                0 (($vel + 1) / 127) ** 0.5 * 0.25 0
+            ] [1 0 -xrand(1/4, 4/5)] 
+            @pan xrand() 
+        );
         for $mc in $chord do (
-            pno(
+            if xrand() > 0.75 then (
+                sinewave(
+                    @pitch $mc + xrandom(-2, 4) * 1200
+                    @duration 300 * xrand(0, 2).exp2() 
+                    @velocity $vel
+                    @envelope [0 0.33 0] [1 0 -xrand(1/3, 3/4)] 
+                ).transcribe(
+                    @onset $t
+                    @gain (($vel + 1) / 127) ** 0.5
+                    @pan xrand() 
+                ) 
+            );
+            xchoose(pno ezsol)(
                 @pitch $mc + xrandom(-1, 2) * 1200
-                @duration $duration * 1.5
+                @duration null
                 @velocity $vel
                 @useseed 1
+                @names family('plucked') 
+                @types 'ord' 'harm' 
+                @gain 0.2
+                @norm 0.25
             ).transcribe(
                 @onset $t
                 @pan mc2pan($mc, 0.1) 
@@ -40,7 +69,7 @@ PercGap = (
             ).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
-                @gain [0 1 0] [1 0 0.7] 
+                @gain [0 0.5 0] [1 0 0.7] 
             );
             $onset += $onsetvar
         ) 
@@ -48,6 +77,12 @@ PercGap = (
 );
 Arpeggi = (
     $onset = 0, $duration = 10000, $chord = null, $velocity = 127, $tempo = 100 -> (
+        PianoRoll(
+            @onset $onset
+            @duration $duration
+            @chord $chord
+            @vel $velocity * 0.25
+        );
         $bardur = 240000 / $tempo;
         $unit = $bardur * xchoose(1/16 1/20 1/12);
         $chord = xscramble($chord).left(xrandom(3, 7));
@@ -55,14 +90,8 @@ Arpeggi = (
         $numnotes = max(3, $duration / $unit);
         $legato = $unit * 0.25;
         $panoffset = xrand(-1, 1);
-        PianoRoll(
-            @onset $onset
-            @duration $duration
-            @chord $chord
-            @vel $velocity
-        );
         $onsets = $onset + arithmser(0, 1, null, $numnotes + 1).scale(
-            @outmax $duration @slope xrand(0.01, 0.25) 
+            @outmax $duration @slope xrand(0.05, 0.3) 
         );
         $durs = thin($onsets).x2dx();
         for $onset $i in $onsets, $dur in $durs do (
@@ -73,7 +102,7 @@ Arpeggi = (
                 @pitch $mc
                 @duration $dur + $legato
                 @names (
-                    'clar' 'flute' 'sax' 
+                    'clar' 'flute' 'sax' 'acc' 
                 ) 
                 @types 'ord' 'ord-high' 'ord-micro' 
                 @velocity $velocity
@@ -86,13 +115,12 @@ Arpeggi = (
         ) 
     ) 
 );
-setseed(240);
+setseed(220);
 $t = 0;
 $meta = read('../01_foreground/foreground.txt');
-$markers = $meta.'markers';
-$chord = ($markers:-1).getkey('chord');
+$chord = $meta.'final_chord';
 $chord = for $mc in $chord collect if $mc > 3600 && $mc < 8500 then $mc;
-$N = 12;
+$N = 13;
 for $i in 1...$N do (
     $dur = scale($i, 1, $N, 3000, 7000, 0.125);
     $tempo = scale($i, 1, $N, 150, 90, 0.125);
@@ -115,7 +143,7 @@ for $i in 1...$N do (
 render(
     @play 1 @process (
         freeverb(
-            @roomsize 0.9
+            @roomsize 0.95
             @wet 0.0125
             @damp 1
             @width 1
