@@ -30,21 +30,21 @@ $numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
 ## Helpers
 ## ----------------------
 $ampmod = (
-    $c, $m -> (
+    $c, $m, $minlevel = -60 , $maxlevel = -10 -> (
         $m = $m.process(scaling(-1, 1, 0, 1) rampsmooth(16, 16));
-        $c.process(multiply($m)).clipnorm(@minlevel -12 @maxlevel -6) 
+        $c.process(multiply($m)).clipnorm(@minlevel $minlevel @maxlevel $maxlevel) 
     ) 
 );
 ## ----------------------
 ## Function: TremChord
 ## ----------------------
 TremChord = (
-    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0 -^ $ampmod, $peak -> (
+    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $ampmod, $peak -> (
         $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
-            $env = [0 xrand(0.05, 0.35) 0] [1 0 -0.25];
+            $env = [0 xrand(0.05, 0.35) ** 1.35 0] [1 0 -0.25];
             if $sign == 1 then ($env = revbpf($env) );
             cycle(
                 @frequency $mc.mc2f() * exp2(xrandom(0, 3) * $sign) 
@@ -79,7 +79,11 @@ TremChord = (
             $env1 = [0 1 0] [$dip xrand(0.1, 0.5) -0.25] [1 1 0.125];
             $env2 = [0 1 0] [0.001 1 0.25] [1 0 -0.125];
             $env = (1 - $envmix) * $env1 + $env2 * $envmix;
-            $b.$ampmod($mod).transcribe(
+            $b.$ampmod(
+                @m $mod
+                @minlevel $minlevel - 6
+                @maxlevel $maxlevel -6
+            ).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 1/3) 
                 @gain $env
@@ -91,7 +95,7 @@ TremChord = (
 ## Function: Gap
 ## ----------------------
 PercGap = (
-    $onset = 0, $duration = 1000, $chord = null -> (
+    $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $mcs = randomseq(
             @llll $chord
             @length xrandom(4, 9) 
@@ -109,7 +113,7 @@ PercGap = (
                 @velocity xrandom(60, 127) 
                 @useseed 1
                 @duration $duration * 2
-            ).clipnorm(@minlevel -10 @maxlevel -5).transcribe(
+            ).clipnorm(@minlevel $minlevel - 6 @maxlevel $maxlevel - 6).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
                 @gain [0 1 0] [1 0 0.7] 
@@ -122,7 +126,7 @@ PercGap = (
 ## Function: Arpeggi
 ## ----------------------
 Arpeggi = (
-    $onset = 0, $duration = 1000, $chord = null -^ $bardur -> (
+    $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -^ $bardur -> (
         $unit = $bardur * xchoose(1/16 1/24 1/20);
         $chord = xscramble($chord).left(xrandom(3, 7));
         $chordsize = length($chord);
@@ -148,7 +152,7 @@ Arpeggi = (
                 @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 
                 @velocity 127
                 @useseed 1
-            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
+            ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
                 @pan fold(mc2pan($mc, 0.125) + $panoffset) 
@@ -160,7 +164,7 @@ Arpeggi = (
 ## Function: Thump
 ## ----------------------
 Thump = (
-    $onset = 0, $duration = 1000, $chord = null -> (
+    $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $mc = xchoose($chord) % 2400 + 2100;
         ezsol(
             @pitch $mc
@@ -169,7 +173,7 @@ Thump = (
             @names 'bass' 'cello' 
             @velocity xrandom(50) 
             @useseed 1
-        ).clipnorm(@minlevel -12 @maxlevel -3).transcribe(
+        ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
             @onset $onset
             @gain [0 1 0] [1 0 0.8] 
             @pan mc2pan($mc, 0.125) 
@@ -180,7 +184,7 @@ Thump = (
 ## Function: Melody
 ## ----------------------
 Melody = (
-    $onset, $duration, $chord -> (
+    $onset, $duration, $chord, $minlevel = -60, $maxlevel = -10 -> (
         Thump(
             @onset $onset
             @duration $duration
@@ -219,7 +223,7 @@ Melody = (
                 @useseed 1
             ).process(
                 resample($res) fade(0, $legato) 
-            ).clipnorm(@minlevel -12 @maxlevel -7).transcribe(
+            ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
                 @onset $t @pan mc2pan($mc1, 0.125) 
             ) 
         ) 
@@ -270,7 +274,7 @@ GetHarmony = (
 ## Function: Pluck
 ## ----------------------
 Pluck = (
-    $onset = 0, $duration = 1000, $chord = null -> (
+    $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $size = xrandom(1, 3);
         $maxplucks = ceil($duration / 180);
         $numplucks = xrandom(1, $maxplucks);
@@ -293,7 +297,7 @@ Pluck = (
                     @types 'harm' 'harm-in-wood' 'ord-high' 
                     @velocity xrand().scale(@outmax 127 @slope 0.2) 
                     @useseed 1
-                ).clipnorm(@minlevel -14).transcribe(
+                ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
                     @onset $onset
                     @pan mc2pan($mc, 0.33) 
                     @gain [0 1 0] [1 0 0.5] 
@@ -334,9 +338,16 @@ $weightsbpf = (
 );
 $count = 0;
 $markers = null;
+$minlevelend = -16;
+$maxlevelend = -3;
+$clipslope = 0.25;
+$minlevelbpf = [0 -24 0] [$peak $minlevelend $clipslope] [1 $minlevelend 0];
+$maxlevelbpf = [0 -18 0] [$peak $maxlevelend $clipslope] [1 $maxlevelend 0];
 while $t < $totdur do (
     $nt = $t / $totdur;
     ## probabilistically choose between objects
+    $minlevel = samplebpf($minlevelbpf, $nt);
+    $maxlevel = samplebpf($maxlevelbpf, $nt);
     $weights = samplebpf($weightsbpf, $nt);
     if $t == 0 then (
         $weights *= 0;
@@ -369,6 +380,8 @@ while $t < $totdur do (
         @chord $chord
         @types $types
         @nt $nt
+        @minlevel $minlevel
+        @maxlevel $maxlevel
     );
     ## advance time and occasionally insert a gap
     $markers _= [
@@ -381,6 +394,7 @@ while $t < $totdur do (
             @onset $t
             @duration $gapdur
             @chord $chord
+            @minlevel $minlevel
         );
         $markers _= [
             ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
