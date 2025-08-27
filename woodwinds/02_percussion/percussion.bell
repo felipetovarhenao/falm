@@ -41,7 +41,7 @@ $velpattern = int(
     round(scale(3 2 3 4 0 8 1 2 9 1 10 2, 0, 10, 1, 127, -0.125)) 
 );
 $mcpattern = scale(8 7 8 9 6 1 5 6 2 6 0 10, 0, 10, 0, 1);
-$durmulpattern = scale(8 7 8 9 6 1 5 6 2 6 0 10, 10, 0, 0, 1).exp2();
+$durmulpattern = scale(8 7 8 9 6 1 5 6 2 6 0 10, 10, 0, -1, 1).exp2();
 $count = 0;
 $groups = (
     [
@@ -64,7 +64,6 @@ for $marker in $markers do (
     $vel = $velpattern:($count + 1);
     $chord = $marker.getkey('chord');
     $mcpos = $mcpattern:($count + 1);
-    print($mcpos);
     $id = int(
         round(
             $mcpos.scale(0, 1, 1, length($chord)) 
@@ -79,7 +78,7 @@ for $marker in $markers do (
         @end 0
         @threshold 0.00125
     );
-    if xrand() > 0.9 then (
+    if xrand() > 0.95 then (
         $process _= freqshift(
             $mc.mc2f() * xrandom(1, 4) @negative xchoose(-1 1) 
         ) 
@@ -103,15 +102,15 @@ for $marker in $markers do (
         @pan mc2pan($mc, 0.125) 
     );
     if $vel > 100 then (
-        $fq = $mc.mc2f();
+        $fq = $mc.mc2f() * 0.5;
         $gliss = $fq * xrand(-90, -10).c2r();
         cycle(
             @frequency [0 $fq 0] [1 $gliss -0.125] 
-            @duration 500
+            @duration $durmul * 200
             @phase rand() 
         ).transcribe(
             @onset $onset
-            @gain [0 0.25 0] [1 0 -0.125] 
+            @gain [0 0.25 0] [1 0 -0.25] 
             @pan mc2pan($mc, 0.125) 
         ) 
     );
@@ -121,12 +120,13 @@ for $marker in $markers do (
 ## $b = importaudio('../01_foreground/foreground.wav').setkey('offset', $peak);
 render(
     @play 1 @process freeverb(
-        @roomsize 0.75
+        @roomsize 0.85
         @wet 0.0025
         @damp 1
         @width 1
     ) normalize(-3) 
     ## -----
     ## mix($b) normalize(-3) 
+    
 );
 ezexport($peak)

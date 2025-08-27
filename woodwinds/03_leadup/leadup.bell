@@ -1,4 +1,4 @@
-setseed(40);
+setseed(4201);
 $meta = read('../01_foreground/foreground.txt');
 $peak = read('../02_percussion/percussion.txt');
 $root = $meta.'root';
@@ -64,14 +64,13 @@ for $m in $markers do (
         @gain [0 1 0] [1 0 0.5] 
     ) 
 );
-envelope(0 @duration 10).transcribe();
 $chord = ($markers:-1).getkey('chord');
 $maxdur = $totdur;
 for $mc in $chord do (
     $b = ezsol(
         @pitch $mc
         @names family('plucked') family('strings') 
-        @types 'ord' 'pizz' 'harm' 
+        @types 'ord' 'pizz' 'harm' 'crushed-to-ord' 
         @duration $maxdur
         @velocity 127
         @useseed 1
@@ -84,7 +83,7 @@ for $mc in $chord do (
     ).clipnorm(@minlevel -10).transcribe(
         @onset $st
         @pan abs(mc2pan($mc, 0.5) - (0 1)) 
-        @gain 0.5
+        @gain 0.25
     ) 
 );
 $bassmc = $chord.sort():1;
@@ -115,4 +114,6 @@ render(
     ## ----
     mix($bass) normalize(-3) 
 );
-ezexport(['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord])
+ezexport(
+    ['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord] 
+)

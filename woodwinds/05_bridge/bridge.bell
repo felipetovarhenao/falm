@@ -1,4 +1,4 @@
-setseed(4510);
+setseed(920);
 Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
@@ -43,10 +43,11 @@ $meta = read('../03_leadup/leadup.txt');
 $meta2 = read('../01_foreground/foreground.txt');
 $tempo = $meta2.'tempo';
 $beatdur = 60000 / $tempo;
-$bardur = $beatdur * 8;
+$bardur = $beatdur * 4;
 $chord = $meta.'chord'.sort();
-$totdur = $bardur * 3/8 * 3;
-$velocity = [0 1 0] [1 127 0.35];
+$totdur = $bardur * 3/8 * 7;
+$finalunit = $bardur * 1/16;
+$velocity = [0 1 0] [1 127 0.3];
 $numvoices = 3;
 for $vel $id in (
     ## [revbpf($velocity)] 
@@ -117,7 +118,7 @@ for $mc in $chord do (
         @gain [0 $b.getkey('maxabs') * 0.25 0] [1 0 -xrand(1/3, 3/4)] 
         @pan xrand() 
     );
-    $t += xrand(40) 
+    $t += xrand(70) 
 );
 $t = $totdur;
 for $o $oi in -2...0 do (
@@ -137,8 +138,8 @@ cycle(
     @onset $totdur @gain [0 1 0] [1 0 -0.5] 
 );
 $tail = 300;
-render(
-    @play 1 @process freeverb(
+$b = render(
+    @reset 1 @process freeverb(
         @roomsize 0.98
         @wet [0 0.05 0] [$totdur / ($totdur + $downbeatdur) 0 -0.125] [1 0 0] 
         @damp 1
@@ -146,4 +147,20 @@ render(
         @tail $tail
     ) fade(0, $tail) normalize(-3) 
 );
-ezexport($totdur)
+$bl = $b.setkey('duration', $totdur);
+$bl.detach().process(normalize(-3)).transcribe();
+$shift = 0;
+$shift += $totdur;
+for $dur in arithmser(0, 1, null, 32).scale(0, 1, 25, $finalunit, 0.25) do (
+    $bm = $b.setkey('offset', $totdur - $dur).setkey('duration', $dur);
+    $bm.process(
+        gain([0 1 0] [1 0 -0.1]) normalize(-3) 
+    ).transcribe( @onset $shift);
+    $shift += $dur
+);
+$br = $b.setkey('offset', $totdur);
+$br.process(normalize(-3)).transcribe($shift);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport($shift)
