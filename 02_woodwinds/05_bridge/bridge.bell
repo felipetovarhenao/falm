@@ -44,7 +44,7 @@ $meta2 = read('../01_foreground/foreground.txt');
 $tempo = $meta2.'tempo';
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-$chord = $meta.'chord'.sort();
+$chord = $meta.'next_chord'.sort();
 $totdur = $bardur * 3/8 * 7;
 $finalunit = $bardur * 1/16;
 $velocity = [0 1 0] [1 127 0.3];
@@ -160,6 +160,12 @@ for $dur in arithmser(0, 1, null, 32).scale(0, 1, 25, $finalunit, 0.25) do (
 );
 $br = $b.setkey('offset', $totdur);
 $br.process(normalize(-3)).transcribe($shift);
+$bassdur = 1000;
+cycle(
+    @frequency $chord:1.mc2f() / 2 @duration $bassdur
+).transcribe(
+    @onset $shift - $bassdur @gain [0 0 0] [1 0.5 0.5] 
+);
 render(
     @play 1 @process normalize(-3) 
 );
