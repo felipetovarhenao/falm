@@ -63,7 +63,7 @@ for $seg $segid in $segs do (
         );
         $copy = $seg.process(
             gain([0 1 0] [1 0 $slope]) 
-        ).process(normalize(-11));
+        ).process(normalize(-10));
         $numcopies = xchoose(1...4 @weights $copyweights);
         $copydur = $copy.getkey('duration') / $numcopies;
         $shift = 0;
