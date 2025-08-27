@@ -78,6 +78,7 @@ for $seg $segid in $segs do (
     );
     $t += $unit * $speed
 );
+if $gates:(-1 2) == 0 then ($gates _= [$t 1]);
 render(
     @play 1 @process normalize(-3) 
 );
