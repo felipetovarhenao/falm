@@ -40,14 +40,17 @@ $ampmod = (
 ## ----------------------
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $ampmod, $peak -> (
+        init $eqbpf = [8.2231608369 0 0] [32.7031956626 0.707 -0.25] [261.6255653006 1 -0.25] [830.6093951599 1 -0.25] [4186.0090448096 0.707 0.25] [26579.5006451165 0.00001 0.25];
         $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
-            $env = [0 xrand(0.05, 0.35) ** 1.35 0] [1 0 -0.25];
+            $fq = $mc.mc2f() * exp2(xrandom(0, 3) * $sign);
+            $eq = samplebpf($eqbpf, $fq);
+            $env = [0 xrand(0.05, 0.35) ** 1.35 * $eq 0] [1 0 -0.25];
             if $sign == 1 then ($env = revbpf($env) );
             cycle(
-                @frequency $mc.mc2f() * exp2(xrandom(0, 3) * $sign) 
+                @frequency $fq
                 @duration $duration
                 @phase xrand() 
             ).transcribe(
@@ -336,7 +339,7 @@ $weightsbpf = (
     ## 
     [1 [0 1 0 0] -0.125] 
 );
-$count = 0;
+$eqbpf = [0 0 0] [] $count = 0;
 $markers = null;
 $minlevelend = -16;
 $maxlevelend = -3;
