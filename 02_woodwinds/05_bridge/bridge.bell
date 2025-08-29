@@ -164,7 +164,9 @@ $bassdur = 1000;
 cycle(
     @frequency $chord:1.mc2f() / 2 @duration $bassdur
 ).transcribe(
-    @onset $shift - $bassdur @gain [0 0 0] [1 0.5 0.5] 
+    @onset $shift - $bassdur
+    @gain [0 0 0] [1 0.5 0.5] 
+    @pan 0.5
 );
 render(
     @play 1 @process normalize(-3) 
