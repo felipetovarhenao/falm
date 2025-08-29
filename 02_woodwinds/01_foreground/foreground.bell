@@ -447,7 +447,6 @@ $weightsbpf = (
     ## 
     [1 [0 1 0 0] -0.125] 
 );
-$eqbpf = [0 0 0] [] $count = 0;
 $markers = null;
 $minlevelend = -16;
 $maxlevelend = -3;
@@ -483,7 +482,6 @@ while $t < $totdur do (
         $pcs = $cycle.getkey('ratios').r2pc($pcroot);
         $index = $cycle.getkey('index') 
     );
-    $count += 1;
     $chord = $fullchord.pcquant($pcs).left($chordsize);
     ## invoke chosen object (Melody or TremChord)
     $object(
