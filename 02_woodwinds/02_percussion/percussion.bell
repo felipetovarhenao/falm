@@ -32,7 +32,7 @@ for $i in -1 * (0...64) as $peakmarker == null || $stop == 0 do (
     if $index == 1 then (
         $peakmarker = $marker;
         $peakid = $addr
-    ) else if $index == 8 then ($stop = 1) 
+    ) else if $index == 6 then ($stop = 1) 
 );
 $peakmarkerid = $peakid;
 $peak = $peakmarker.getkey('onset');
