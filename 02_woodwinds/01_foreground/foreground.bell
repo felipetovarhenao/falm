@@ -88,7 +88,7 @@ TremChord = (
         ## woodwind layer with modulation
         $dip = xrand(0.05, 2/3);
         $envmix = samplebpf(
-            [0 0 0] [$peak 0 0] [1 1 -0.25], $nt
+            [0 0 0] [$peak 0.25 0.125] [1 1 -0.25], $nt
         );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
@@ -512,7 +512,9 @@ while $t < $totdur do (
     );
     $chord = $fullchord.pcquant($pcs).left($chordsize);
     ## invoke chosen object (Melody or TremChord)
-    $object(
+    $reps = 1;
+    if $object == Melody && $nt > 0.3 then $reps = 2;
+    for $rep in 1...$reps do ($object(
         @onset $t
         @duration $maxdur
         @chord $chord
@@ -520,7 +522,7 @@ while $t < $totdur do (
         @nt $nt
         @minlevel $minlevel
         @maxlevel $maxlevel
-    );
+    ) );
     ## advance time and occasionally insert a gap
     $markers _= [
         ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
