@@ -40,7 +40,7 @@ $ampmod = (
 ## ----------------------
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $ampmod, $peak -> (
-        init $eqbpf = [0 0 0] [32 0.25 -0.25] [261 1 -0.25] [830 1 -0.25] [4186 0.125 0.25] [26579 0.00001 0.25];
+        init $eqbpf = [0 0 0] [32 0.125 -0.25] [261 1 -0.25] [830 0.707 -0.25] [4186 0.05 0.25] [26579 0.0 0.25];
         $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
@@ -203,7 +203,7 @@ Granulate = (
         $grainstoffset = 0;
         if xrand() > 0.6 then (
             $graingainbpf = revbpf($graingainbpf);
-            if xrand() > 0.5 then ($grainstoffset = -$texturedur) 
+            if xrand() > 0.5 && $onset > $texturedur then ($grainstoffset = -$texturedur) 
         );
         $octoffset = xrandom(-1, 4);
         $graindurmul = xrand().exp2();
@@ -309,17 +309,51 @@ PianoRoll = (
         $vel = xrand(20, 100);
         $incr = xrand(50);
         for $mc in $chord do (
-            pno(
+            $b = pno(
                 @pitch $mc + xrandom(-1, 2) * 1200
                 @duration $duration * 1.5
                 @velocity $vel
                 @useseed 1
-            ).transcribe(
+            );
+            $b.transcribe(
                 @onset $t
                 @pan mc2pan($mc, 0.1) 
                 @gain [0 1 0] [1 0 0.7] 
             );
+            if rand() > 0.707 then (Freeze(@onset $t @buffer $b));
             $t += $incr
+        ) 
+    ) 
+);
+## ----------------------
+## Function: Freeze
+## ----------------------
+Freeze = (
+    $buffer, $onset = 0, $duration = null -> (
+        $bufdur = $buffer.getkey('duration');
+        $duration = $duration ||| ($bufdur * xrand(-1, 1).exp2());
+        $readst = $buffer.getkey('offset');
+        $readend = $bufdur + $readst;
+        $graindur = min($bufdur, xrand(50, 150));
+        $readbpf = [0 $readst 0.] [1 max($readst, $readend - $graindur) 0];
+        $gainbpf = [0 1 0] [1 0 -xrand(1/10, 3/4)];
+        if xrand() > 0.6 then (
+            $gainbpf = revbpf($gainbpf);
+            if xrand() > 0.5 then ($onset -= $duration) 
+        );
+        $t = 0;
+        $win = hanning();
+        while $t < $duration do (
+            $nt = $t / $duration;
+            $grainoffset = samplebpf($readbpf, $nt);
+            $gain = samplebpf($gainbpf, $nt);
+            $grain = $buffer.setkey('offset', $grainoffset).setkey('duration', $graindur);
+            $grain.transcribe(
+                @onset $t + $onset
+                @gain $win * $gain
+                @pan xrand() 
+            );
+            $t += $graindur * xrand(0.125, 1/3) 
         ) 
     ) 
 );
