@@ -1,12 +1,12 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(8);
+setseed(77);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-$harmonicpulse = $bardur * (3/4);
-$root = f#3;
+$harmonicpulse = $bardur * (3/4) * 1.5;
+$root = F#3;
 $pcroot = $root.mc2pc();
 $t = 0;
 $totalbars = 200;
@@ -421,11 +421,11 @@ Pluck = (
 ## Function: UpdateHarmony
 ## ----------------------
 UpdateHarmony = (
-    $delta = 0, $period = 6, $threshold = 3000 -> (
+    $delta = 0, $period = 6, $threshold = 2000 -> (
         init $time = 0;
         init $count = 0;
         $test = 0;
-        if $count % $period == 0 || $time % $threshold < $time then (
+        if $count % $period == 0 || $time > $threshold then (
             $test = 1;
             keep $time = 0;
             keep $count = 0
@@ -477,6 +477,7 @@ while $t < $totdur do (
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
     ## choose chord slice
+    addmarker($t);
     if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
         $cycle = GetHarmony();
         $pcs = $cycle.getkey('ratios').r2pc($pcroot);
