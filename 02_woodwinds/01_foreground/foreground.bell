@@ -36,6 +36,32 @@ $ampmod = (
     ) 
 );
 ## ----------------------
+## Function: Stutter
+## ----------------------
+Stutter = (
+    $buffer, $onset = 0 -> (
+        $duration = $buffer.getkey('duration');
+        $maxreps = max(
+            1, int(round($duration / 55)) 
+        );
+        $numreps = xrandom(2, $maxreps);
+        $onsets = arithmser(0, 1, null, $numreps);
+        $onsets = $onset + scale($onsets, 0, 1, 0, $duration, xrand(1/20, 1/2) * xchoose(-1 1));
+        $durs = x2dx($onsets $duration);
+        $pan = xrand();
+        $readbpf = [0 0 0] [1 1 0];
+        $speed = xrand(0.25) ** 2;
+        for $onset in $onsets, $dur in $durs do (
+            if $dur > 10 then (
+                $nt = $onset / $duration;
+                $offset = samplebpf($readbpf, $nt) * $speed * ($duration - $dur);
+                $seg = $buffer.setkey('offset', $offset).setkey('duration', $dur);
+                $seg.transcribe(@onset $onset @pan $pan) 
+            ) 
+        ) 
+    ) 
+);
+## ----------------------
 ## Function: TremChord
 ## ----------------------
 TremChord = (
@@ -288,9 +314,11 @@ Melody = (
             ).process(
                 resample($res) fade(0, $legato) 
             ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
-            $b.transcribe(
-                @onset $t @pan mc2pan($mc1, 0.125) 
-            );
+            if xrand() > 0.05 || $b.getkey('duration') < 80 then (
+                $b.transcribe(
+                    @onset $t @pan mc2pan($mc1, 0.125) 
+                ) 
+            ) else Stutter(@buffer $b @onset $t);
             ## ----- granulation start ------
             if xrand() > 0.8 then (Granulate(
                 @onset $t
