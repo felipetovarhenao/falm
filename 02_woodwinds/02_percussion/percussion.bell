@@ -25,14 +25,14 @@ $peak = $onsets:$peakmarkerid;
 $stop = 0;
 $peakmarker = null;
 $peakid = null;
-for $i in -1 * (0...32) as $peakmarker == null || $stop == 0 do (
+for $i in -1 * (0...64) as $peakmarker == null || $stop == 0 do (
     $addr = ($peakmarkerid + $i);
     $marker = $markers:$addr;
     $index = $marker.getkey('index');
     if $index == 1 then (
         $peakmarker = $marker;
         $peakid = $addr
-    ) else if $index == 4 then ($stop = 1) 
+    ) else if $index == 8 then ($stop = 1) 
 );
 $peakmarkerid = $peakid;
 $peak = $peakmarker.getkey('onset');
