@@ -10,7 +10,7 @@ $split = read('../02_percussion/percussion.txt');
 $basemarkers = $meta.'markers';
 $wetenv = for $m in $basemarkers collect (
     $x = $m.getkey('onset') / $totdur;
-    $y = xrand().scale(0, 1, 0.00125, 0.0125, 0.35);
+    $y = xrand().scale(0, 1, 0.005, 0.0125, 0.25);
     $s = xrand(-0.125, 0.125);
     [$x $y $s] 
 );
