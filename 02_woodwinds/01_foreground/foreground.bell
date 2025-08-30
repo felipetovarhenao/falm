@@ -5,7 +5,7 @@ setseed(77);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-$harmonicpulse = $bardur * (3/4) * 1.5;
+$harmonicpulse = $bardur * (3/4) * 1.125;
 $root = F#3;
 $pcroot = $root.mc2pc();
 $t = 0;
@@ -13,7 +13,7 @@ $totalbars = 200;
 $peak = 0.7;
 $totdur = $totalbars * ($bardur * 3/8);
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
-$fullchord = r2mc(1...21, $root).sort();
+$fullchord = r2mc(1...23, $root).sort();
 $maxunitsize = 14;
 $units = rev(
     sort((1 1 1...$maxunitsize) / 16) 
@@ -23,7 +23,7 @@ $gapunits = thin($units).sort().right(-$maxunitsize + 3);
 ## BPFs
 ## -------------------------
 $gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
-$chordsizebpf = [0 6 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
+$chordsizebpf = [0 7 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
 $numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
 ## ----------------------
@@ -42,21 +42,27 @@ Stutter = (
     $buffer, $onset = 0 -> (
         $duration = $buffer.getkey('duration');
         $maxreps = max(
-            1, int(round($duration / 55)) 
+            1, int(round($duration / 35)) 
         );
         $numreps = xrandom(2, $maxreps);
         $onsets = arithmser(0, 1, null, $numreps);
-        $onsets = $onset + scale($onsets, 0, 1, 0, $duration, xrand(1/20, 1/2) * xchoose(-1 1));
+        $onsets = scale($onsets, 0, 1, 0, $duration, xrand(1/20, 1/2) * xchoose(-1 1));
         $durs = x2dx($onsets $duration);
         $pan = xrand();
         $readbpf = [0 0 0] [1 1 0];
-        $speed = xrand(0.25) ** 2;
-        for $onset in $onsets, $dur in $durs do (
-            if $dur > 10 then (
-                $nt = $onset / $duration;
+        $speed = xrand(0.125) ** 2;
+        $slope = xrand(1/5, 2/3) * xchoose(-1 1);
+        $env = [0 0 0] [xrand(0.0001, 0.9999) 1 0] [1 0 $slope];
+        for $t in $onsets, $dur in $durs do (
+            if $dur > 2 then (
+                $nt = $t / $duration;
                 $offset = samplebpf($readbpf, $nt) * $speed * ($duration - $dur);
                 $seg = $buffer.setkey('offset', $offset).setkey('duration', $dur);
-                $seg.transcribe(@onset $onset @pan $pan) 
+                $seg.transcribe(
+                    @onset $t + $onset
+                    @pan $pan
+                    @gain $env
+                ) 
             ) 
         ) 
     ) 
@@ -88,7 +94,7 @@ TremChord = (
         ## woodwind layer with modulation
         $dip = xrand(0.05, 2/3);
         $envmix = samplebpf(
-            [0 0 0] [$peak 0.25 0.125] [1 1 -0.25], $nt
+            [0 0 0] [$peak 0.5 0.125] [1 1 -0.25], $nt
         );
         for $mc in $chord do (
             $oct = xrandom(-6, -9) * xchoose(1 -1);
@@ -177,8 +183,8 @@ Arpeggi = (
             $b = ezsol(
                 @pitch $mc
                 @duration $unit + $legato
-                @names 'clar' 
-                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 
+                @names 'clar' 'acc' 'flute' 'sax' 
+                @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 'reg' 
                 @velocity 127
                 @useseed 1
             ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
@@ -314,7 +320,7 @@ Melody = (
             ).process(
                 resample($res) fade(0, $legato) 
             ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
-            if xrand() > 0.05 || $b.getkey('duration') < 80 then (
+            if xrand() > 0.125 || $b.getkey('duration') < 70 then (
                 $b.transcribe(
                     @onset $t @pan mc2pan($mc1, 0.125) 
                 ) 
