@@ -1,7 +1,7 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(77);
+setseed(774);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
