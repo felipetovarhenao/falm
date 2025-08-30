@@ -5,7 +5,7 @@ $root = $meta.'root';
 $tempo = $meta.'tempo';
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
-$numbars = 12;
+$numbars = 18;
 $totdur = $bardur * 3/8 * $numbars;
 $unit = $bardur * 1/16;
 $markers = for $m in $meta.'markers' collect (
@@ -116,6 +116,6 @@ render(
 );
 ezexport(
     ['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord] [
-        'next_chord' ($markers:-1).getkey('chord')
+        'next_chord' ($markers:-1).getkey('chord') 
     ] 
 )

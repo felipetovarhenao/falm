@@ -12,21 +12,24 @@ $minlevel = -20;
 $maxlevel = -6;
 $rate = 0.125;
 $bass = (
-    $onset, $fq, $dur -> (
+    $onset, $fq, $dur, $gain -> (
         cycle(@frequency $fq @duration $dur).transcribe(
             @onset $onset
-            @gain [0 0.25 0] [1 0 -0.5] 
+            @gain [0 0.25 * $gain 0] [1 0 -0.5] 
             @pan 0.5
         ) 
     ) 
 );
-for $g in $gates with @unwrap 1 do (
+$gainbpf = [0 0.00001 0] [1 1 -0.125];
+for $g $gi in $gates with @unwrap 1 do (
+    $nt = scale($gi, 1, length($gates), 0, 1);
+    $gain = samplebpf($gainbpf, $nt);
     $start = $g:(1 1);
     $end = $g:(2 1);
     $dur = $end - $start;
     $start -= $offset;
-    $c.setkey('offset', max(0, $start * $rate)).setkey('duration', $dur).detach().clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe($start);
-    $bass($start, $bassfq, $dur);
+    $c.setkey('offset', max(0, $start * $rate)).setkey('duration', $dur).detach().clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe($start @gain $gain);
+    $bass($start, $bassfq, $dur, $gain);
     $t += $dur
 );
 $c.setkey('offset', max(0, $start * $rate)).detach().clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe($start);
