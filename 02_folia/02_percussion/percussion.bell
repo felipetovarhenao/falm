@@ -129,4 +129,4 @@ render(
     ## mix($b) normalize(-3) 
     
 );
-ezexport($peak)
+ezexport($peakmarker)

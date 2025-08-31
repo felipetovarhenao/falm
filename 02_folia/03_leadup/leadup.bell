@@ -1,6 +1,6 @@
 setseed(4201);
 $meta = read('../01_foreground/foreground.txt');
-$peak = read('../02_percussion/percussion.txt');
+$peak = read('../02_percussion/percussion.txt').getkey('onset');
 $root = $meta.'root';
 $tempo = $meta.'tempo';
 $beatdur = 60000 / $tempo;
@@ -116,6 +116,6 @@ render(
 );
 ezexport(
     ['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord] [
-        'next_chord' ($markers:-1).getkey('chord') 
+        'next_chord' ($markers:-2).getkey('chord') 
     ] 
 )
