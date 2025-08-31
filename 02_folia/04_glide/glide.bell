@@ -29,7 +29,7 @@ PianoRoll = (
                     @pan xrand() 
                 ) 
             );
-            xchoose(pno ezsol)(
+            $b = xchoose(pno ezsol)(
                 @pitch $mc + xrandom(-1, 2) * 1200
                 @duration null
                 @velocity $vel
@@ -38,7 +38,8 @@ PianoRoll = (
                 @types 'ord' 'harm' 
                 @gain 0.2
                 @norm 0.25
-            ).transcribe(
+            );
+            $b.transcribe(
                 @onset $t
                 @pan mc2pan($mc, 0.1) 
                 @gain [0 1 0] [1 0 0.7] 
@@ -98,7 +99,7 @@ Arpeggi = (
             $mc = $chord:(
                 (($i - 1) % $chordsize) + 1
             );
-            ezsol(
+            $b = ezsol(
                 @pitch $mc
                 @duration $dur + $legato
                 @names (
@@ -107,7 +108,9 @@ Arpeggi = (
                 @types 'ord' 'ord-high' 'ord-micro' 
                 @velocity $velocity
                 @useseed 1
-            ).transcribe(
+            );
+            if $mc > 4500 && xrand() > 0.9 then (Freeze(@buffer $b @onset $onset));
+            $b.transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
                 @pan fold(mc2pan($mc, 0.125) + $panoffset) 
@@ -115,7 +118,39 @@ Arpeggi = (
         ) 
     ) 
 );
-setseed(220);
+## ----------------------
+## Function: Freeze
+## ----------------------
+Freeze = (
+    $buffer, $onset = 0, $duration = null -> (
+        $bufdur = $buffer.getkey('duration');
+        $duration = $duration ||| ($bufdur * xrand(-1, 1).exp2());
+        $readst = $buffer.getkey('offset');
+        $readend = $bufdur + $readst;
+        $graindur = min($bufdur, xrand(50, 150));
+        $readbpf = [0 $readst 0.] [1 max($readst, $readend - $graindur) 0];
+        $gainbpf = [0 1 0] [1 0 -xrand(1/10, 3/4)];
+        if xrand() > 0.6 then (
+            $gainbpf = revbpf($gainbpf);
+            if xrand() > 0.5 then ($onset -= $duration) 
+        );
+        $t = 0;
+        $win = hanning();
+        while $t < $duration do (
+            $nt = $t / $duration;
+            $grainoffset = samplebpf($readbpf, $nt);
+            $gain = samplebpf($gainbpf, $nt);
+            $grain = $buffer.setkey('offset', $grainoffset).setkey('duration', $graindur);
+            $grain.transcribe(
+                @onset $t + $onset
+                @gain $win * $gain
+                @pan xrand() 
+            );
+            $t += $graindur * xrand(0.125, 1/3) 
+        ) 
+    ) 
+);
+setseed(777);
 $t = 0;
 $meta = read('../01_foreground/foreground.txt');
 $chord = $meta.'final_chord';

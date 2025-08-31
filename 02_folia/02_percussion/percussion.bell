@@ -90,7 +90,7 @@ for $marker in $markers do (
     ).transcribe(
         @onset $onset
         @pan mc2pan($mc, 0.3) 
-        @gain 0.25
+        @gain 0.125
     );
     $b = ezsol(
         @pitch $mc
