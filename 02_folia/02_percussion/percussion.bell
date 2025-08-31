@@ -83,6 +83,15 @@ for $marker in $markers do (
             $mc.mc2f() * xrandom(1, 4) @negative xchoose(-1 1) 
         ) 
     );
+    maracas(
+        @velocity $vel
+        @useseed 1
+        @duration $bardur * 1/16 * $durmul
+    ).transcribe(
+        @onset $onset
+        @pan mc2pan($mc, 0.3) 
+        @gain 0.25
+    );
     $b = ezsol(
         @pitch $mc
         @names $group.getkey('names') 
