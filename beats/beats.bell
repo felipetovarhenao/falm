@@ -1,0 +1,72 @@
+setseed(0);
+GenDivisions = (
+    $duration, $divisions = 1, $slope = null -> (
+        $x = arithmser(0, 1, null, $divisions + 1).scale(0, 1, 0, $duration, $slope);
+        [x2dx($x)] 
+    ) 
+);
+$bars = 5000;
+$rec = (
+    $dur, $addr -> (
+        $maxdivs = max(
+            1, round(
+                $dur / (
+                    500 / exp2(length($addr) - 1) 
+                ) 
+            ) 
+        );
+        GenDivisions(
+            $dur, xrandom($maxdivs // 2, $maxdivs).max(1), xrand(-0.25, 0.25) 
+        ) 
+    ) 
+);
+for $i in 1...3 do $bars = $bars.map($rec @maxdepth -1);
+$mcs = $bars.map(
+    $x -> (
+        init $chord = r2mc(1...24, c2).pcquant(r2pc(1 5/4 3/2 9/8));
+        keep $chord;
+        $triad = left(scramble($chord), xrandom(1, 5));
+        [
+            [$triad] :* length($x::1) 
+        ] 
+    ) @maxdepth -2
+);
+$t = 0;
+$vels = $bars.autoscale().scale(0, 1, 0, 127, 0.25);
+for $i in 1...3 do (
+    for $beat $addr in $bars with @maxdepth -1 do (
+        $chord = $mcs:$addr::1;
+        $downbeat = ($addr:2) == 1;
+        $vel = 50;
+        if $downbeat == 1 then (
+            $vel = 127;
+            cycle(
+                $chord.minimum().mc2f() / 2
+            ).transcribe(
+                $t @gain [0 0.5 0] [1 0 -0.5] 
+            ) 
+        );
+        for $mc in $chord do (
+            ezsol(
+                @pitch $mc
+                @duration $beat + 300
+                @velocity $vels:$addr
+                @names family('strings') family('plucked') 
+                @types 'pizz' 
+            ).transcribe(
+                @onset $t
+                @gain [0 1 0] [1 0 0.25] 
+                @pan mc2pan($mc, 0.35) 
+            ) 
+        );
+        $t += $beat
+    ) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+)
