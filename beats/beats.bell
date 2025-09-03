@@ -5,7 +5,7 @@ GenDivisions = (
         [x2dx($x)] 
     ) 
 );
-$bars = 5000;
+$bars = 3000;
 $rec = (
     $dur, $addr -> (
         $maxdivs = max(
@@ -33,7 +33,7 @@ $mcs = $bars.map(
 );
 $t = 0;
 $vels = $bars.autoscale().scale(0, 1, 0, 127, 0.25);
-for $i in 1...3 do (
+for $i in 1...8 do (
     for $beat $addr in $bars with @maxdepth -1 do (
         $chord = $mcs:$addr::1;
         $downbeat = ($addr:2) == 1;
