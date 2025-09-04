@@ -9,11 +9,13 @@ Consume = (
                 $mc = $child.getkey('pitch');
                 $vel = $child.getkey('velocity');
                 $duration = $child.getkey('duration');
+                $names = $child.getkey('names');
+                $types = $child.getkey('types');
                 ezsol(
                     @pitch $mc
-                    @duration max(200, $duration + 100) 
-                    @names family('strings') family('plucked') 
-                    @types 'pizz' 'harm-in-wood' 'pizz-secco' 
+                    @duration max(200, $duration * 2) 
+                    @names $names
+                    @types $types
                     @velocity $vel
                     @useseed 1
                 ).transcribe(
@@ -30,8 +32,8 @@ Consume = (
 );
 $t = 0;
 $depth = $events.getkey('depth');
-$reps = 4;
-for $i in 3...($depth + 1 + $reps) do (
+$reps = 2;
+for $i in 1...($depth + 1 + $reps) do (
     addmarker($t, $i);
     $t += Consume($events, $t, @maxlevel $i) 
 );

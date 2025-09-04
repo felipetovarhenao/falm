@@ -1,24 +1,28 @@
-setseed(120);
+setseed(20);
 $period = 5000;
 $depth = 6;
 GetRoot = (-> f2);
 MakeEvent = (
-    $pitch = c5, $duration = 1000, $velocity = 65 -> (
+    $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null -> (
         [
-            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] 
+            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] ['names' $names] ['types' $types] 
         ] 
     ) 
 );
 $events = [
-    ['depth' $depth] ['children' MakeEvent(
-        @pitch GetRoot() 
-        @duration $period
-        @velocity 127
-    )] 
+    ['depth' $depth] [
+        'children' MakeEvent(
+            @pitch GetRoot() 
+            @duration $period
+            @velocity 127
+            @names 'guitar' 
+            @types 'ord' 
+        ) 
+    ] 
 ];
-$nestify = (
+Nestify = (
     $event, $addr -> (
-        $duration = $event.getkey('duration');
+        $duration = getkey($event, 'duration');
         if $duration != null then (
             $depth = int(length($addr) / 2) - 1;
             $root = GetRoot();
@@ -28,7 +32,7 @@ $nestify = (
             $topvel = getkey($event, 'velocity');
             $mc = xchoose(
                 pcquant(
-                    $chord, r2pc(1 9/8 8/7 5/4 7/5 3/2 5/3 15/8, mc2pc($root)) 
+                    $chord, r2pc(1 5/4 3/2 15/8, mc2pc($root)) 
                 ) 
             );
             $maxlength = max(1, round($duration / 110));
@@ -37,15 +41,31 @@ $nestify = (
             $durations = nest($duration, $length, $slope);
             $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.125);
             if xrand() > 0.5 then ($vels = rev($vels));
+            $groups = (
+                [
+                    ['names' family('plucked')] [
+                        'types' 'harm' 
+                    ] 
+                ] [
+                    ['names' family('strings')] [
+                        'types' 'pizz' 'pizz-secco' 
+                    ] 
+                ] 
+            );
+            $group = xchoose($groups);
+            $names = $group.getkey('names');
+            $types = $group.getkey('types');
             $children = for $d in $durations, $v in $vels collect MakeEvent(
                 @pitch $mc
                 @duration $d
                 @velocity $v
+                @names $names
+                @types $types
             );
             $event = $event.setkey('children', $children @mode 1) 
         );
         $event
     ) 
 );
-for $i in 1...$depth do ($events = $events.map($nestify @maxdepth -3));
+for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 write($events, './events.txt')
