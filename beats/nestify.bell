@@ -1,7 +1,7 @@
-setseed(1);
-$period = 5000;
+setseed(100);
+$period = 6000;
 $depth = 6;
-GetRoot = (-> f2);
+GetRoot = (-> d2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null -> (
         [
@@ -16,7 +16,7 @@ Nestify = (
             $depth = int(length($addr) / 2) - 1;
             $root = GetRoot();
             $chord = r2mc(
-                ($depth + 1)...min(exp2($depth + 1), 32), $root
+                int(exp2($depth / 1.25))...min(exp2($depth + 1), 48), $root
             );
             $topvel = getkey($event, 'velocity');
             $mc = xchoose(
