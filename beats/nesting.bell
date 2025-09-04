@@ -23,7 +23,7 @@ $pitchfunc = (
         $key = tosymbol($addr.left($key));
         if PitchMap.$key == null then (
             $st = min(8, exp2($dims - 1));
-            $end = min(24, exp2($dims) - 1);
+            $end = min(32, exp2($dims) - 1);
             PitchMap _= [
                 $key r2mc($st...$end, c2).pcquant(r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8)).xchoose() 
             ] 
