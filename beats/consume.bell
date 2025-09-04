@@ -1,9 +1,10 @@
-$events = [read('./events.txt')];
+setseed(1);
+$events = read('./events.txt');
 Consume = (
-    $event, $onset = 0, $level = 1, $maxlevel = -1 -> (
+    $event, $onset = 0, $level = 0, $maxlevel = -1 -> (
         $t = $onset;
         $children = $event.getkey('children');
-        if $maxlevel == -1 || $level <= $maxlevel then (
+        if $maxlevel == -1 || $level < $maxlevel then (
             for $child in $children do (
                 $mc = $child.getkey('pitch');
                 $vel = $child.getkey('velocity');
@@ -12,12 +13,13 @@ Consume = (
                     @pitch $mc
                     @duration max(200, $duration + 100) 
                     @names family('strings') family('plucked') 
-                    @types 'pizz' 
+                    @types 'pizz' 'harm-in-wood' 'pizz-secco' 
                     @velocity $vel
+                    @useseed 1
                 ).transcribe(
                     @onset $t
                     @pan mc2pan($mc, 0.35) 
-                    @gain [0 1 0] [1 0 0.25] 
+                    @gain [0 1 0] [1 0 -0.25] 
                 );
                 Consume($child, $t, $level + 1, $maxlevel);
                 $t += $duration
@@ -27,7 +29,12 @@ Consume = (
     ) 
 );
 $t = 0;
-for $i in 1...12 do ($t += Consume($events, $t, 1, $i));
+$depth = $events.getkey('depth');
+$reps = 4;
+for $i in 3...($depth + 1 + $reps) do (
+    addmarker($t, $i);
+    $t += Consume($events, $t, @maxlevel $i) 
+);
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
@@ -35,4 +42,5 @@ render(
         @damp 1
         @width 1
     ) normalize(-3) 
-)
+);
+ezexport()

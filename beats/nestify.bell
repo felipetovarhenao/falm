@@ -1,30 +1,39 @@
-setseed(2);
+setseed(120);
 $period = 5000;
-$root = c3;
-$pcroot = mc2pc($root);
+$depth = 6;
+GetRoot = (-> f2);
 MakeEvent = (
-    $pitch, $duration, $velocity = 65 -> (
+    $pitch = c5, $duration = 1000, $velocity = 65 -> (
         [
             ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] 
         ] 
     ) 
 );
-$events = ['children' MakeEvent(
-    @pitch $root
-    @duration $period
-    @velocity 127
-)];
+$events = [
+    ['depth' $depth] ['children' MakeEvent(
+        @pitch GetRoot() 
+        @duration $period
+        @velocity 127
+    )] 
+];
 $nestify = (
-    $event -> (
+    $event, $addr -> (
         $duration = $event.getkey('duration');
         if $duration != null then (
-            $topvel = $event.getkey('velocity');
-            $mc = xchoose(
-                r2mc(1...21, c2).pcquant(r2pc(1 9/8 5/4 3/2 5/3 15/8)) 
+            $depth = int(length($addr) / 2) - 1;
+            $root = GetRoot();
+            $chord = r2mc(
+                ($depth + 1)...min(exp2($depth + 1), 32), $root
             );
-            $maxlength = max(1, round($duration / 100));
-            $length = min($maxlength, random(2, 4));
-            $slope = xrand(-0.125, 0.125);
+            $topvel = getkey($event, 'velocity');
+            $mc = xchoose(
+                pcquant(
+                    $chord, r2pc(1 9/8 8/7 5/4 7/5 3/2 5/3 15/8, mc2pc($root)) 
+                ) 
+            );
+            $maxlength = max(1, round($duration / 110));
+            $length = min($maxlength, random(2, 5));
+            $slope = xrand(-0.15, 0.15);
             $durations = nest($duration, $length, $slope);
             $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.125);
             if xrand() > 0.5 then ($vels = rev($vels));
@@ -38,5 +47,5 @@ $nestify = (
         $event
     ) 
 );
-for $i in 1...4 do ($events = $events.map($nestify @maxdepth -3));
+for $i in 1...$depth do ($events = $events.map($nestify @maxdepth -3));
 write($events, './events.txt')
