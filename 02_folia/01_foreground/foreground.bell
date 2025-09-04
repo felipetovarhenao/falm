@@ -1,7 +1,7 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(771);
+setseed(778);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
@@ -119,8 +119,8 @@ TremChord = (
             $env = (1 - $envmix) * $env1 + $env2 * $envmix;
             $b.$ampmod(
                 @m $mod
-                @minlevel $minlevel - 4.5
-                @maxlevel $maxlevel - 4.5
+                @minlevel $minlevel - 6
+                @maxlevel $maxlevel - 6
             ).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 1/3) 
