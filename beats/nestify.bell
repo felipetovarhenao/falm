@@ -13,24 +13,28 @@ Nestify = (
     $event, $addr -> (
         $duration = getkey($event, 'duration');
         if $duration != null then (
-            $depth = int(length($addr) / 2) - 1;
-            $root = GetRoot();
-            $chord = r2mc(
-                int(exp2($depth / 1.25))...min(exp2($depth + 1), 48), $root
-            );
-            $topvel = getkey($event, 'velocity');
-            $mc = xchoose(
-                pcquant(
-                    $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
-                ) 
-            );
             $maxlength = max(1, round($duration / 100));
             $length = min($maxlength, xrandom(2, 4));
-            $slope = xrand(-0.15, 0.15);
-            $durations = nest($duration, $length, $slope);
+            $slope = xrand(-0.175, 0.175);
+            $durations = nest(
+                @duration $duration
+                @length $length
+                @slope $slope
+            );
             if length($durations) > 1 then (
+                $topvel = getkey($event, 'velocity');
+                $depth = int(length($addr) / 2) - 1;
+                $root = GetRoot();
+                $chord = r2mc(
+                    int(exp2($depth / 1.25))...min(exp2($depth + 1), 48), $root
+                );
+                $mc = xchoose(
+                    pcquant(
+                        $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
+                    ) 
+                );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
-                if xrand() > 0.5 then ($vels = rev($vels));
+                if $slope >= 0 then ($vels = rev($vels));
                 $groups = (
                     ## [
                     ##     ['names' 'guitar'] [
