@@ -1,5 +1,5 @@
-setseed(4);
-$period = 4000;
+setseed(24);
+$period = 7000;
 $rhythm = $period;
 $depth = 6;
 for $i in 1...$depth do (
@@ -9,7 +9,7 @@ for $i in 1...$depth do (
             $maxreps = max(1, round($x / $mindur));
             [
                 nest(
-                    $x, min($maxreps, xrandom(2, 5)), xrand(-0.15, 0.15) 
+                    $x, min($maxreps, xrandom(2, 4)), xrand(-0.125, 0.125) 
                 ) 
             ] 
         ) @maxdepth -1
@@ -22,8 +22,8 @@ $pitchfunc = (
         $key = max(1, $dims - 1);
         $key = tosymbol($addr.left($key));
         if PitchMap.$key == null then (
-            $st = exp2($dims - 1);
-            $end = exp2($dims) - 1;
+            $st = min(8, exp2($dims - 1));
+            $end = min(24, exp2($dims) - 1);
             PitchMap _= [
                 $key r2mc($st...$end, c2).pcquant(r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8)).xchoose() 
             ] 
