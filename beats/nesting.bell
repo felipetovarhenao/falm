@@ -55,7 +55,7 @@ for $numcycles in 1...(length($rhythm) * 2) do (
         ).transcribe(
             @onset $t + $shift
             @pan fold(mc2pan($mc, 0.25) + $panvals:$dims) 
-            @gain [0 1 0] [1 0 0.25] 
+            @gain [0 1 0] [1 0 -0.25] 
         );
         $shift += $beat
     );
