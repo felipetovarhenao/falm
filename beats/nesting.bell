@@ -1,5 +1,5 @@
-setseed(24);
-$period = 7000;
+setseed(4510);
+$period = 8000;
 $rhythm = $period;
 $depth = 6;
 for $i in 1...$depth do (
@@ -9,7 +9,7 @@ for $i in 1...$depth do (
             $maxreps = max(1, round($x / $mindur));
             [
                 nest(
-                    $x, min($maxreps, xrandom(2, 4)), xrand(-0.125, 0.125) 
+                    $x, min($maxreps, xrandom(2, 4)), xrand(-0.15, 0.15) 
                 ) 
             ] 
         ) @maxdepth -1
@@ -47,7 +47,7 @@ for $numcycles in 1...(length($rhythm) * 2) do (
         $mc = $mcs:$addr;
         ezsol(
             @pitch $mc
-            @duration $beat + 100
+            @duration $beat + 200
             @names family('strings') 
             @types 'pizz' 
             @velocity 127 / (1.1 ** ($dims - 1) ) 
@@ -55,7 +55,7 @@ for $numcycles in 1...(length($rhythm) * 2) do (
         ).transcribe(
             @onset $t + $shift
             @pan fold(mc2pan($mc, 0.25) + $panvals:$dims) 
-            @gain [0 1 0] [1 0 -0.25] 
+            @gain [0 1 0] [1 0 -0.125] 
         );
         $shift += $beat
     );
