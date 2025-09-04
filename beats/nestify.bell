@@ -1,0 +1,37 @@
+$period = 3000;
+$root = c3;
+$pcroot = mc2pc($root);
+MakeEvent = (
+    $pitch, $duration, $velocity = 65 -> (
+        [
+            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] 
+        ] 
+    ) 
+);
+$events = ['children' MakeEvent(@pitch $root @duration $period)];
+$nestify = (
+    $event -> (
+        $duration = $event.getkey('duration');
+        if $duration != null then (
+            $topvel = $event.getkey('velocity');
+            $mc = xchoose(
+                r2mc(1...21, c2).pcquant(r2pc(1 9/8 5/4 3/2 5/3 15/8)) 
+            );
+            $maxlength = max(1, round($duration / 100));
+            $length = min($maxlength, random(2, 4));
+            $slope = xrand(-0.125, 0.125);
+            $durations = nest($duration, $length, $slope);
+            $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 0.75, $topvel, 0);
+            if xrand() > 0.5 then ($vels = rev($vels));
+            $children = for $d in $durations, $v in $vels collect MakeEvent(
+                @pitch $mc
+                @duration $d
+                @velocity $v
+            );
+            $event = $event.setkey('children', $children @mode 1) 
+        );
+        $event
+    ) 
+);
+for $i in 1...4 do ($events = $events.map($nestify @maxdepth -3));
+write($events, './events.txt')
