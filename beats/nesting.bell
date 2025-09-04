@@ -1,0 +1,72 @@
+setseed(4);
+$period = 4000;
+$rhythm = $period;
+$depth = 6;
+for $i in 1...$depth do (
+    $rhythm _= ($rhythm:-1).map(
+        $x -> (
+            $mindur = 100;
+            $maxreps = max(1, round($x / $mindur));
+            [
+                nest(
+                    $x, min($maxreps, xrandom(2, 5)), xrand(-0.15, 0.15) 
+                ) 
+            ] 
+        ) @maxdepth -1
+    ) 
+);
+PitchMap = null;
+$pitchfunc = (
+    $x, $addr -> (
+        $dims = length($addr);
+        $key = max(1, $dims - 1);
+        $key = tosymbol($addr.left($key));
+        if PitchMap.$key == null then (
+            $st = exp2($dims - 1);
+            $end = exp2($dims) - 1;
+            PitchMap _= [
+                $key r2mc($st...$end, c2).pcquant(r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8)).xchoose() 
+            ] 
+        );
+        PitchMap.$key
+    ) 
+);
+$depth = $rhythm.depth();
+$panvals = for $i in 1...$depth collect xrand();
+$mcs = $rhythm.map($pitchfunc @maxdepth -1);
+$t = 0;
+for $numcycles in 1...(length($rhythm) * 2) do (
+    $shift = 0;
+    $pdims = 1;
+    for $beat $addr in $rhythm.left($numcycles) with @maxdepth -1 @spikemode 1 do (
+        $dims = length($addr);
+        if $dims > $pdims then (
+            $shift = 0;
+            $pdims = $dims
+        );
+        $mc = $mcs:$addr;
+        ezsol(
+            @pitch $mc
+            @duration $beat + 100
+            @names family('strings') 
+            @types 'pizz' 
+            @velocity 127 / (1.1 ** ($dims - 1) ) 
+            @useseed 1
+        ).transcribe(
+            @onset $t + $shift
+            @pan fold(mc2pan($mc, 0.25) + $panvals:$dims) 
+            @gain [0 1 0] [1 0 0.25] 
+        );
+        $shift += $beat
+    );
+    $t += $shift
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @width 1
+        @damp 1
+    ) normalize(-3) 
+);
+ezexport()

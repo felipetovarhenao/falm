@@ -591,8 +591,10 @@ nest(
 )#
 nest = (
     $duration = 1000, $length = 3, $slope = 0 -> (
-        $x = arithmser(0, 1, null, $length + 1);
-        $x = scale($x, 0, 1, 0, $duration, $slope);
-        x2dx($x) 
+        if $length > 1 then (
+            $x = arithmser(0, 1, null, $length + 1);
+            $x = scale($x, 0, 1, 0, $duration, $slope);
+            x2dx($x) 
+        ) else $duration
     ) 
 )
