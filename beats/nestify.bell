@@ -1,6 +1,6 @@
 setseed(200);
-$period = 4000;
-$depth = 6;
+$period = 4500;
+$depth = 7;
 GetRoot = (-> e2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
@@ -41,20 +41,22 @@ Nestify = (
                     @name $name @types 'pizz' 
                 );
                 $plucked = for $name in family('plucked') collect instrument(
-                    @name $name @types 'ord' 
+                    @name $name
+                    @types 'harm' 'ord' 
+                    @join 0
                 );
                 $names = null;
                 $types = null;
                 for $mc in $mcs do (
                     $instrument = xchoose(
                         pitchfilter(
-                            @instruments $strings (if $mc >= c5 then $plucked) 
+                            @instruments $strings (if $mc >= g5 then $plucked) 
                             @pitch $mc
-                            @tolerance 600
+                            @tolerance 1200
                         ) 
                     );
                     $names _= $instrument.getkey('name');
-                    $types _= $instrument.getkey('types') 
+                    $types _= $instrument.getkey('types')
                 );
                 $children = for $d in $durations, $v in $vels collect MakeEvent(
                     @pitch $mcs
