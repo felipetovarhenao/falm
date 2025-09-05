@@ -33,7 +33,7 @@ Nestify = (
                     left(
                         xscramble(
                             pcquant(
-                                $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
+                                $chord, r2pc(1 10/9 5/4 3/2 5/3, mc2pc($root)) 
                             ) 
                         ), xrandom(2, 6) 
                     ) 
@@ -99,7 +99,7 @@ Consume = (
                 $duration = $child.getkey('duration');
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
-                $gainmul = scale(0, 127, 0.01, 1, 0.125) ** 0.5;
+                $gainmul = sqrt(scale(0, 127, 0.01, 1, 0.125) / exp2($level - 1));
                 $nt = $t / $maxonset;
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
