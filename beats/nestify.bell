@@ -1,7 +1,7 @@
-setseed(100);
-$period = 6000;
-$depth = 6;
-GetRoot = (-> d2);
+setseed(200);
+$period = 4000;
+$depth = 7;
+GetRoot = (-> e2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null -> (
         [
@@ -13,7 +13,7 @@ Nestify = (
     $event, $addr -> (
         $duration = getkey($event, 'duration');
         if $duration != null then (
-            $maxlength = max(1, round($duration / 100));
+            $maxlength = max(1, round($duration / 125));
             $length = min($maxlength, xrandom(2, 4));
             $slope = xrand(-0.175, 0.175);
             $durations = nest(
@@ -26,11 +26,15 @@ Nestify = (
                 $depth = int(length($addr) / 2) - 1;
                 $root = GetRoot();
                 $chord = r2mc(
-                    int(exp2($depth / 1.25))...min(exp2($depth + 1), 48), $root
+                    int(exp2($depth / 1.25))...min(exp2($depth + 1), 54), $root
                 );
-                $mc = xchoose(
-                    pcquant(
-                        $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
+                $mcs = sort(
+                    left(
+                        xscramble(
+                            pcquant(
+                                $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
+                            ) 
+                        ), xrandom(1, 4) 
                     ) 
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
@@ -68,7 +72,7 @@ Nestify = (
                 $names = $group.getkey('names');
                 $types = $group.getkey('types');
                 $children = for $d in $durations, $v in $vels collect MakeEvent(
-                    @pitch $mc
+                    @pitch $mcs
                     @duration $d
                     @velocity $v
                     @names $names
@@ -86,23 +90,25 @@ Consume = (
         $children = $event.getkey('children');
         if $maxlevel == -1 || $level < $maxlevel then (
             for $child in $children do (
-                $mc = $child.getkey('pitch');
+                $mcs = $child.getkey('pitch');
                 $vel = $child.getkey('velocity');
                 $duration = $child.getkey('duration');
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
-                ezsol(
-                    @pitch $mc
-                    @duration max(200, $duration * 2) 
-                    @names $names
-                    @types $types
-                    @velocity $vel
-                    ## $vel
-                    @useseed 1
-                ).clipnorm(@maxlevel -10).transcribe(
-                    @onset $t
-                    @pan mc2pan($mc, 0.35) 
-                    @gain [0 1 0] [1 0 -0.25] 
+                $gainmul = scale(0, 127, 0.01, 1, 0.125) ** 0.5;
+                for $mc in $mcs do (
+                    ezsol(
+                        @pitch $mc
+                        @duration max(200, $duration * 2) 
+                        @names $names
+                        @types $types
+                        @velocity $vel
+                        @useseed 1
+                    ).process(normalize(-3)).transcribe(
+                        @onset $t
+                        @pan mc2pan($mc, 0.7) 
+                        @gain [0 $gainmul 0] [1 0 -0.25] 
+                    ) 
                 );
                 Consume($child, $t, $level + 1, $maxlevel);
                 $t += $duration
@@ -131,8 +137,8 @@ for $i in 1...($depth + 1 + $reps) do (
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.8
-        @wet 0.05
+        @roomsize 0.95
+        @wet 0.0125
         @damp 1
         @width 1
     ) normalize(-3) 
