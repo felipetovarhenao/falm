@@ -56,7 +56,7 @@ Nestify = (
                         ) 
                     );
                     $names _= $instrument.getkey('name');
-                    $types _= $instrument.getkey('types')
+                    $types _= $instrument.getkey('types') 
                 );
                 $children = for $d in $durations, $v in $vels collect MakeEvent(
                     @pitch $mcs
@@ -75,7 +75,11 @@ Nestify = (
 Consume = (
     $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
-        $chordiszebpf = [0 0 0] [1 1 0.125];
+        $peak = 0.9;
+        $chordiszebpf = [0 0 0] [$peak 1 0.125] [1 1 0];
+        $legatobpf = [0 1 0] [$peak 2 0.125] [1 2 0];
+        $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
+        $sinegatebpf = [0 0 0] [$peak 0.25 0.125] [1 0.25 0];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
@@ -90,10 +94,26 @@ Consume = (
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
                 );
+                $legato = samplebpf($legatobpf, $nt);
+                $envslope = samplebpf($envslopebpf, $nt);
+                $sinegate = samplebpf($sinegatebpf, $nt);
+                $sinegate = rand() < samplebpf($sinegatebpf, $nt);
+                $sineoct = random(-2, 2) * 1200;
                 for $mc $mci in left($mcs, $chordsize) do (
+                    if $sinegate == 1 then (
+                        sinewave(
+                            @pitch $mc + $sineoct
+                            @velocity $vel
+                            @duration $duration * $legato
+                        ).transcribe(
+                            @onset $t
+                            @gain [0 $gainmul * 0.125 0] [1 0 $envslope] 
+                            @pan mc2pan($mc, 0.1) 
+                        ) 
+                    );
                     ezsol(
                         @pitch $mc
-                        @duration max(125, $duration * 2) 
+                        @duration max(50, $duration * $legato) 
                         @names $names:$mci
                         @types $types:$mci
                         @velocity $vel
@@ -101,7 +121,7 @@ Consume = (
                     ).process(normalize(-3)).transcribe(
                         @onset $t
                         @pan mc2pan($mc, 0.7) 
-                        @gain [0 $gainmul 0] [1 0 -0.25] 
+                        @gain [0 $gainmul 0] [1 0 $envslope] 
                     ) 
                 );
                 Consume(
