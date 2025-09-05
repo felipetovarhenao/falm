@@ -1,6 +1,6 @@
 setseed(200);
 $period = 4000;
-$depth = 6;
+$depth = 4;
 GetRoot = (-> e2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
@@ -22,8 +22,8 @@ Nestify = (
                 @slope $slope
             );
             if length($durations) > 1 then (
-                $topvel = getkey($event, 'velocity');
-                $level = getkey($event, 'level');
+                $topvel = getkey($event, 'velocity') ||| 127;
+                $level = getkey($event, 'level') ||| 0;
                 $root = GetRoot();
                 $harmst = $level + 1;
                 $harmend = min(exp2($harmst), 64);
@@ -91,7 +91,7 @@ Consume = (
         $t = $onset;
         $chordiszebpf = [0 0 0] [1 1 0.25];
         $children = $event.getkey('children');
-        $level = $event.getkey('level');
+        $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
             for $child in $children do (
                 $mcs = $child.getkey('pitch');
@@ -99,7 +99,7 @@ Consume = (
                 $duration = $child.getkey('duration');
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
-                $gainmul = sqrt(scale(0, 127, 0.01, 1, 0.125) / exp2($level - 1));
+                $gainmul = sqrt(scale($vel, 0, 127, 0.1, 1) / exp2($level));
                 $nt = $t / $maxonset;
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
