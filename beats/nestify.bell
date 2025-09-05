@@ -88,7 +88,7 @@ Nestify = (
 Consume = (
     $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
-        $chordiszebpf = [0 0 0] [1 1 0.25];
+        $chordiszebpf = [0 0 0] [1 1 0.125];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
