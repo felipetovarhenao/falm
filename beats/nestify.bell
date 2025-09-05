@@ -1,6 +1,6 @@
 setseed(200);
 $period = 4000;
-$depth = 5;
+$depth = 6;
 GetRoot = (-> e2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null -> (
@@ -36,7 +36,7 @@ Nestify = (
                             pcquant(
                                 $chord, r2pc(1 5/4 3/2 5/3, mc2pc($root)) 
                             ) 
-                        ), xrandom(1, 4) 
+                        ), xrandom(2, 6) 
                     ) 
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
