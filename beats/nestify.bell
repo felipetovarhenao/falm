@@ -1,5 +1,5 @@
 setseed(200);
-$period = 4500;
+$period = 5000;
 $depth = 6;
 GetRoot = (-> e2);
 MakeEvent = (
@@ -25,14 +25,14 @@ Nestify = (
                 $topvel = getkey($event, 'velocity') ||| 127;
                 $level = getkey($event, 'level') ||| 0;
                 $root = GetRoot();
-                $chord = r2mc(1...48, $root);
+                $chord = r2mc(1...60, $root);
                 $mcs = sort(
                     left(
                         xscramble(
                             pcquant(
                                 $chord, r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc($root)) 
                             ) 
-                        ), xrandom(2, 6) 
+                        ), xrandom(3, 7) 
                     ) 
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
@@ -129,6 +129,13 @@ Consume = (
         $t - $onset
     ) 
 );
+GetMaxLevel = (
+    $event -> (
+        $children = $event.getkey('children');
+        if $children == null then $levels = ($event.getkey('level') ||| 0) else ($levels = for $child in $children collect GetMaxLevel($child));
+        maximum($levels) 
+    ) 
+);
 $events = [
     [
         'children' MakeEvent(
@@ -143,7 +150,8 @@ $events = [
 for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 $t = 0;
 $reps = 16;
-$levels = 1...($depth + 1 + $reps);
+$depth = GetMaxLevel($events);
+$levels = 1...($depth + $reps);
 $totdur = float($period * length($levels));
 for $i in $levels do (
     addmarker($t, $i);
