@@ -64,7 +64,9 @@ Nestify = (
                     ## ] 
                     ## ----
                     [
-                        ['names' family('strings')] [
+                        [
+                            'names' xchoose(family('strings')) 
+                        ] [
                             'types' 'pizz' 
                         ] 
                     ] 
