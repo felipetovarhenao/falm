@@ -1,6 +1,6 @@
 setseed(200);
-$period = 4000;
-$depth = 4;
+$period = 4500;
+$depth = 6;
 GetRoot = (-> e2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
@@ -25,10 +25,7 @@ Nestify = (
                 $topvel = getkey($event, 'velocity') ||| 127;
                 $level = getkey($event, 'level') ||| 0;
                 $root = GetRoot();
-                $harmst = $level + 1;
-                $harmend = min(exp2($harmst), 64);
-                $harm = $harmst...$harmend;
-                $chord = r2mc($harm, $root);
+                $chord = r2mc(1...48, $root);
                 $mcs = sort(
                     left(
                         xscramble(
@@ -145,7 +142,7 @@ $events = [
 ];
 for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 $t = 0;
-$reps = 6;
+$reps = 16;
 $levels = 1...($depth + 1 + $reps);
 $totdur = float($period * length($levels));
 for $i in $levels do (
