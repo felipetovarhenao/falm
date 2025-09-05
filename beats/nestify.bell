@@ -27,7 +27,7 @@ Nestify = (
                 $root = GetRoot();
                 $chord = r2mc(
                     max(
-                        $depth + 2, int(exp2($depth / 1.25)) 
+                        max($depth, 1) + 1, int(exp2($depth / 1.25)) 
                     )...min(exp2($depth + 1), 54), $root
                 );
                 $mcs = sort(
