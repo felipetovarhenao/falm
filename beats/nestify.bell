@@ -10,7 +10,7 @@ MakeEvent = (
     ) 
 );
 Nestify = (
-    $event, $addr -> (
+    $event -> (
         $duration = getkey($event, 'duration');
         if $duration != null then (
             $maxlength = max(1, round($duration / 90));
