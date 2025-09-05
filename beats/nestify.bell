@@ -27,7 +27,7 @@ Nestify = (
                 $root = GetRoot();
                 $chord = r2mc(
                     max(
-                        $depth + 1, int(exp2($depth / 1.25)) 
+                        $depth + 2, int(exp2($depth / 1.25)) 
                     )...min(exp2($depth + 1), 54), $root
                 );
                 $mcs = sort(
@@ -101,7 +101,7 @@ Consume = (
                 $gainmul = scale(0, 127, 0.01, 1, 0.125) ** 0.5;
                 $nt = $t / $maxonset;
                 $chordsize = max(
-                    1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs))
+                    1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
                 );
                 for $mc in $mcs.left($chordsize) do (
                     ezsol(
