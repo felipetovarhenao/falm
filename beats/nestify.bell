@@ -1,5 +1,5 @@
 setseed(200);
-$period = 5000;
+$period = 4000;
 $depth = 6;
 GetRoot = (-> e2);
 MakeEvent = (
@@ -37,53 +37,22 @@ Nestify = (
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
                 if $slope >= 0 then ($vels = rev($vels));
-                $groups = (
-                    ## [
-                    ##     ['names' 'guitar'] [
-                    ##         'types' 'ord' 
-                    ##     ] 
-                    ## ] [
-                    ##     ['names' 'harp'] [
-                    ##         'types' 'ord' 
-                    ##     ] 
-                    ## ] 
-                    ## ----
-                    ## [
-                    ##     ['names' 'guitar'] [
-                    ##         'types' 'harm' 
-                    ##     ] 
-                    ## ] 
-                    ## ## ----
-                    ## [
-                    ##     ['names' 'harp'] [
-                    ##         'types' 'harm' 
-                    ##     ] 
-                    ## ] 
-                    ## ----
-                    [
-                        [
-                            'names' xchoose(family('strings')) 
-                        ] [
-                            'types' 'pizz' 
-                        ] 
-                    ] 
+                $strings = for $name in family('strings') collect instrument(
+                    @name $name @types 'pizz' 
                 );
-                $group = xchoose($groups);
-                $instruments = (
-                    for $name in family('strings') collect instrument(
-                        @name $name
-                        @types 'pizz' 
-                        @join 1
-                    ) 
+                $plucked = for $name in family('plucked') collect instrument(
+                    @name $name @types 'ord' 
                 );
                 $names = null;
                 $types = null;
                 for $mc in $mcs do (
-                    $instrument = xchoose(pitchfilter(
-                        @instruments $instruments
-                        @pitch $mc
-                        @tolerance 1200
-                    ));
+                    $instrument = xchoose(
+                        pitchfilter(
+                            @instruments $strings (if $mc >= c5 then $plucked) 
+                            @pitch $mc
+                            @tolerance 600
+                        ) 
+                    );
                     $names _= $instrument.getkey('name');
                     $types _= $instrument.getkey('types') 
                 );

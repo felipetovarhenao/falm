@@ -323,7 +323,7 @@ family = (
             ] [
                 'brass' 'tpt' 'horn' 'tromb' 'tuba' 
             ] [
-                'plucked' 'harp' 'guitar' 'pno' 
+                'plucked' 'harp' 'guitar' 
             ] 
         );
         $families.$name ||| BP_FN_ERROR('invalid family name:' $name) 
