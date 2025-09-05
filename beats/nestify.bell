@@ -1,5 +1,5 @@
-setseed(200);
-$period = 4500;
+setseed(7);
+$period = 5000;
 $depth = 7;
 GetRoot = (-> e2);
 MakeEvent = (
@@ -79,7 +79,7 @@ Consume = (
         $chordiszebpf = [0 0 0] [$peak 1 0.125] [1 1 0];
         $legatobpf = [0 1 0] [$peak 2 0.125] [1 2 0];
         $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
-        $sinegatebpf = [0 0 0] [$peak 0.25 0.125] [1 0.25 0];
+        $sinegatebpf = [0 0 0] [$peak 0.25 0.125] [1 0.5 0];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
@@ -97,10 +97,10 @@ Consume = (
                 $legato = samplebpf($legatobpf, $nt);
                 $envslope = samplebpf($envslopebpf, $nt);
                 $sinegate = samplebpf($sinegatebpf, $nt);
-                $sinegate = rand() < samplebpf($sinegatebpf, $nt);
-                $sineoct = random(-2, 2) * 1200;
+                $sinegate = xrand() < samplebpf($sinegatebpf, $nt);
                 for $mc $mci in left($mcs, $chordsize) do (
                     if $sinegate == 1 then (
+                        $sineoct = xrandom(-2, 2) * 1200;
                         sinewave(
                             @pitch $mc + $sineoct
                             @velocity $vel
