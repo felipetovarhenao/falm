@@ -3,9 +3,9 @@ $period = 4000;
 $depth = 6;
 GetRoot = (-> e2);
 MakeEvent = (
-    $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null -> (
+    $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
         [
-            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] ['names' $names] ['types' $types] 
+            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] ['names' $names] ['types' $types] ['level' $level] 
         ] 
     ) 
 );
@@ -23,13 +23,12 @@ Nestify = (
             );
             if length($durations) > 1 then (
                 $topvel = getkey($event, 'velocity');
-                $depth = int(length($addr) / 2) - 1;
+                $level = getkey($event, 'level');
                 $root = GetRoot();
-                $chord = r2mc(
-                    max(
-                        max($depth, 1) + 1, int(exp2($depth / 1.25)) 
-                    )...min(exp2($depth + 1), 54), $root
-                );
+                $harmst = min(4, exp2($level + 1));
+                $harmend = min(exp2($level + 2), 48);
+                $harm = $harmst...$harmend;
+                $chord = r2mc($harm, $root);
                 $mcs = sort(
                     left(
                         xscramble(
@@ -79,6 +78,7 @@ Nestify = (
                     @velocity $v
                     @names $names
                     @types $types
+                    @level $level + 1
                 );
                 $event = $event.setkey('children', $children @mode 1) 
             ) 
@@ -87,10 +87,11 @@ Nestify = (
     ) 
 );
 Consume = (
-    $event, $onset = 0, $level = 0, $maxlevel = -1, $maxonset = 0 -> (
+    $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
-        $chordiszebpf = [0 0 0] [1 1 0];
+        $chordiszebpf = [0 0 0] [1 1 0.25];
         $children = $event.getkey('children');
+        $level = $event.getkey('level');
         if $maxlevel == -1 || $level < $maxlevel then (
             for $child in $children do (
                 $mcs = $child.getkey('pitch');
@@ -120,7 +121,6 @@ Consume = (
                 Consume(
                     @event $child
                     @onset $t
-                    @level $level + 1
                     @maxlevel $maxlevel
                     @maxonset $maxonset
                 );
