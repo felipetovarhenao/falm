@@ -107,7 +107,7 @@ Consume = (
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
                 $gainmul = sqrt(scale($vel, 0, 127, 0.1, 1) / exp2($level));
-                $nt = $t / $maxonset;
+                $nt = max(0, min(1, $t / $maxonset));
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
                 );
