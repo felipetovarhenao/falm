@@ -88,14 +88,23 @@ ApplyTremolo = (
         $buffer.process(multiply($mod)) 
     ) 
 );
+RandomOctave = (
+    $mc, $min = 2100, $max = 13000, $maxdev = 2 -> (
+        $down = floor(($mc - $min) / 1200);
+        $up = floor(($max - $mc) / 1200);
+        $down = minimum(abs($maxdev $down)) * sgn($down);
+        $up = minimum(abs($maxdev $up)) * sgn($up);
+        $mc + xrandom(-$down, $up) * 1200
+    ) 
+);
 Consume = (
     $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
         $peak = 0.9;
         $chordiszebpf = [0 0 0] [$peak 1 0.125] [1 1 0];
-        $legatobpf = [0 1 0] [$peak 2 0.125] [1 2 0];
+        $legatobpf = [0 1 0] [$peak 2 0.125] [1 4 1/3];
         $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
-        $sinegatebpf = [0 0 0] [$peak 0.25 0.125] [1 0.5 0];
+        $sinegatebpf = [0 0 0] [$peak 1/3 0.125] [1 0.5 0];
         $panspreadbpf = [0 0.05 0] [1 1 1/3.];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
@@ -119,17 +128,16 @@ Consume = (
                 for $mc $mci in left($mcs, $chordsize) do (
                     $panval = mc2pan($mc, $panspread);
                     if $sinegate == 1 then (
-                        $sineoct = xrandom(-2, 2) * 1200;
                         sinewave(
-                            @pitch $mc + $sineoct
+                            @pitch RandomOctave($mc) 
                             @velocity $vel
                             @duration $duration * $legato
                             @phase xrand() 
                             @envelope [0 $gainmul 0] [1 0 $envslope] 
                         ).ApplyTremolo().transcribe(
                             @onset $t
-                            @gain 0.125
-                            @pan $panval
+                            @gain 0.1
+                            @pan $panval xrand() 
                         ) 
                     );
                     ezsol(
