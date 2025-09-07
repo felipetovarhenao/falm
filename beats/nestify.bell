@@ -181,6 +181,7 @@ for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 $t = 0;
 $reps = 16;
 $depth = GetMaxLevel($events);
+print('Recursion depth:' $depth);
 $levels = 1...($depth + $reps);
 $totdur = float($period * length($levels));
 for $i in $levels do (
