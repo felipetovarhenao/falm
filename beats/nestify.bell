@@ -1,5 +1,5 @@
-setseed(697);
-$period = 5000;
+setseed(700);
+$period = 5500;
 $depth = 7;
 GetRoot = (-> c2);
 MakeEvent = (
