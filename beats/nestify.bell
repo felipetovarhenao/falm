@@ -1,6 +1,6 @@
 setseed(700);
 $period = 5500;
-$depth = 7;
+$depth = 10;
 GetRoot = (-> c2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
