@@ -218,4 +218,4 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport()
+ezexport($totdur)

@@ -4,5 +4,9 @@ $t += read('./intro/intro.txt').maximum();
 importaudio('./bridge/bridge.wav').transcribe($t);
 $t += read('./bridge/bridge.txt').maximum();
 importaudio('./nesting/nesting.wav').transcribe($t);
-render(@play 1);
+$t += read('./nesting/nesting.txt');
+importaudio('./cresc/cresc.wav').transcribe($t - read('./cresc/cresc.txt'));
+render(
+    @play 1 @process normalize(-3) 
+);
 ezexport()
