@@ -3,15 +3,17 @@ $period = 5500;
 $depth = 10;
 GetRoot = (-> c2);
 MakeEvent = (
-    $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1 -> (
+    $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1, $time = 0, $period = null -> (
         [
-            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] ['names' $names] ['types' $types] ['level' $level] 
+            ['pitch' $pitch] ['duration' $duration] ['velocity' $velocity] ['names' $names] ['types' $types] ['level' $level] ['time' $time] ['period' $period ||| $duration] 
         ] 
     ) 
 );
 Nestify = (
     $event -> (
         $duration = getkey($event, 'duration');
+        $offset = getkey($event, 'time') ||| 0;
+        $period = getkey($event, 'period');
         if $duration != null then (
             $maxlength = max(1, round($duration / 90));
             $length = min($maxlength, xrandom(2, 4));
@@ -67,13 +69,16 @@ Nestify = (
                     $names _= $instrument.getkey('name');
                     $types _= $instrument.getkey('types') 
                 );
-                $children = for $d in $durations, $v in $vels collect MakeEvent(
+                $times = dx2x($durations, $offset);
+                $children = for $d in $durations, $v in $vels, $time in $times collect MakeEvent(
                     @pitch $mcs
                     @duration $d
                     @velocity $v
                     @names $names
                     @types $types
                     @level $level + 1
+                    @time $time
+                    @period $period
                 );
                 $event = $event.setkey('children', $children @mode 1) 
             ) 
@@ -193,29 +198,29 @@ $events = [
     ] 
 ];
 for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
-## write($events, './events.txt');
-## null
-$t = 0;
-$reps = 20;
-$depth = GetMaxLevel($events);
-print('Recursion depth:' $depth);
-$levels = 1...($depth + $reps);
-$totdur = float($period * length($levels));
-for $i in $levels do (
-    addmarker($t, $i);
-    $t += Consume(
-        @event $events
-        @onset $t
-        @maxlevel $i
-        @maxonset $totdur
-    ) 
-);
-render(
-    @play 1 @process freeverb(
-        @roomsize 0.85
-        @wet 0.0125
-        @damp 1
-        @width 1
-    ) normalize(-3) 
-);
-ezexport($totdur)
+write($events, './events.txt');
+null
+## $t = 0;
+## $reps = 20;
+## $depth = GetMaxLevel($events);
+## print('Recursion depth:' $depth);
+## $levels = 1...($depth + $reps);
+## $totdur = float($period * length($levels));
+## for $i in $levels do (
+##     addmarker($t, $i);
+##     $t += Consume(
+##         @event $events
+##         @onset $t
+##         @maxlevel $i
+##         @maxonset $totdur
+##     ) 
+## );
+## render(
+##     @play 1 @process freeverb(
+##         @roomsize 0.85
+##         @wet 0.0125
+##         @damp 1
+##         @width 1
+##     ) normalize(-3) 
+## );
+## ezexport($totdur)
