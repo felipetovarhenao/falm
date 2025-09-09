@@ -32,25 +32,34 @@ Nestify = (
                             pcquant(
                                 $chord, r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc($root)) 
                             ) 
-                        ), xrandom(3, 8) 
+                        ), xrandom(3, 12) 
                     ) 
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
                 if $slope >= 0 then ($vels = rev($vels));
                 $strings = for $name in family('strings') collect instrument(
-                    @name $name @types 'pizz' 
+                    @name $name
+                    @types 'pizz' 'pizz-secco' 
+                    @join 0
                 );
                 $plucked = for $name in family('plucked') collect instrument(
                     @name $name
                     @types 'harm' 'ord' 
                     @join 0
                 );
+                $winds = for $name in family('winds') 'acc' collect instrument(
+                    @name $name
+                    @types 'stacc' 
+                    @join 0
+                );
                 $names = null;
                 $types = null;
-                for $mc in $mcs do (
+                for $mc $mci in $mcs do (
                     $instrument = xchoose(
                         pitchfilter(
-                            @instruments $strings (if $mc >= g5 then $plucked) 
+                            @instruments $strings (if $mc >= g5 then $plucked) (
+                                if $mc >= d4 && $mc <= d7 && $mci > 3 then $winds
+                            ) 
                             @pitch $mc
                             @tolerance 1200
                         ) 
@@ -187,7 +196,7 @@ for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 ## write($events, './events.txt');
 ## null
 $t = 0;
-$reps = 16;
+$reps = 24;
 $depth = GetMaxLevel($events);
 print('Recursion depth:' $depth);
 $levels = 1...($depth + $reps);
