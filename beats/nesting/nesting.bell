@@ -196,7 +196,7 @@ for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
 ## write($events, './events.txt');
 ## null
 $t = 0;
-$reps = 24;
+$reps = 20;
 $depth = GetMaxLevel($events);
 print('Recursion depth:' $depth);
 $levels = 1...($depth + $reps);
