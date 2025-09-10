@@ -183,7 +183,7 @@ GetMaxLevel = (
 setseed(25);
 Root = c2;
 Harmony = r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc(Root));
-$period = 3500;
+$period = 5500;
 $maxdepth = 30;
 $events = [
     [
