@@ -1,15 +1,14 @@
-setseed(1);
-$chord = r2mc(1/2 1 5/2 9/4 3/2 5 15/4, c4).sort().rev();
-$chord = r2mc(1...32, c2).rev().pcquant(r2pc(1/2 1 5/2 9/4 3/2 5 15/4));
+setseed(797);
+$chord = r2mc(1...32, c2).rev().pcquant(r2pc(1 5/4 21/16 3/2 5/3));
 $totdur = 35000;
-$incrbpf = [0 100 0] [0.9 40 0.25] [1 350 0.125];
+$incrbpf = [0 150 0] [0.9 40 0.25] [1 350 0.125];
 $incrjitbpf = [0 1 0] [1 0 -0.125];
 $jitterbpf = [0 3 0] [1 0 0.125];
 $octvarbpf = [0 3 0] [1 0 -0.5];
 $t = 0;
 $i = 0;
 RandomOctave = (
-    $mc, $min = 2100, $max = 13000, $maxdev = 2 -> (
+    $mc, $min = 3600, $max = 13000, $maxdev = 2 -> (
         $down = floor(($mc - $min) / 1200);
         $up = floor(($max - $mc) / 1200);
         $down = minimum(abs($maxdev $down)) * sgn($down);
@@ -18,7 +17,7 @@ RandomOctave = (
     ) 
 );
 while ($t < $totdur) || (
-    $t >= $totdur && ($i + 1) != (length($chord) - 1) 
+    $t >= $totdur && ($i + 1) != (length($chord) - 2) 
 ) do (
     $nt = max(0, min(1, $t / $totdur));
     $incr = samplebpf($incrbpf, $nt);
@@ -68,6 +67,11 @@ while ($t < $totdur) || (
     $t += $incr * $incrjit
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
 );
 ezexport($t + 150)
