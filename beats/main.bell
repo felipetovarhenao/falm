@@ -2,7 +2,7 @@ $t = 0 ;
 importaudio('./intro/intro.wav').transcribe($t);
 $t += read('./intro/intro.txt').maximum();
 importaudio('./arpeggi/arpeggi.wav').transcribe($t);
-$t += read('./arpeggi/arpeggi.txt') + 150;
+$t += read('./arpeggi/arpeggi.txt');
 importaudio('./nesting/nesting.wav').transcribe($t);
 $meta = read('./nesting/nesting.txt');
 $peak = $meta.'peak';
