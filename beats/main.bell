@@ -5,7 +5,11 @@ importaudio('./bridge/bridge.wav').transcribe($t);
 $t += read('./bridge/bridge.txt').maximum();
 importaudio('./nesting/nesting.wav').transcribe($t);
 $t += read('./nesting/nesting.txt');
-importaudio('./cresc/cresc.wav').transcribe($t - read('./cresc/cresc.txt'));
+$b = importaudio('./cresc/cresc.wav');
+$b.transcribe($t - read('./cresc/cresc.txt'));
+$b.process(reverse()).transcribe(
+    $t + 300 @gain [0 1 0] [0.05 0.5 -0.5] [1 0 -0.125] 
+);
 render(
     @play 1 @process normalize(-3) 
 );
