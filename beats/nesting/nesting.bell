@@ -122,7 +122,7 @@ Consume = (
                 $duration = $child.getkey('duration');
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
-                $gainmul = sqrt(scale($vel, 0, 127, 0.1, 1) / exp2($level));
+                $gainmul = sqrt(scale($vel, 0, 127, 0.125, 1) / exp2($level));
                 $nt = max(0, min(1, $t / $maxonset));
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
@@ -180,7 +180,7 @@ GetMaxLevel = (
         maximum($levels) 
     ) 
 );
-setseed(5);
+setseed(25);
 Root = c2;
 Harmony = r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc(Root));
 $period = 5500;
@@ -190,7 +190,7 @@ $events = [
         'children' MakeEvent(
             @pitch r2mc(exp2(0...3), Root) 
             @duration $period
-            @velocity 110
+            @velocity 112
             @names 'bass' 'cello' 'viola' 'violin' 
             @types 'pizz' 'pizz' 'pizz' 'pizz' 
         ) 
@@ -228,5 +228,5 @@ render(
     ) normalize(-3) 
 );
 ezexport(
-    ['peak' $peaksize * $period] ['markers' thin(Markers)]
+    ['peak' $peaksize * $period] ['markers' thin(Markers)] 
 )
