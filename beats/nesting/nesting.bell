@@ -103,6 +103,7 @@ RandomOctave = (
         $mc + xrandom(-$down, $up) * 1200
     ) 
 );
+Markers = null;
 Consume = (
     $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
@@ -111,7 +112,7 @@ Consume = (
         $legatobpf = [0 1 0] [$peak 2 0.125] [1 3 1/3];
         $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
         $sinegatebpf = [0 0 0] [$peak 1/3 0.125] [1 2/3 0];
-        $panspreadbpf = [0 0.05 0] [1 1 1/3.];
+        $panspreadbpf = [0 0.1 0] [1 1 1/3.];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
@@ -157,7 +158,8 @@ Consume = (
                         @onset $t
                         @pan $panval
                         @gain [0 $gainmul 0] [1 0 $envslope] 
-                    ) 
+                    );
+                    Markers _= $t
                 );
                 Consume(
                     @event $child
@@ -225,4 +227,6 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport($peaksize * $period)
+ezexport(
+    ['peak' $peaksize * $period] ['markers' thin(Markers)]
+)
