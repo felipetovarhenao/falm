@@ -33,6 +33,8 @@ harp(
     @gain [0 1 0] [1 0 -0.5] 
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process (
+        normalize(0) multiply(1.3) arctan() normalize(-3) 
+    ) 
 );
 ezexport()
