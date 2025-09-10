@@ -156,7 +156,7 @@ Consume = (
                     );
                     ezsol(
                         @pitch $mc
-                        @duration max(50, $duration * $legato) 
+                        @duration max(120, $duration * $legato) 
                         @names $names:$mci
                         @types $types:$mci
                         @velocity $vel
