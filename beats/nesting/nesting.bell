@@ -1,7 +1,3 @@
-setseed(700);
-$period = 5500;
-$depth = 10;
-GetRoot = (-> c2);
 MakeEvent = (
     $pitch = c5, $duration = 1000, $velocity = 65, $names = null, $types = null, $level = 1, $time = 0, $period = null -> (
         [
@@ -17,7 +13,7 @@ Nestify = (
         if $duration != null then (
             $maxlength = max(1, round($duration / 90));
             $length = min($maxlength, xrandom(2, 4));
-            $slope = xrand(-0.18, 0.18);
+            $slope = xrand(-0.185, 0.185);
             $durations = nest(
                 @duration $duration
                 @length $length
@@ -26,15 +22,11 @@ Nestify = (
             if length($durations) > 1 then (
                 $topvel = getkey($event, 'velocity') ||| 127;
                 $level = getkey($event, 'level') ||| 0;
-                $root = GetRoot();
+                $root = Root();
                 $chord = r2mc(max(2, $level)...60, $root);
                 $mcs = sort(
                     left(
-                        xscramble(
-                            pcquant(
-                                $chord, r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc($root)) 
-                            ) 
-                        ), xrandom(3, 12) 
+                        xscramble(pcquant($chord, Harmony)), xrandom(3, 12) 
                     ) 
                 );
                 $vels = arithmser(0, 1, null, $length).scale(0, 1, $topvel * 2/3., $topvel, 0.25);
@@ -60,7 +52,7 @@ Nestify = (
                     $instrument = xchoose(
                         pitchfilter(
                             @instruments $strings (if $mc >= g5 then $plucked) (
-                                if $mc >= d4 && $mc <= d7 && $mci > 3 then $winds
+                                if $mc >= d4 && $mc <= d7 && $mci > 3 && (xrand() > 0.25) then $winds
                             ) 
                             @pitch $mc
                             @tolerance 1200
@@ -114,9 +106,9 @@ RandomOctave = (
 Consume = (
     $event, $onset = 0, $maxlevel = -1, $maxonset = 0 -> (
         $t = $onset;
-        $peak = 0.9;
+        $peak = Peak;
         $chordiszebpf = [0 0 0] [$peak 1 0.125] [1 1 0];
-        $legatobpf = [0 1 0] [$peak 2 0.125] [1 4 1/3];
+        $legatobpf = [0 1 0] [$peak 2 0.125] [1 3 1/3];
         $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
         $sinegatebpf = [0 0 0] [$peak 1/3 0.125] [1 2/3 0];
         $panspreadbpf = [0 0.05 0] [1 1 1/3.];
@@ -186,34 +178,44 @@ GetMaxLevel = (
         maximum($levels) 
     ) 
 );
+setseed(5);
+Root = c2;
+Harmony = r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc(Root));
+$period = 5500;
+$maxdepth = 30;
 $events = [
     [
         'children' MakeEvent(
-            @pitch GetRoot() 
+            @pitch r2mc(exp2(0...3), Root) 
             @duration $period
             @velocity 110
-            @names 'bass' 
-            @types 'pizz' 
+            @names 'bass' 'cello' 'viola' 'violin' 
+            @types 'pizz' 'pizz' 'pizz' 'pizz' 
         ) 
     ] 
 ];
-for $i in 1...$depth do ($events = $events.map(Nestify @maxdepth -3));
+for $i in 1...$maxdepth do ($events = $events.map(Nestify @maxdepth -3));
 ## write($events, './events.txt');
 ## null
 $t = 0;
-$reps = 20;
+$reps = 16;
 $depth = GetMaxLevel($events);
 print('Recursion depth:' $depth);
-$levels = 1...($depth + $reps);
-$totdur = float($period * length($levels));
-for $i in $levels do (
+$levels = 1...($depth - 1) ($depth :* $reps);
+$peaksize = length($levels);
+$levels _= rev(1...max(1, $depth - 1));
+$gap = 300;
+Peak = float($peaksize / length($levels));
+$totdur = float($period * length($levels)) + $gap;
+for $i $n in $levels do (
     addmarker($t, $i);
     $t += Consume(
         @event $events
         @onset $t
         @maxlevel $i
         @maxonset $totdur
-    ) 
+    );
+    if $n == $peaksize then ($t += $gap) 
 );
 render(
     @play 1 @process freeverb(
@@ -223,4 +225,4 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport($totdur)
+ezexport($peaksize * $period)
