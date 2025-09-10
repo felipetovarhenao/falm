@@ -38,7 +38,7 @@ Nestify = (
                 );
                 $plucked = for $name in family('plucked') collect instrument(
                     @name $name
-                    @types 'harm' 'ord' 
+                    @types 'harm' 'ord' 'pizz'
                     @join 0
                 );
                 $mixed = for $name in family('winds') 'acc' family('strings') collect instrument(
@@ -52,7 +52,7 @@ Nestify = (
                     $instrument = xchoose(
                         pitchfilter(
                             @instruments $strings (if $mc >= g5 then $plucked) (
-                                if $mc >= d4 && $mc <= d7 && $mci > 3 && (xrand() > 0.25) then $mixed
+                                if $mc >= d4 && $mc <= d7 && $mci > 4 && (xrand() > 0.25) then $mixed
                             ) 
                             @pitch $mc
                             @tolerance 500
