@@ -1,6 +1,9 @@
 $t = 0 ;
 importaudio('./intro/intro.wav').transcribe($t);
 $t += read('./intro/intro.txt').maximum();
+importaudio('./bisb/bisb.wav').transcribe(
+    $t - read('./bisb/bisb.txt') @gain 0.707
+);
 importaudio('./arpeggi/arpeggi.wav').transcribe($t);
 $t += read('./arpeggi/arpeggi.txt');
 importaudio('./swell/swell.wav').transcribe(

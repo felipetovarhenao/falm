@@ -1,0 +1,37 @@
+$chord = r2mc(1...64, c3).pcquant(r2pc(1 5/4 3/2 5/3 9/8));
+$tail = 2000;
+$durs = for $mc in $chord collect (
+    $b = harp(
+        @pitch $mc
+        @type 'harm' 
+        @velocity 127
+        @duration null
+        @usecache 1
+    ).process(trim(@threshold 0.005 @start 0));
+    $b.transcribe(
+        @onset $tail
+        @pan 1 - mc2pan($mc, 0.5) 
+        @gain [0 1 0] [1 0 -0.5] 
+    );
+    $b.getkey('duration') 
+);
+$totdur = maximum($durs);
+$peak = $tail / ($tail + $totdur);
+sinewave(
+    @pitch $chord:1
+    @duration $totdur + $tail
+    @velocity 127
+).transcribe(
+    @gain [0 0 0] [$peak 0.25 0.25] [1 0 -0.125] 
+);
+$maxwet = 0.05;
+render(
+    @play 1 @process normalize(-3) reverse() freeverb(
+        @roomsize 0.99
+        @wet [0 0 0] [1 - $peak $maxwet 0.5] [1 $maxwet 0] 
+        @width 1
+        @damp 1
+        @tail 4000
+    ) fade(0, 4000) 
+);
+ezexport($totdur)
