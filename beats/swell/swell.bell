@@ -1,0 +1,82 @@
+setseed(30);
+## $t = 0;
+## $totdur = 5000;
+## $gainbpf = [0 0 0] [0.707 1 0.25] [1 0 -0.125];
+$chord = r2mc(4...32, c2).pcquant(r2pc(1 5/4 3/2 15/8 9/8));
+$bufs = for $mc in $chord collect (
+    ## violin bass
+    $b = ezsol(
+        @pitch $mc
+        @duration null
+        @velocity 127
+        @types 'cresc-to-dim' 
+        @names family('strings') 
+        @useseed 1
+    ).analyze(envmaxtime()) 
+);
+$maxdur = maximum(for $b in $bufs collect $b.getkey('envmaxtime'));
+for $b in $bufs do (
+    $offset = $maxdur - $b.getkey('envmaxtime');
+    $t = 0;
+    $maxgraindur = 100;
+    $bufdur = $b.getkey('duration') - $maxgraindur;
+    while $t < $bufdur do (
+        $grainenv = xchoose(
+            [
+                [0 1 0] [1 0 -xrand(1/3, 5/6)] 
+            ] [
+                [0 0 0] [1 1 xrand(1/3, 5/6)] 
+            ] [hanning()] 
+        )::1;
+        $graindur = xrand($maxgraindur / 6, $maxgraindur);
+        $jit = xrand(-1, 1) * 400;
+        if xrand() > 0.8 then (
+            $grain = sinewave(
+                @pitch $b.getkey('pitch') + 1200
+                @velocity $b.getkey('maxabs') * 100
+                @duration $graindur
+            ) 
+        ) else (
+            $grain = $b.setkey('offset', $t).setkey('duration', $graindur) 
+        );
+        $grain.transcribe(
+            @onset $t + $jit + $offset
+            @pan xrand() 
+            @gain $grainenv
+            @detune xrandom(-1, 2) * 1200
+        );
+        $t += xrand(200) 
+    ) 
+);
+$totdur = maximum(for $b in $bufs collect $b.getkey('duration'));
+for $i in 1...3 do (
+    ezsol(
+        @pitch xrandom(21, 108) * 100
+        @names family('strings') 
+        @useseed 1
+        @types 'nat-harm-gliss' 
+        @duration null
+        @resample 0
+        @velocity 0
+    ).process(trim(
+        @end 1
+        @start 0
+        @threshold 0.005
+    )).transcribe(
+        @onset $maxdur - xrand(-1000, 1000) 
+        @pan xrand() 
+        @gain hanning() 
+    ) 
+);
+$peak = $maxdur / $totdur;
+render(
+    @play 1 @process biquad(
+        [0 9000 0] [$peak 5000 -0.125] [1 90 0.25] @type 0 @q 0.25
+    ) freeverb(
+        @roomsize 0.98
+        @wet [0 0 0] [$peak 0.05 0.33] [1 0.0125 -0.125] 
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport($totdur)

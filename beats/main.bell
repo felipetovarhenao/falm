@@ -3,6 +3,9 @@ importaudio('./intro/intro.wav').transcribe($t);
 $t += read('./intro/intro.txt').maximum();
 importaudio('./arpeggi/arpeggi.wav').transcribe($t);
 $t += read('./arpeggi/arpeggi.txt');
+importaudio('./swell/swell.wav').transcribe(
+    @onset $t - read('./swell/swell.txt') + 500 @gain 0.707
+);
 importaudio('./nesting/nesting.wav').transcribe($t);
 $meta = read('./nesting/nesting.txt');
 $peak = $meta.'peak';
