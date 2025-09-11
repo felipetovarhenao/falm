@@ -1,12 +1,12 @@
-setseed(30);
-$chord = r2mc(4...32, c2).pcquant(r2pc(1 5/4 3/2 15/8 9/8));
+setseed(24);
+$chord = r2mc(8...16, c2).pcquant(r2pc(1 5/4 3/2 5/3 9/8 10/9));
 $bufs = for $mc in $chord collect (
     ## violin bass
     $b = ezsol(
         @pitch $mc
         @duration null
         @velocity 127
-        @types 'cresc-to-dim' 
+        @types 'cresc-to-dim' 'harm' 'nonvib' 
         @names family('strings') 
         @useseed 1
     ).analyze(envmaxtime()) 
@@ -15,7 +15,7 @@ $maxdur = maximum(for $b in $bufs collect $b.getkey('envmaxtime'));
 for $b in $bufs do (
     $offset = $maxdur - $b.getkey('envmaxtime');
     $t = 0;
-    $maxgraindur = 100;
+    $maxgraindur = 50;
     $bufdur = $b.getkey('duration') - $maxgraindur;
     while $t < $bufdur do (
         $grainenv = xchoose(

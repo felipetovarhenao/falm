@@ -38,7 +38,7 @@ Nestify = (
                 );
                 $plucked = for $name in family('plucked') collect instrument(
                     @name $name
-                    @types 'harm' 'ord' 'pizz'
+                    @types 'harm' 'ord' 'pizz' 
                     @join 0
                 );
                 $mixed = for $name in family('winds') 'acc' family('strings') collect instrument(
@@ -132,7 +132,11 @@ Consume = (
                 $sinegate = samplebpf($sinegatebpf, $nt);
                 $panspread = samplebpf($panspreadbpf, $nt);
                 $sinegate = xrand() < samplebpf($sinegatebpf, $nt);
-                for $mc $mci in left($mcs, $chordsize) do (
+                $submcs = left($mcs, $chordsize);
+                $balance = 1.066 ** (
+                    -1 * (length($submcs) - 1) 
+                );
+                for $mc $mci in $submcs do (
                     $panval = mc2pan($mc, $panspread);
                     if $sinegate == 1 then (
                         sinewave(
@@ -143,7 +147,7 @@ Consume = (
                             @envelope [0 $gainmul 0] [1 0 $envslope] 
                         ).ApplyTremolo().transcribe(
                             @onset $t
-                            @gain 0.1
+                            @gain 0.1 * $balance
                             @pan $panval xrand() 
                         ) 
                     );
@@ -157,7 +161,7 @@ Consume = (
                     ).process(normalize(-3)).transcribe(
                         @onset $t
                         @pan $panval
-                        @gain [0 $gainmul 0] [1 0 $envslope] 
+                        @gain [0 $gainmul * $balance 0] [1 0 $envslope] 
                     );
                     Markers _= $t
                 );
@@ -221,7 +225,7 @@ for $i $n in $levels do (
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.85
+        @roomsize 0.9
         @wet 0.0125
         @damp 1
         @width 1

@@ -1,5 +1,5 @@
 setseed(797);
-$chord = r2mc(1...32, c2).rev().pcquant(r2pc(1 5/4 21/16 3/2 5/3));
+$chord = r2mc(1...24, c2).rev().pcquant(r2pc(1 5/4 21/16 3/2 5/3));
 $totdur = 35000;
 $incrbpf = [0 150 0] [0.9 40 0.25] [1 350 0.125];
 $incrjitbpf = [0 1 0] [1 0 -0.125];
