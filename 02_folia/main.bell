@@ -5,26 +5,19 @@ $t += read('./07_tile/tile.txt');
 $b = importaudio('./07_tile/tile.wav');
 $b.transcribe($t);
 render(
-    @play 1 @process normalize(-3) 
-    ## dynamics(
-    ##     @attack 30
-    ##     @release 250
-    ##     @knee 3
-    ##     @makeup 1
-    ##     @ratio 1.3
-    ##     @thresh -12
-    ##     @ampunit 1
-    ##     @timeunit 0
-    ## ) 
-    dynamics(
-        @attack 40
-        @release 300
-        @knee 2
-        @makeup 0.5
-        @ratio 1.2
-        @thresh -10
-        @ampunit 1
-        @timeunit 0
-    ) normalize(-3) 
+    @play 1 @process (
+        normalize(3) dynamics(
+            @attack 40
+            @release 300
+            @knee 0.5
+            @makeup 0.5
+            @ratio 4
+            @thresh -24
+            @ampunit 1
+            @timeunit 0
+        ) 
+        ## ----
+        normalize(-3) 
+    ) 
 );
 ezexport()
