@@ -3,7 +3,6 @@ $riffs = $data.'riffs';
 $combine = 0;
 $t = 0;
 $riffids = 1...length($riffs);
-## $riffids = 1 2;
 for $riffid in $riffids do (
     $section = $riffs:$riffid;
     $riff = $section.getkey('riff');
