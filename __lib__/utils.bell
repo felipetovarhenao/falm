@@ -565,7 +565,7 @@ clipnorm(
 Normalizes a buffer only if it's peak amplitude is outside the `@minlevel` and `@maxlevel` range.
 )#
 clipnorm = (
-    $buffer = null, $minlevel = -25, $maxlevel = -3, $ampunit = 1 -> (
+    $buffer = null, $minlevel = -25, $maxlevel = -3, $ampunit = 1, $rms = 0 -> (
         $maxabs = $buffer.getkey('maxabs');
         if $ampunit == 0 then (
             $minlevel = dbtoa($minlevel);
@@ -573,10 +573,18 @@ clipnorm = (
         ) else ($maxabs = atodb($maxabs) );
         $process = null if $maxabs < $minlevel then (
             ## 
-            $process = normalize(@level $minlevel @ampunit $ampunit) 
+            $process = normalize(
+                @level $minlevel
+                @ampunit $ampunit
+                @rms $rms
+            ) 
         ) else if $maxabs > $maxlevel then (
             ## 
-            $process = normalize(@level $maxlevel @ampunit $ampunit) 
+            $process = normalize(
+                @level $maxlevel
+                @ampunit $ampunit
+                @rms $rms
+            ) 
         );
         if $process != null then ($buffer = $buffer.process($process));
         $buffer

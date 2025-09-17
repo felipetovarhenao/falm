@@ -3,8 +3,8 @@ $pcroot = mc2pc($mcroot);
 $ratios = 1 9/8 5/4 7/5 3/2 5/3;
 $pcs = r2pc($ratios @pc $pcroot);
 $fullchord = pcquant(r2mc(4...24, $mcroot), $pcs);
-$unit = 170;
-$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'bartok' 'slide' 'xylo';
+$unit = 175;
+$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'slide' 'xylo' 'bartok';
 $names = family('plucked');
 $instruments = for $name in $names collect instrument(
     @name $name
@@ -20,7 +20,7 @@ for $name in family('strings') do $instruments _= instrument(
 $riffs = null;
 $seeds = (
     ## 1
-    536
+    45
     ## 2
     2
     ## 3
@@ -32,7 +32,7 @@ $seeds = (
     ## 6
     6
     ## 7
-    7
+    16
 );
 $numsizes = length($seeds);
 for $seed $chordsize in $seeds collect (
@@ -53,7 +53,7 @@ for $seed $chordsize in $seeds collect (
         $slope = xrand(1/3, 6/7) * xchoose(-1 1);
         $poly = null;
         for $gliss in $glisses with @unwrap 1 do (
-            $vel = xrand(10, 127);
+            $vel = xrand(10, 115);
             $mc1 = $gliss:1;
             $mc2 = $gliss:2;
             $diff = c2r(pitchdiff($mc1, $mc2));
