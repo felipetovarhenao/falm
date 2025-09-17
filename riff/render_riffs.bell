@@ -26,7 +26,7 @@ for $riffid in $riffids do (
                 @types $types
             ).process(
                 ## --
-                trim(@threshold 0.0005 @end 0) 
+                trim(@threshold 0.00125 @end 0) 
                 ## --
                 resample($gliss) 
                 ## --
