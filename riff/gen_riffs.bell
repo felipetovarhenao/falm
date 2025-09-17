@@ -1,0 +1,92 @@
+$mcroot = ab1;
+$pcroot = mc2pc($mcroot);
+$ratios = 1 9/8 5/4 7/5 3/2 5/3;
+$pcs = r2pc($ratios @pc $pcroot);
+$fullchord = pcquant(r2mc(4...24, $mcroot), $pcs);
+$unit = 170;
+$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'bartok' 'slide' 'xylo';
+$names = family('plucked');
+$instruments = for $name in $names collect instrument(
+    @name $name
+    @types $types
+    @join 0
+);
+## guitar
+for $name in family('strings') do $instruments _= instrument(
+    @name $name
+    @types 'pizz' 
+    @join 0
+);
+$riffs = null;
+$seeds = (
+    ## 1
+    536
+    ## 2
+    2
+    ## 3
+    3
+    ## 4
+    4
+    ## 5
+    5
+    ## 6
+    6
+    ## 7
+    7
+);
+$numsizes = length($seeds);
+for $seed $chordsize in $seeds collect (
+    setseed($seed);
+    $events = null;
+    $t = 0;
+    $chords = xscramble(
+        group(group($fullchord, $chordsize, $chordsize - 1), 2, 1) 
+    );
+    for $chordpair in $chords with @unwrap 1 do (
+        $dur = $unit * xchoose(
+            1...int(
+                round(scale($chordsize, 1, $numsizes, 3, 1, 0.25)) 
+            ) 
+        );
+        if xrand() > 0.5 then $chordpair = rev($chordpair);
+        $glisses = trans($chordpair);
+        $slope = xrand(1/3, 6/7) * xchoose(-1 1);
+        $poly = null;
+        for $gliss in $glisses with @unwrap 1 do (
+            $vel = xrand(10, 127);
+            $mc1 = $gliss:1;
+            $mc2 = $gliss:2;
+            $diff = c2r(pitchdiff($mc1, $mc2));
+            $env = [0 1 0] [1 1/$diff $slope];
+            $durmul = integrate(
+                @llll $env @numsamples 100
+            ):(-1 2);
+            $instrument = xchoose(pitchfilter(
+                @pitch $mc1
+                @instruments $instruments
+                @tolerance 300
+            ));
+            $event = (
+                ## --
+                ['onset' $t] 
+                ## --
+                ['pitch' $mc1] 
+                ## --
+                ['duration' $dur / $durmul] 
+                ## --
+                ['velocity' $vel] 
+                ## --
+                ['name' $instrument.getkey('name')] 
+                ## --
+                ['types' $instrument.getkey('types')] 
+                ## --
+                ['gliss' $env] 
+            );
+            $poly _= [$event] 
+        );
+        $events _= [['events' $poly] ['timestep' $dur]];
+        $t += $dur
+    );
+    $riffs _= [$events] 
+);
+write($riffs, './riffs.txt')

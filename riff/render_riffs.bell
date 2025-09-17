@@ -1,0 +1,31 @@
+$riffs = read('./riffs.txt');
+$riff = $riffs::1;
+$t = 0;
+for $slide in $riff :* 4 do (
+    $timestep = $slide.getkey('timestep');
+    $events = $slide.getkey('events');
+    for $event in $events do (
+        $pitch = $event.getkey('pitch');
+        $duration = $event.getkey('duration');
+        $velocity = $event.getkey('velocity');
+        $name = $event.getkey('name');
+        $types = $event.getkey('types');
+        $gliss = $event.getkey('gliss');
+        $b = ezsol(
+            @pitch $pitch
+            @duration $duration
+            @velocity $velocity
+            @names $name
+            @types $types
+        ).process(trim(@threshold 0.002 @end 0) resample($gliss)).clipnorm(@minlevel -14 @maxlevel -3);
+        $b.transcribe(
+            @onset $t
+            @pan mc2pan($pitch, 1/3) 
+            @gain [0 1 0] [1 0 0.95] 
+        ) 
+    );
+    $t += $timestep
+);
+render(
+    @play 1 @process normalize(-3) 
+)
