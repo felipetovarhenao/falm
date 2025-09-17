@@ -11,7 +11,7 @@ for $name in family('strings') do $instruments _= instrument(
     @types 'pizz' 
     @join 0
 );
-$riffs = null;
+$riffs = ['unit' $unit] ['riffs'];
 $seeds = (
     ## 1
     60
@@ -94,6 +94,6 @@ for $seed $chordsize in $seeds collect (
         $events.'riff' _= [['timestep' $dur] ['events' $poly] ];
         $t += $dur
     );
-    $riffs _= [$events] 
+    $riffs.'riffs' _= [$events] 
 );
 write($riffs, './riffs.txt')

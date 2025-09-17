@@ -1,4 +1,5 @@
-$riffs = read('./riffs.txt');
+$data = read('./riffs.txt');
+$riffs = $data.'riffs';
 $combine = 0;
 $t = 0;
 $riffids = 1...length($riffs);
@@ -6,7 +7,6 @@ $riffids = 1...length($riffs);
 for $riffid in $riffids do (
     $section = $riffs:$riffid;
     $riff = $section.getkey('riff');
-    $pcs = $section.getkey('pcs');
     if $combine == 0 then ($t = 0);
     for $slide in $riff :* 4 do (
         $timestep = $slide.getkey('timestep');
