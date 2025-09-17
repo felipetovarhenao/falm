@@ -1,10 +1,12 @@
 $riffs = read('./riffs.txt');
-$combine = 0;
+$combine = 1;
 $t = 0;
-$riffids = 7;
+$riffids = 1...length($riffs);
 for $riffid in $riffids do (
-    ## $riffid = 2;
-    $riff = $riffs::$riffid;
+    $section = $riffs:$riffid;
+    $riff = $section.getkey('riff');
+    $pcs = $section.getkey('pcs');
+    if $combine == 0 then ($t = 0);
     for $slide in $riff :* 4 do (
         $timestep = $slide.getkey('timestep');
         $events = $slide.getkey('events');
@@ -24,14 +26,17 @@ for $riffid in $riffids do (
                 @types $types
             ).process(
                 ## --
-                trim(@threshold 0.0025 @end 0) 
+                trim(@threshold 0.0005 @end 0) 
                 ## --
                 resample($gliss) 
-            ).clipnorm(
-                @minlevel -18
-                @maxlevel -12
-                @rms 1
+                ## --
+                normalize(-14 @rms 1) 
             );
+            ## $b = $b.clipnorm(
+            ##     @minlevel -18
+            ##     @maxlevel -12
+            ##     @rms 1
+            ## );
             $b.transcribe(
                 @onset $t
                 @pan mc2pan($pitch, 1/3) 
