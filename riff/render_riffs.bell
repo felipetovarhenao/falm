@@ -1,4 +1,5 @@
 $riffs = read('./riffs.txt');
+$combine = 0;
 $t = 0;
 $riffids = 7;
 for $riffid in $riffids do (
@@ -38,9 +39,17 @@ for $riffid in $riffids do (
             ) 
         );
         $t += $timestep
+    );
+    if $combine == 0 then (
+        render(
+            @reset 1 @process normalize(-3) 
+        );
+        ezexport(@id $riffid) 
     ) 
 );
-render(
-    @play 1 @process normalize(-3) 
-);
-ezexport()
+if $combine == 1 then (
+    render(
+        @play 1 @process normalize(-3) 
+    );
+    ezexport() 
+)
