@@ -1,12 +1,11 @@
 $unit = 175;
-$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'damp' 'stacc' 'harm-in-wood' 'slide' 'xylo' 'bartok';
+$types = 'ord' 'harm' 'ord-high' 'pizz' 'pont' 'tasto' 'near-pegs' 'near-board' 'stacc' 'harm-in-wood' 'slide' 'bartok';
 $names = family('plucked');
 $instruments = for $name in $names collect instrument(
     @name $name
     @types $types
     @join 0
 );
-## guitar
 for $name in family('strings') do $instruments _= instrument(
     @name $name
     @types 'pizz' 
@@ -15,7 +14,7 @@ for $name in family('strings') do $instruments _= instrument(
 $riffs = null;
 $seeds = (
     ## 1
-    45
+    60
     ## 2
     2
     ## 3
@@ -42,7 +41,6 @@ for $seed $chordsize in $seeds collect (
             r2dr(1 9/8 5/4 7/5 3/2 5/3 13/7 2),  ($chordsize - 1) * 4
         ) 
     );
-    print($ratios);
     $pcs = sort(
         thin(r2pc($ratios @pc $pcroot)) 
     );

@@ -2,6 +2,7 @@ $riffs = read('./riffs.txt');
 $combine = 1;
 $t = 0;
 $riffids = 1...length($riffs);
+$riffids = 1 2;
 for $riffid in $riffids do (
     $section = $riffs:$riffid;
     $riff = $section.getkey('riff');
@@ -25,18 +26,12 @@ for $riffid in $riffids do (
                 @names $name
                 @types $types
             ).process(
+                normalize(-14 @rms 1) 
                 ## --
-                trim(@threshold 0.00125 @end 0) 
+                trim(@threshold 0.025 @end 0) 
                 ## --
                 resample($gliss) 
-                ## --
-                normalize(-14 @rms 1) 
             );
-            ## $b = $b.clipnorm(
-            ##     @minlevel -18
-            ##     @maxlevel -12
-            ##     @rms 1
-            ## );
             $b.transcribe(
                 @onset $t
                 @pan mc2pan($pitch, 1/3) 
