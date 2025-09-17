@@ -1,8 +1,8 @@
 $riffs = read('./riffs.txt');
-$combine = 1;
+$combine = 0;
 $t = 0;
 $riffids = 1...length($riffs);
-$riffids = 1 2;
+## $riffids = 1 2;
 for $riffid in $riffids do (
     $section = $riffs:$riffid;
     $riff = $section.getkey('riff');
@@ -21,17 +21,16 @@ for $riffid in $riffids do (
             $gliss = $event.getkey('gliss');
             $b = ezsol(
                 @pitch $pitch
-                @duration $duration
+                @duration $duration + 300
                 @velocity $velocity
                 @names $name
                 @types $types
             ).process(
                 normalize(-14 @rms 1) 
                 ## --
-                trim(@threshold 0.025 @end 0) 
-                ## --
-                resample($gliss) 
+                trim(@threshold 0.1 @end 0) 
             );
+            $b = $b.setkey('duration', $duration).process(resample($gliss));
             $b.transcribe(
                 @onset $t
                 @pan mc2pan($pitch, 1/3) 
