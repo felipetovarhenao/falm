@@ -1,0 +1,72 @@
+setseed(1);
+$data = read('../sequence.txt');
+$sections = $data.'sections';
+$unit = $data.'unit';
+$mix = 0;
+$dummy = envelope(0);
+for $id in 2...length($sections) do (
+    $chords = ($sections:$id).getkey('chords');
+    $base = importaudio(
+        '../riff/riff_' + tosymbol($id) + '.wav' 
+    );
+    $dummy.transcribe();
+    $t = 0;
+    $empty = 1;
+    $maxdivs = max(
+        1, min(4, ceil($id / 2)) 
+    );
+    for $chord in $chords :* 4 do (
+        $timestep = $chord.getkey('timestep');
+        $numunits = int(round($timestep / $unit));
+        $notes = $chord.getkey('notes');
+        $vel = ($notes:-1).getkey('velocity');
+        $pitch = ($notes:-1).getkey('pitch');
+        for $i in 1...($numunits - 1) do (
+            $empty = 0;
+            $onset = $t;
+            $numdivs = xchoose(1...$maxdivs, @weights rev(1...$maxdivs));
+            $step = $i * $unit;
+            $b = ezsol(
+                @pitch $pitch
+                @names family('strings') family('plucked') 
+                @types 'hit-on-body' 'perc' 'behind-frog' 
+                @velocity $vel
+                @duration $timestep
+                @resample 1
+                @useseed 1
+            ).clipnorm(
+                @minlevel -20
+                @maxlevel -12
+                @rms 1
+            );
+            $onset = $t + $step;
+            $substep = $unit / $numdivs;
+            for $div in 0...($numdivs - 1) do (
+                $b.setkey('duration', $substep).transcribe(
+                    @onset $onset + $substep * $div
+                    @gain [0 1 0] [1 0 -0.5] 
+                    @pan mc2pan($pitch, 0.2) 
+                ) 
+            ) 
+        );
+        $t += $timestep
+    );
+    if $empty == 0 then (
+        render(
+            @reset 1 @process (
+                ## ---
+                freeverb(
+                    @roomsize 0.75
+                    @wet 0.0125
+                    @damp 1
+                    @width 1
+                ) 
+                ## ---
+                normalize(-3) 
+                ## ---
+                (if $mix == 1 then mix($base)) normalize(-3) 
+            ) 
+        );
+        ezexport(@id $id) 
+    ) 
+)

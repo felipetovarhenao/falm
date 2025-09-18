@@ -560,6 +560,7 @@ clipnorm(
     @minlevel -25
     @maxlevel -3
     @ampunit 1
+    @rms 0
 ) -> float
 ```
 Normalizes a buffer only if it's peak amplitude is outside the `@minlevel` and `@maxlevel` range.

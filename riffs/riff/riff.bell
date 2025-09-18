@@ -42,7 +42,7 @@ for $sectionid in $sectionids do (
         render(
             @reset 1 @process normalize(-3) 
         );
-        ezexport(@id $sectionid) 
+        ezexport(@data $t @id $sectionid) 
     ) 
 );
 if $combine == 1 then (
