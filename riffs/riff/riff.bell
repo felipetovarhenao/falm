@@ -1,9 +1,8 @@
-$data = read('./sequence.txt');
+$data = read('../sequence.txt');
 $sections = $data.'sections';
-$combine = 1;
+$combine = 0;
 $t = 0;
 $sectionids = 1...length($sections);
-## $sectionids = 3;
 for $sectionid in $sectionids do (
     $section = $sections:$sectionid;
     $chords = $section.getkey('chords');
