@@ -96,6 +96,6 @@ for $seed $chordsize in $seeds collect (
         ];
         $t += $dur
     );
-    $sequence.'sections' _= [$section] 
+    $sequence.'sections' _= [['total_duration' $t] $section] 
 );
 write($sequence, './sequence.txt')
