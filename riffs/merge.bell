@@ -3,7 +3,7 @@ $sections = $data.'sections';
 $numsections = length($sections);
 $layers = 'riff' 'perc' 'sines';
 $t = 0;
-for $i in 3...$numsections do (
+for $i in 1...$numsections do (
     $id = tosymbol($i);
     for $layer in $layers do (
         $file = './' + $layer + '/' + $layer + '_' + $id + '.wav';
