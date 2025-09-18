@@ -11,7 +11,7 @@ for $name in family('strings') do $instruments _= instrument(
     @types 'pizz' 
     @join 0
 );
-$riffs = ['unit' $unit] ['riffs'];
+$sequence = ['unit' $unit] ['sections'];
 $seeds = (
     ## 1
     60
@@ -44,38 +44,34 @@ for $seed $chordsize in $seeds collect (
     $pcs = sort(
         thin(r2pc($ratios @pc $pcroot)) 
     );
-    $events = ['pcs' $pcs] ['riff' null];
-    $fullchord = pcquant(r2mc(4...24, $mcroot), $pcs);
-    $chords = xscramble(
-        group(group($fullchord, $chordsize, $chordsize - 1), 2, 1) 
+    $section = ['pitch_classes' $pcs] ['chords' null];
+    $spectrum = pcquant(r2mc(4...24, $mcroot), $pcs);
+    $progression = xscramble(
+        group(group($spectrum, $chordsize, $chordsize - 1), 2, 1) 
     );
-    for $chordpair in $chords with @unwrap 1 do (
+    for $chordpair in $progression with @unwrap 1 do (
         $dur = $unit * xchoose(
             1...int(
                 round(scale($chordsize, 1, $numsizes, 3, 1, 0.25)) 
             ) 
         );
         if xrand() > 0.5 then $chordpair = rev($chordpair);
-        $glisses = trans($chordpair);
+        $mcpairs = trans($chordpair);
         $slope = xrand(1/3, 6/7) * xchoose(-1 1);
-        $poly = null;
-        for $gliss in $glisses with @unwrap 1 do (
+        $notes = null;
+        for $mcpair in $mcpairs with @unwrap 1 do (
             $vel = xrand(10, 115);
-            $mc1 = $gliss:1;
-            $mc2 = $gliss:2;
+            $mc1 = $mcpair:1;
+            $mc2 = $mcpair:2;
             $diff = c2r(pitchdiff($mc1, $mc2));
             $env = [0 1 0] [1 1/$diff $slope];
-            $durmul = integrate(
-                @llll $env @numsamples 100
-            ):(-1 2);
+            $durmul = integrate( @llll $env):(-1 2);
             $instrument = xchoose(pitchfilter(
                 @pitch $mc1
                 @instruments $instruments
                 @tolerance 300
             ));
-            $event = (
-                ## --
-                ['onset' $t] 
+            $note = (
                 ## --
                 ['pitch' $mc1] 
                 ## --
@@ -83,17 +79,23 @@ for $seed $chordsize in $seeds collect (
                 ## --
                 ['velocity' $vel] 
                 ## --
-                ['name' $instrument.getkey('name')] 
+                ['name' getkey($instrument, 'name')] 
                 ## --
-                ['types' $instrument.getkey('types')] 
+                ['type' getkey($instrument, 'types')] 
                 ## --
                 ['gliss' $env] 
             );
-            $poly _= [$event] 
+            $notes _= [$note] 
         );
-        $events.'riff' _= [['timestep' $dur] ['events' $poly] ];
+        $section.'chords' _= [
+            ['onset' $t] 
+            ## --
+            ['timestep' $dur] 
+            ## --
+            ['notes' $notes] 
+        ];
         $t += $dur
     );
-    $riffs.'riffs' _= [$events] 
+    $sequence.'sections' _= [$section] 
 );
-write($riffs, './riffs.txt')
+write($sequence, './sequence.txt')

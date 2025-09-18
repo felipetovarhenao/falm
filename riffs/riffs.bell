@@ -1,24 +1,25 @@
-$data = read('./riffs.txt');
-$riffs = $data.'riffs';
-$combine = 0;
+$data = read('./sequence.txt');
+$sections = $data.'sections';
+$combine = 1;
 $t = 0;
-$riffids = 1...length($riffs);
-for $riffid in $riffids do (
-    $section = $riffs:$riffid;
-    $riff = $section.getkey('riff');
+$sectionids = 1...length($sections);
+## $sectionids = 3;
+for $sectionid in $sectionids do (
+    $section = $sections:$sectionid;
+    $chords = $section.getkey('chords');
     if $combine == 0 then ($t = 0);
-    for $slide in $riff :* 4 do (
-        $timestep = $slide.getkey('timestep');
-        $events = $slide.getkey('events');
-        $balance = 1.05 ** (1 - length($events));
-        for $event in $events do (
+    for $chord in $chords :* 4 do (
+        $timestep = $chord.getkey('timestep');
+        $notes = $chord.getkey('notes');
+        $balance = 1.05 ** (1 - length($notes));
+        for $event in $notes do (
             $pitch = $event.getkey('pitch');
             $duration = $event.getkey('duration');
             $velocity = $event.getkey('velocity');
             $name = $event.getkey('name');
-            $types = $event.getkey('types');
+            $types = $event.getkey('type');
             $gliss = $event.getkey('gliss');
-            $b = ezsol(
+            $buffer = ezsol(
                 @pitch $pitch
                 @duration $duration + 300
                 @velocity $velocity
@@ -29,8 +30,8 @@ for $riffid in $riffids do (
                 ## --
                 trim(@threshold 0.1 @end 0) 
             );
-            $b = $b.setkey('duration', $duration).process(resample($gliss));
-            $b.transcribe(
+            $buffer = $buffer.setkey('duration', $duration).process(resample($gliss));
+            $buffer.transcribe(
                 @onset $t
                 @pan mc2pan($pitch, 1/3) 
                 @gain [0 $balance 0] [1 0 0.95] 
@@ -42,7 +43,7 @@ for $riffid in $riffids do (
         render(
             @reset 1 @process normalize(-3) 
         );
-        ezexport(@id $riffid) 
+        ezexport(@id $sectionid) 
     ) 
 );
 if $combine == 1 then (
