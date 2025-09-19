@@ -4,10 +4,10 @@ $unit = $sequence.'unit';
 $ids = 5...length($sections);
 $minid = minimum($ids);
 $maxid = maximum($ids);
-## $ids = 5;
-$combine = 0;
+## $ids = 8;
+$combine = length($ids) == 1;
 $subdivsbpf = [0 1 0] [1 2 0];
-$numnotesbpf = [0 2 0] [1 5 0.125];
+$numnotesbpf = [0 2 0] [1 5 -0.125];
 $numreps = 4;
 $postfx = (
     ## ----
@@ -54,7 +54,7 @@ for $id in $ids do (
                         @duration $unit * 0.5
                         @velocity $velocity
                         @names 'sax' 'tpt' 'tromb' 
-                        @types 'stacc' 'sfz'
+                        @types 'stacc' 'sfz' 
                         @useseed 1
                     ).process(
                         normalize(-9) trim(@end 0 @threshold 0.005) 
