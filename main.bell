@@ -4,7 +4,7 @@ for $folder $id in $folders with @unwrap 1 do (
     $file = $folder:2 ||| 'main';
     $folder = $folder:1;
     $path = './0' + tosymbol($id) + '_' + $folder + '/' + $file + '.wav';
-    $b = importaudio($path).process(trim(@threshold 0.0005 @start 0));
+    $b = importaudio($path).process(trim(@threshold 0.00001 @start 0));
     $b.transcribe($t);
     $t += $b.getkey('duration') 
 );
