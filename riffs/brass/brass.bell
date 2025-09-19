@@ -1,0 +1,81 @@
+$sequence = read('../sequence.txt');
+$sections = $sequence.'sections';
+$unit = $sequence.'unit';
+$ids = 5...length($sections);
+$minid = minimum($ids);
+$maxid = maximum($ids);
+## $ids = 5;
+$combine = 0;
+$subdivsbpf = [0 1 0] [1 2 0];
+$numnotesbpf = [0 2 0] [1 5 0.125];
+$numreps = 4;
+$postfx = (
+    ## ----
+    freeverb(
+        @roomsize 0.75
+        @wet 0.0125
+        @width 1
+        @damp 1
+    ) 
+    ## ----
+    normalize(-7.5) 
+);
+for $id in $ids do (
+    setseed($id);
+    $gnt = scale($id, $minid, $maxid, 0, 1);
+    $subdiv = int(
+        round(samplebpf($subdivsbpf, $gnt)) 
+    );
+    $numnotes = int(
+        round(samplebpf($numnotesbpf, $gnt)) 
+    );
+    $beat = $unit / $subdiv;
+    $section = $sections:$id;
+    $totdur = getkey($section, 'total_duration') * $numreps;
+    $chords = getkey($section, 'chords');
+    $t = 0;
+    ## importaudio(
+    ##     '../riff/riff_' + tosymbol($id) + '.wav' 
+    ## ).transcribe($t);
+    for $chord in $chords :* $numreps do (
+        $notes = getkey($chord, 'notes');
+        $timestep = getkey($chord, 'timestep');
+        $numbeats = int(round($timestep / $beat));
+        $shift = 0;
+        for $n in 1...($numbeats - 1) do (
+            $shift += $beat;
+            for $note in left(xscramble($notes), $numnotes) do (
+                $pitch = getkey($note, 'pitch');
+                $velocity = getkey($note, 'velocity');
+                $onset = $t + $shift;
+                if $onset <= $totdur then (
+                    ezsol(
+                        @pitch $pitch
+                        @duration $unit * 0.5
+                        @velocity $velocity
+                        @names 'sax' 'tpt' 'tromb' 
+                        @types 'stacc' 'sfz'
+                        @useseed 1
+                    ).process(
+                        normalize(-9) trim(@end 0 @threshold 0.005) 
+                    ).transcribe(
+                        @onset $onset
+                        @gain [0 1 0] [1 0 0.5] 
+                        @pan mc2pan($pitch, 1) 
+                    ) 
+                );
+                $shift += $beat
+            ) 
+        );
+        $t += $timestep
+    );
+    if $combine == 0 then (
+        render(
+            @reset 1 @process $postfx
+        );
+        ezexport(@id $id) 
+    ) 
+);
+if $combine == 1 then (render(
+    @play 1 @process $postfx
+) )
