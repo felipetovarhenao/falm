@@ -1,26 +1,14 @@
-$files = 'introduction' 'prelude';
+$folders = 'introduction' 'folia' 'scherzo' 'vespertino' ['andante' 'post'] 'passacaglia';
 $t = 0;
-for $f in $files do (
-    $basepath = './' + $f + '/main';
-    importaudio($basepath + '.wav').transcribe($t);
-    $t += read($basepath + '.txt') 
+for $folder $id in $folders with @unwrap 1 do (
+    $file = $folder:2 ||| 'main';
+    $folder = $folder:1;
+    $path = './0' + tosymbol($id) + '_' + $folder + '/' + $file + '.wav';
+    $b = importaudio($path).process(trim(@threshold 0.0005 @start 0));
+    $b.transcribe($t);
+    $t += $b.getkey('duration') 
 );
 render(
-    @play 1 @process (
-        ## -----
-        ## crop(@start $t - 67000 @end $t + 10000) 
-        ## -----
-        dynamics(
-            @knee 0.33
-            @thresh -30
-            @ratio 4
-            @attack 50
-            @release 300
-            @makeup 3
-        ) 
-        ## -----
-        ## resample(1/c2r(-150)) 
-        
-    ) 
+    @play 1 @process normalize(-3) 
 );
 ezexport()
