@@ -1,0 +1,61 @@
+$sequence = read('../sequence.txt');
+$sections = $sequence.'sections';
+$ids = 4...length($sections);
+$minid = minimum($ids);
+$maxid = maximum($ids);
+$numnotesbpf = [0 0 0] [1 1 0];
+## $ids = 7;
+for $id in $ids do (
+    $gnt = scale($id, $minid, $maxid, 0, 1);
+    $section = $sections:$id;
+    $chords = getkey($section, 'chords');
+    $numnotes = max(
+        1, int(
+            round(samplebpf($numnotesbpf, $gnt) * length($chords)) 
+        ) 
+    );
+    $vels = for $chord in $chords collect (
+        $notes = getkey($chord, 'notes');
+        mean(for $note in $notes collect getkey($note, 'velocity')) 
+    );
+    $chordfilter = thin(
+        1 sort(
+            left(
+                rev(argsort($vels)), $numnotes
+            ) 
+        ) 
+    );
+    $t = 0;
+    ## importaudio(
+    ##     '../riff/riff_' + tosymbol($id) + '.wav' 
+    ## ).transcribe($t);
+    for $rep in 1...4 do (
+        for $chord $chordid in $chords do (
+            $timestep = getkey($chord, 'timestep');
+            if intersection($chordid, $chordfilter) != null then (
+                $vel = $vels:$chordid;
+                $notes = getkey($chord, 'notes');
+                $pitch = getkey($notes:1, 'pitch') - 1200;
+                ## ----
+                ezsol(
+                    @pitch $pitch
+                    @duration null
+                    @names 'bass' 'cello' 
+                    @types 'pizz' 'pizz-secco' 
+                    @velocity $vel
+                ).transcribe(
+                    @onset $t
+                    @pan mc2pan($pitch, 0.1) 
+                    @gain [0 1 0] [1 0 0.125] 
+                ) 
+                ## ---
+                
+            );
+            $t += $timestep
+        ) 
+    );
+    render(
+        @reset 1 @process normalize(-3) 
+    );
+    ezexport(@id $id) 
+)
