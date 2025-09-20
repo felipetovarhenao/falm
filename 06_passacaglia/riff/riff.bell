@@ -4,23 +4,22 @@ Stutter = (
         $speed = xrand(1/3);
         $numsegs = max(
             2, min(
-                int(round($duration / 150)), $maxdivs
+                int(round($duration / 90)), $maxdivs
             ) 
         );
         $offset = getkey($buffer, 'offset');
-        $offsetstep = ($duration / $numsegs);
-        for $i in 1...$numsegs do (
+        $markers = arithmser(0, 1, null, $numsegs + 1).scale(0, 1, 0, $duration, xrand(-0.125, 0.125));
+        $durs = x2dx($markers);
+        for $m in $markers, $dur in $durs do (
             $seg = setkey(
-                setkey($buffer, 'offset', $offset), 'duration', $offsetstep
+                setkey($buffer, 'offset', $m * $speed + $offset), 'duration', $dur
             );
-            $offset += $offsetstep * $speed;
             $seg.transcribe(
-                @onset $onset
+                @onset $onset + $m
                 @pan xrand() 
                 @detune xrandom(-$octdev, $octdev) * 1200
                 @gain [0 $balance 0] [1 0 0.95] 
-            );
-            $onset += $offsetstep
+            ) 
         ) 
     ) 
 );
@@ -31,7 +30,7 @@ $globaloffsets = dx2x(for $section in $sections collect getkey($section, 'total_
 $globalduration = $globaloffsets:-1;
 $t = 0;
 $sectionids = 1...length($sections);
-## $sectionids = 8;
+$sectionids = 2;
 $combine = length($sectionids) == 1;
 $stutterbpf = [0 0 0] [1 0.2 -0.1];
 $stutterdivsbpf = [0 3 0] [1 12 0.25];
