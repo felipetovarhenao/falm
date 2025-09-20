@@ -33,19 +33,21 @@ Freeze = (
 );
 $sequence = read('../riff/sequence.txt');
 $sections = $sequence.'sections';
-$ids = 1...length($sections);
-## $ids = 8;
+$unit = $sequence.'unit';
+$ids = 1...(length($sections) - 1);
 $mcroot = $sequence.'root';
 $fullchord = r2mc(4...48, $mcroot + 1200);
 for $id in $ids do (
     setseed($id);
     $section = $sections:$id;
-    $totdur = getkey($section, 'total_duration');
+    $totdur = getkey($section, 'total_duration') / $id;
     $numattacks = $id;
     $numattacks = 1;
     $pcs = getkey($section, 'pitch_classes');
-    $mcs = left(
-        xscramble(pcquant($fullchord, $pcs)), 10
+    $mcs = sort(
+        left(
+            xscramble(pcquant($fullchord, $pcs)), 12
+        ) 
     );
     $t = 0;
     $markers = arithmser(0, 1, null, $numattacks + 1).scale(0, 1, 0, $totdur, xrand(0.1, 1/4) * xchoose(-1 1));
@@ -53,7 +55,7 @@ for $id in $ids do (
     $markers = $markers.left(-1);
     for $t in $markers, $mdur in $mdurs do (
         $offset = 0;
-        $strum = xrand(30);
+        $strum = xrand(1);
         for $mc in $mcs do (
             $onset = $t + $offset;
             $maxdur = max(1, min($totdur - $onset, $mdur * 2));
@@ -65,11 +67,11 @@ for $id in $ids do (
                 @velocity 30
                 @duration $maxdur
             ).process(trim(@start 0 @threshold 0.001) normalize(@level -20 @rms 1));
-            Freeze(
-                @buffer $b
-                @onset $onset
-                @duration $maxdur
-            );
+            ## Freeze(
+            ##     @buffer $b
+            ##     @onset $onset
+            ##     @duration $maxdur
+            ## );
             $b.transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
@@ -81,7 +83,12 @@ for $id in $ids do (
         ) 
     );
     render(
-        @reset 1 @process normalize(-3) 
+        @reset 1 @process freeverb(
+            @roomsize 0.9
+            @wet 0.0125
+            @damp 1
+            @width 1
+        ) normalize(-3) 
     );
     ezexport(@data $totdur @id $id) 
 )
