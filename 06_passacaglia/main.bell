@@ -1,0 +1,16 @@
+$folders = 'riff' 'strum';
+$t = 0;
+for $i in 1...8 do (
+    $id = tosymbol($i);
+    for $folder in $folders do (
+        $basefile = './' + $folder + '/' + $folder + '_' + $id ;
+        $sndfile = $basefile + '.wav';
+        $txtfile = $basefile + '.txt';
+        if exists($sndfile) == 1 && exists($txtfile) == 1 then (
+            $b = importaudio($sndfile);
+            $b.transcribe($t);
+            $t += read($txtfile) 
+        ) 
+    ) 
+);
+render(@play 1)

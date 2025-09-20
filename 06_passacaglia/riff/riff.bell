@@ -5,6 +5,7 @@ $layers = 'strings' 'perc' 'sines' 'bass' 'brass';
 $t = 0;
 for $i in 1...$numsections do (
     $id = tosymbol($i);
+    $t = 0;
     for $layer in $layers do (
         $file = './' + $layer + '/' + $layer + '_' + $id + '.wav';
         if exists($file) == 1 then (
@@ -12,9 +13,9 @@ for $i in 1...$numsections do (
             $b.transcribe($t) 
         ) 
     );
-    $t += read('./strings/strings_' + $id + '.txt') 
-);
-render(
-    @play 1 @process normalize(-3) 
-);
-ezexport()
+    $t += read('./strings/strings_' + $id + '.txt');
+    render(
+        @reset 1 @process normalize(-3) 
+    );
+    ezexport(@data $t @id $i) 
+)

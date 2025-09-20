@@ -1,0 +1,87 @@
+## ----------------------
+## Function: Freeze
+## ----------------------
+Freeze = (
+    $buffer, $onset = 0, $duration = null -> (
+        $bufdur = $buffer.getkey('duration');
+        $duration = $duration ||| ($bufdur * xrand(-1, 1).exp2());
+        $readst = $buffer.getkey('offset');
+        $readend = $bufdur + $readst;
+        $graindur = min($bufdur, xrand(50, 150));
+        $readbpf = [0 $readst 0.] [1 max($readst, $readend - $graindur) 0];
+        $gainbpf = [0 1 0] [1 0 -xrand(1/10, 3/4)];
+        if xrand() > 0.6 then (
+            $gainbpf = revbpf($gainbpf);
+            if xrand() > 0.5 then ($onset -= $duration) 
+        );
+        $t = 0;
+        $win = hanning();
+        $pan = xrand();
+        while $t < $duration do (
+            $nt = $t / $duration;
+            $grainoffset = samplebpf($readbpf, $nt);
+            $gain = samplebpf($gainbpf, $nt);
+            $grain = $buffer.setkey('offset', $grainoffset).setkey('duration', $graindur);
+            $grain.transcribe(
+                @onset $t + $onset
+                @gain $win * $gain
+                @pan $pan
+            );
+            $t += $graindur * xrand(0.125, 1/3) 
+        ) 
+    ) 
+);
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$ids = 1...length($sections);
+## $ids = 8;
+$mcroot = $sequence.'root';
+$fullchord = r2mc(4...48, $mcroot + 1200);
+for $id in $ids do (
+    setseed($id);
+    $section = $sections:$id;
+    $totdur = getkey($section, 'total_duration');
+    $numattacks = $id;
+    $numattacks = 1;
+    $pcs = getkey($section, 'pitch_classes');
+    $mcs = left(
+        xscramble(pcquant($fullchord, $pcs)), 10
+    );
+    $t = 0;
+    $markers = arithmser(0, 1, null, $numattacks + 1).scale(0, 1, 0, $totdur, xrand(0.1, 1/4) * xchoose(-1 1));
+    $mdurs = x2dx($markers);
+    $markers = $markers.left(-1);
+    for $t in $markers, $mdur in $mdurs do (
+        $offset = 0;
+        $strum = xrand(30);
+        for $mc in $mcs do (
+            $onset = $t + $offset;
+            $maxdur = max(1, min($totdur - $onset, $mdur * 2));
+            $fn = xchoose(ezsol pno @weights 8 1);
+            $b = $fn(
+                @pitch $mc
+                @names family('plucked') 
+                @types 'ord' 'harm' 'pizz' 
+                @velocity 30
+                @duration $maxdur
+            ).process(trim(@start 0 @threshold 0.001) normalize(@level -20 @rms 1));
+            Freeze(
+                @buffer $b
+                @onset $onset
+                @duration $maxdur
+            );
+            $b.transcribe(
+                @onset $onset
+                @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
+                @pan for $n in 1...xrandom(10, 50) collect [
+                    $n - 1 abs(($n % 2) - mc2pan($mc, 0.5)) xrand(-0.5, 0.5) 
+                ] 
+            );
+            $offset += $strum
+        ) 
+    );
+    render(
+        @reset 1 @process normalize(-3) 
+    );
+    ezexport(@data $totdur @id $id) 
+)
