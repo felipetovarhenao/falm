@@ -36,7 +36,7 @@ $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $ids = 1...(length($sections) - 1);
 $mcroot = $sequence.'root';
-$fullchord = r2mc(4...48, $mcroot + 1200);
+$fullchord = r2mc(3...48, $mcroot + 1200);
 for $id in $ids do (
     setseed($id);
     $section = $sections:$id;
@@ -44,7 +44,7 @@ for $id in $ids do (
     $numattacks = $id;
     $numattacks = 1;
     $pcs = getkey($section, 'pitch_classes');
-    $mcs = sort(
+    $mcs = (
         left(
             xscramble(pcquant($fullchord, $pcs)), 12
         ) 
@@ -55,7 +55,7 @@ for $id in $ids do (
     $markers = $markers.left(-1);
     for $t in $markers, $mdur in $mdurs do (
         $offset = 0;
-        $strum = xrand(1);
+        $strum = xrand(20);
         for $mc in $mcs do (
             $onset = $t + $offset;
             $maxdur = max(1, min($totdur - $onset, $mdur * 2));
@@ -65,7 +65,7 @@ for $id in $ids do (
                 @names family('plucked') 
                 @types 'ord' 'harm' 'pizz' 
                 @velocity 30
-                @duration $maxdur
+                @duration $maxdur + 2000
             ).process(trim(@start 0 @threshold 0.001) normalize(@level -20 @rms 1));
             ## Freeze(
             ##     @buffer $b

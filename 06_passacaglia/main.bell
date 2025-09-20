@@ -13,4 +13,7 @@ for $i in 1...8 do (
         ) 
     ) 
 );
-render(@play 1)
+render(
+    @play 1 @process normalize(-3)
+);
+ezexport()
