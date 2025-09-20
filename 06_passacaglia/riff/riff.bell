@@ -1,106 +1,20 @@
-Stutter = (
-    $onset, $buffer, $balance, $maxdivs = 2, $octdev = 0 -> (
-        $duration = getkey($buffer, 'duration');
-        $speed = xrand(1/3);
-        $numsegs = max(
-            2, min(
-                int(round($duration / 90)), $maxdivs
-            ) 
-        );
-        $numsegs = xrandom(2, $numsegs);
-        $offset = getkey($buffer, 'offset');
-        $slope = xrand(-0.15, 0.15);
-        $markers = scale(arithmser(0, 1, null, $numsegs + 1), 0, 1, 0, $duration, $slope);
-        $durs = x2dx($markers);
-        for $m in $markers, $dur in $durs do (
-            $seg = setkey(
-                setkey($buffer, 'offset', $m * $speed + $offset), 'duration', $dur
-            );
-            $seg.transcribe(
-                @onset $onset + $m
-                @pan xrand() 
-                @detune xrandom(-$octdev, $octdev) * 1200
-                @gain [0 $balance 0] [1 0 0.95] 
-            ) 
-        ) 
-    ) 
-);
-$data = read('../sequence.txt');
+$data = read('./sequence.txt');
 $sections = $data.'sections';
-$numreps = 4;
-$globaloffsets = dx2x(for $section in $sections collect getkey($section, 'total_duration') * $numreps);
-$globalduration = $globaloffsets:-1;
+$numsections = length($sections);
+$layers = 'strings' 'perc' 'sines' 'bass' 'brass';
 $t = 0;
-$sectionids = 1...length($sections);
-## $sectionids = 6;
-$combine = length($sectionids) == 1;
-$stutterbpf = [0 0 0] [1 0.2 -0.1];
-$stutterdivsbpf = [0 3 0] [1 12 0.25];
-$stutteroctdevbpf = [0 0 0] [1 1 -0.25];
-$seedoffset = 1;
-for $sectionid in $sectionids do (
-    $section = $sections:$sectionid;
-    $chords = $section.getkey('chords');
-    setseed($sectionid + $seedoffset);
-    $gt = $globaloffsets:$sectionid;
-    if $combine == 0 then ($t = 0);
-    for $rep in 1...$numreps do (
-        for $chord in $chords do (
-            $timestep = $chord.getkey('timestep');
-            $notes = $chord.getkey('notes');
-            $balance = 1.05 ** (1 - length($notes));
-            $nt = float($t + $gt) / $globalduration;
-            $stutter = samplebpf($stutterbpf, $nt);
-            $stutterdivs = samplebpf($stutterdivsbpf, $nt);
-            $stutteroctdev = int(
-                round(samplebpf($stutteroctdevbpf, $nt)) 
-            );
-            for $event in $notes do (
-                $pitch = $event.getkey('pitch');
-                $duration = $event.getkey('duration');
-                $velocity = $event.getkey('velocity');
-                $name = $event.getkey('name');
-                $types = $event.getkey('type');
-                $gliss = $event.getkey('gliss');
-                $buffer = ezsol(
-                    @pitch $pitch
-                    @duration $duration + 300
-                    @velocity $velocity
-                    @names $name
-                    @types $types
-                ).process(
-                    normalize(-14 @rms 1) 
-                    ## --
-                    trim(@threshold 0.1 @end 0) 
-                );
-                $buffer = $buffer.setkey('duration', $duration).process(resample($gliss));
-                if $rep > 1 && xrand() < $stutter then Stutter(
-                    @onset $t
-                    @buffer $buffer
-                    @balance $balance
-                    @maxdivs $stutterdivs
-                    @octdev $stutteroctdev
-                ) else (
-                    $buffer.transcribe(
-                        @onset $t
-                        @pan mc2pan($pitch, 1/3) 
-                        @gain [0 $balance 0] [1 0 0.95] 
-                    ) 
-                ) 
-            );
-            $t += $timestep
+for $i in 1...$numsections do (
+    $id = tosymbol($i);
+    for $layer in $layers do (
+        $file = './' + $layer + '/' + $layer + '_' + $id + '.wav';
+        if exists($file) == 1 then (
+            $b = importaudio($file);
+            $b.transcribe($t) 
         ) 
     );
-    if $combine == 0 then (
-        render(
-            @reset 1 @process normalize(-3) 
-        );
-        ezexport(@data $t @id $sectionid) 
-    ) 
+    $t += read('./strings/strings_' + $id + '.txt') 
 );
-if $combine == 1 then (
-    render(
-        @play 1 @process normalize(-3) 
-    );
-    ezexport() 
-)
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport()

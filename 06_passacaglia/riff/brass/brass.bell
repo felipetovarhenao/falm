@@ -35,7 +35,7 @@ for $id in $ids do (
     $chords = getkey($section, 'chords');
     $t = 0;
     ## importaudio(
-    ##     '../riff/riff_' + tosymbol($id) + '.wav' 
+    ##     '../strings/strings_' + tosymbol($id) + '.wav' 
     ## ).transcribe($t);
     for $chord in $chords :* $numreps do (
         $notes = getkey($chord, 'notes');

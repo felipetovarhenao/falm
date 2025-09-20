@@ -27,7 +27,7 @@ for $id in $ids do (
     );
     $t = 0;
     ## importaudio(
-    ##     '../riff/riff_' + tosymbol($id) + '.wav' 
+    ##     '../strings/strings_' + tosymbol($id) + '.wav' 
     ## ).transcribe($t);
     for $rep in 1...4 do (
         for $chord $chordid in $chords do (

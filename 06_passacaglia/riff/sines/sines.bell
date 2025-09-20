@@ -100,7 +100,7 @@ if $combine == 1 then (
         @play 1 @process $postfx (
             if $preview == 1 then (
                 ## ---
-                mix(importaudio('../riff/riff_' + $id + '.wav')) 
+                mix(importaudio('../strings/strings_' + $id + '.wav')) 
                 ## ---
                 normalize(-3) 
             ) 

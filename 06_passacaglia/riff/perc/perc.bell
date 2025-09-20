@@ -7,7 +7,7 @@ $dummy = envelope(0);
 for $id in 2...length($sections) do (
     $chords = ($sections:$id).getkey('chords');
     $base = importaudio(
-        '../riff/riff_' + tosymbol($id) + '.wav' 
+        '../strings/strings_' + tosymbol($id) + '.wav' 
     );
     $dummy.transcribe();
     $t = 0;
