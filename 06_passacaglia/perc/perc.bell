@@ -62,9 +62,11 @@ for $id in 2...length($sections) do (
                     @width 1
                 ) 
                 ## ---
-                normalize(-3) 
+                normalize(-8) 
                 ## ---
-                (if $mix == 1 then mix($base)) normalize(-3) 
+                (
+                    if $mix == 1 then mix($base) normalize(-3) 
+                ) 
             ) 
         );
         ezexport(@id $id) 
