@@ -6,9 +6,16 @@ for $folder $id in $folders with @unwrap 1 do (
     $path = './0' + tosymbol($id) + '_' + $folder + '/' + $file + '.wav';
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
-    $tail = $b.setkey('offset', $bdur - 20000).process(reverse() trim(@threshold 0.0001 @end 0));
-    $b.setkey('duration', $bdur - $tail.getkey('duration')).transcribe($t);
-    $t += $b.getkey('duration') + 1000
+    $tailsize = 20000;
+    $tail = $b.setkey('offset', $bdur - 15000).setkey('duration', $tailsize).process(
+        reverse() normalize(-3) trim(@threshold 0.001 @end 0) 
+    );
+    $taildur = $tail.getkey('duration');
+    $b = $b.setkey(
+        'duration', min($bdur,  ($bdur - $taildur) + 1000) 
+    );
+    $b.transcribe($t);
+    $t += $b.getkey('duration') 
 );
 render(
     @play 1 @process normalize(-3) 
