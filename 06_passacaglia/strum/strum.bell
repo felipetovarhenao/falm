@@ -66,6 +66,7 @@ for $id in $ids do (
                 @types 'ord' 'harm' 'pizz' 
                 @velocity 30
                 @duration $maxdur + 2000
+                @useseed 1
             ).process(trim(@start 0 @threshold 0.001) normalize(@level -20 @rms 1));
             ## Freeze(
             ##     @buffer $b
