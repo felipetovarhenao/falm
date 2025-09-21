@@ -1,0 +1,28 @@
+setseed(0);
+$mcs = r2mc(8...16, ab3).pcquant(1 4 7 11);
+$t = 0;
+$dur = 150;
+for $i in 1...8 do (
+    $mcs = rev($mcs);
+    $shift = 0;
+    $speed = xrand(4);
+    for $mc in $mcs do (
+        ezsol(
+            @pitch $mc
+            @duration $dur + 100
+            @types 'ord' 'harm' 
+            @names 'guitar' 'harp' 
+            @velocity scale($i, 1, 8, 0, 127)
+            @useseed 1
+        ).transcribe(
+            @onset $t + $shift
+            @pan mc2pan($mc, 0.25) 
+            @gain [0 1 0] [1 0 0.5] 
+        );
+        $shift += $speed
+    );
+    $t += $dur
+);
+render(
+    @play 1 @process normalize(-3) 
+)

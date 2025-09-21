@@ -6,7 +6,7 @@ BassDrum = (
             @frequency mc2f($pitch) * 0.5 @duration $unit * 0.25
         );
         $knock = ezsol(
-            @pitch $pitch
+            @pitch xrandom(21, 108) * 100
             @names family('plucked') family('strings') 
             @types 'perc' 'hit-on-body' 
             @duration $unit
