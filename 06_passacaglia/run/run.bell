@@ -1,0 +1,117 @@
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$unit = $sequence.'unit';
+$ids = 3...length($sections);
+$minid = minimum($ids);
+$maxid = maximum($ids);
+## $ids = 8;
+$preview = length($ids) == 1;
+$groupsizebpf = [0 1 0] [1 4 0.125];
+$maxnotesbpf = [0 12 0] [1 8 0];
+$postfx = (
+    reverse() 
+    ## ---
+    freeverb(
+        @tail 0
+        @roomsize 0.85
+        @wet 0.0125
+        @damp 1
+    ) 
+    ## ---
+    fade(0, 5) 
+    ## ---
+    reverse() 
+    ## ---
+    ## freeverb(
+    ##     @roomsize 0.9
+    ##     @wet 0.0125
+    ##     @damp 1
+    ##     @width 1
+    ## ) 
+    ## ---
+    normalize(-3) 
+);
+for $id in $ids do (
+    setseed($id);
+    $gnt = min(
+        1, max(0, scale($id, $minid, $maxid, 0, 1)) 
+    );
+    $section = $sections:$id;
+    $chords = getkey($section, 'chords');
+    $t = 0;
+    $notes = for $chord in $chords collect getkey($chord, 'notes');
+    $notes = thin(
+        $notes,  ($a, $b -> getkey($a, 'pitch') == getkey($b, 'pitch')) 
+    );
+    $maxnotes = int(
+        round(samplebpf($maxnotesbpf, $gnt)) 
+    );
+    $notes = sort(
+        @llll left(xscramble($notes), $maxnotes) @function ($a, $b -> getkey($a, 'pitch') < getkey($b, 'pitch')) 
+    );
+    if $id % 2 == 0 then ($notes = rev($notes));
+    $groupsize = int(
+        round(samplebpf($groupsizebpf, $gnt)) 
+    );
+    $overlap = $groupsize - 1;
+    $notes = group($notes, $groupsize, $groupsize, $overlap).flat(1).rev();
+    $numnotes = length($notes);
+    for $note $noteid in $notes do (
+        $pitch = getkey($note, 'pitch');
+        $nextpitch = getkey($notes:min($numnotes, $noteid + 1), 'pitch');
+        $resample = [0 1 0] [1 c2r($pitch - $nextpitch) xrand(1/2, 5/6)];
+        $durmul = integrate($resample):(-1 2);
+        $fn = xchoose(pno ezsol @weights 1 10);
+        $group = xchoose(
+            [['family' 'strings'] [
+                'types' 'pizz' 'pizz-secco' 
+            ] ] [['family' 'plucked'] [
+                'types' 'ord' 'harm' 'stacc' 
+            ]] @weights 1 6
+        );
+        $b = $fn(
+            @pitch $pitch + xrandom(0, 1) * 1200
+            @duration $unit * $durmul
+            @names family(getkey($group, 'family')) 
+            @types getkey($group, 'types') 
+            @velocity 60
+            @useseed 1
+        ).process(
+            normalize(-14 @rms 1) trim(@threshold 0.05 @end 0) resample($resample) 
+        );
+        $b.transcribe(
+            @onset $t
+            @gain [0 1 0] [1 0 0.85] 
+            @pan mc2pan($pitch, 0.4) 
+        );
+        $t += $unit / min(6, $overlap + 1) 
+    );
+    $totdur = $t;
+    ## for $note in $notes do (
+    ##     $pitch = getkey($note, 'pitch');
+    ##     $env = [0 1 0] [1 0.1 -xrand(1/4, 4/5)];
+    ##     if xrand() > 0.5 then ($env = revbpf($env));
+    ##     $pan = abs(
+    ##         xrand() - (0 1) 
+    ##     );
+    ##     ezsol(
+    ##         @pitch $pitch + xrandom(0, 2) * 1200
+    ##         @names family('woodwinds') 'acc' 
+    ##         @types 'ord' 'flz' 
+    ##         @velocity 0
+    ##         @duration $totdur
+    ##         @useseed 1
+    ##     ).transcribe(
+    ##         @onset 0
+    ##         @pan $pan
+    ##         @gain $env
+    ##     ) 
+    ## );
+    if $preview == 0 then (
+        render(@reset 1 @process $postfx);
+        ezexport(@data $totdur @id $id) 
+    ) 
+);
+if $preview == 1 then render(
+    @play 1 @process $postfx
+)
