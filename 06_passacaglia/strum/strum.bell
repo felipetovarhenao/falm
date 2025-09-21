@@ -9,11 +9,8 @@ Freeze = (
         $readend = $bufdur + $readst;
         $graindur = min($bufdur, xrand(50, 150));
         $readbpf = [0 $readst 0.] [1 max($readst, $readend - $graindur) 0];
-        $gainbpf = [0 1 0] [1 0 -xrand(1/3, 9/10)];
-        if xrand() > 0 then (
-            $gainbpf = revbpf($gainbpf);
-            if xrand() > 0.5 then ($onset -= $duration) 
-        );
+        $gainbpf = [0 1 0] [1 0 -xrand(0.125, 0.75)];
+        if xrand() > 0 then ($gainbpf = revbpf($gainbpf));
         $t = 0;
         $win = hanning();
         $pan = xrand();
@@ -35,15 +32,15 @@ $postfx = normalize(-3);
 $sequence = read('../riff/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
-$ids = 1...(length($sections) - 1);
-## $ids = 1;
+$ids = 2...length($sections);
+## $ids = 2;
 $preview = length($ids) == 1;
 $mcroot = $sequence.'root';
 $fullchord = r2mc(3...48, $mcroot + 1200);
 for $id in $ids do (
-    setseed($id + 16);
-    $section = $sections:$id;
-    $totdur = getkey($section, 'total_duration') / (($id + 1) / 2);
+    setseed($id + 300);
+    $section = $sections:($id - 1);
+    $totdur = getkey($section, 'total_duration') / ($id / 2.0);
     $numattacks = $id;
     $numattacks = 1;
     $pcs = getkey($section, 'pitch_classes');
@@ -56,27 +53,48 @@ for $id in $ids do (
     $markers = arithmser(0, 1, null, $numattacks + 1).scale(0, 1, 0, $totdur, xrand(0.1, 1/4) * xchoose(-1 1));
     $mdurs = x2dx($markers);
     $markers = $markers.left(-1);
+    $maxonset = 0;
     for $t in $markers, $mdur in $mdurs do (
         $offset = 0;
         $strum = xrand(20);
         for $mc in $mcs do (
             $onset = $t + $offset;
+            $maxonset = max($onset, $maxonset);
             $maxdur = max(1, min($totdur - $onset, $mdur * 2));
-            $fn = xchoose(ezsol pno @weights 8 1);
+            $fn = xchoose(ezsol pno @weights 10 1);
             $b = $fn(
                 @pitch $mc
                 @names family('plucked') 
-                @types 'ord' 'harm' 'pizz' 
+                @types 'ord' 'harm' 'pizz' 'harm-in-wood' 
                 @velocity 30
                 @duration $maxdur + 100
                 @useseed 1
-            ).process(trim(@start 0 @threshold 0.001) normalize(@level -20 @rms 1));
+            ).clipnorm(@minlevel -22 @rms 1);
+            $wind = ezsol(
+                @pitch $mc
+                @names 'flute' 'sax' 'clar' 'acc' 
+                @velocity 0
+                @types 'flz' 'ord-to-flz' 'bisb' 'reg' 
+                @duration $maxdur
+                @useseed 1
+            ).process(trim(@threshold 0.0025)).clipnorm(@minlevel -28 @rms 1);
+            $wind.process(reverse()).transcribe(
+                @onset $totdur - $wind.getkey('duration') 
+                @pan mc2pan($mc, 0.3) 
+                @gain [0 0 0] [1 1 xrand(1/5, 2/3)] 
+            );
             Freeze(
                 @buffer $b
                 @onset $onset
                 @duration $maxdur
             );
-            $b.transcribe(
+            $b.process(
+                resample(
+                    [0 1 0] [
+                        1 1/c2r(-xrand(100, 300)) 0.25
+                    ] 
+                ) 
+            ).transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
                 @pan for $n in 1...xrandom(4, 10) collect [
@@ -90,7 +108,9 @@ for $id in $ids do (
         render(
             @reset 1 @process $postfx
         );
-        ezexport(@data $totdur @id $id) 
+        ezexport(
+            @data ['duration' max(0, $totdur - $maxonset)] ['offset' $maxonset] @id $id
+        ) 
     ) 
 );
 if $preview == 1 then (render(@play 1 @process $postfx) )

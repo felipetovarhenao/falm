@@ -1,4 +1,4 @@
-$folders = 'riff' 'strum';
+$folders = 'strum' 'riff';
 $t = 0;
 for $i in 1...8 do (
     $id = tosymbol($i);
@@ -8,12 +8,18 @@ for $i in 1...8 do (
         $txtfile = $basefile + '.txt';
         if exists($sndfile) == 1 && exists($txtfile) == 1 then (
             $b = importaudio($sndfile);
-            $b.transcribe($t);
-            $t += read($txtfile) 
+            $meta = read($txtfile);
+            if $folder == 'strum' then (
+                $b.transcribe($t - $meta.'offset');
+                $t += $meta.'duration' 
+            ) else (
+                $b.transcribe($t);
+                $t += $meta
+            ) 
         ) 
     ) 
 );
 render(
-    @play 1 @process normalize(-3)
+    @play 1 @process normalize(-3) 
 );
 ezexport()
