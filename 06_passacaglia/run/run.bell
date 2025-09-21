@@ -29,10 +29,10 @@ $postfx = (
     ##     @width 1
     ## ) 
     ## ---
-    normalize(-6) 
+    normalize(-9) 
 );
 for $id in $ids do (
-    setseed($id);
+    setseed($id + 10);
     $gnt = min(
         1, max(0, scale($id, $minid, $maxid, 0, 1)) 
     );
