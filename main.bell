@@ -1,9 +1,9 @@
-$folders = 'introduction' 'folia' 'scherzo' 'vespertino' ['andante' 'post'] 'passacaglia';
+$folders = '01_introduction' '04_vespertino' '03_scherzo' ['05_andante' 'post'] '02_folia' '06_passacaglia';
 $t = 0;
 for $folder $id in $folders with @unwrap 1 do (
     $file = $folder:2 ||| 'main';
     $folder = $folder:1;
-    $path = './0' + tosymbol($id) + '_' + $folder + '/' + $file + '.wav';
+    $path = './' + $folder + '/' + $file + '.wav';
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
     $tailsize = 20000;
