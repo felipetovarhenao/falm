@@ -29,14 +29,14 @@ $postfx = (
     ##     @width 1
     ## ) 
     ## ---
-    normalize(-3) 
+    normalize(-6) 
 );
 for $id in $ids do (
     setseed($id);
     $gnt = min(
         1, max(0, scale($id, $minid, $maxid, 0, 1)) 
     );
-    $section = $sections:$id;
+    $section = $sections:($id - 1);
     $chords = getkey($section, 'chords');
     $t = 0;
     $notes = for $chord in $chords collect getkey($chord, 'notes');
@@ -56,7 +56,10 @@ for $id in $ids do (
     $overlap = $groupsize - 1;
     $notes = group($notes, $groupsize, $groupsize, $overlap).flat(1).rev();
     $numnotes = length($notes);
+    $velbpf = [0 1 0] [1 127 0.125];
     for $note $noteid in $notes do (
+        $nt = scale($noteid, 1, $numnotes, 0, 1);
+        $vel = samplebpf($velbpf, $nt);
         $pitch = getkey($note, 'pitch');
         $nextpitch = getkey($notes:min($numnotes, $noteid + 1), 'pitch');
         $resample = [0 1 0] [1 c2r($pitch - $nextpitch) xrand(1/2, 5/6)];
@@ -74,7 +77,7 @@ for $id in $ids do (
             @duration $unit * $durmul
             @names family(getkey($group, 'family')) 
             @types getkey($group, 'types') 
-            @velocity 60
+            @velocity $vel
             @useseed 1
         ).process(
             normalize(-14 @rms 1) trim(@threshold 0.05 @end 0) resample($resample) 
