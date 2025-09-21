@@ -33,16 +33,19 @@ $sequence = read('../riff/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $ids = 2...length($sections);
-## $ids = 2;
+$minid = minimum($ids);
+$maxid = maximum($ids);
+## $ids = 8;
 $preview = length($ids) == 1;
 $mcroot = $sequence.'root';
 $fullchord = r2mc(3...48, $mcroot + 1200);
+$windlayerbpf = [0 0 0] [1 1 0.125];
 for $id in $ids do (
+    $gnt = scale($id, $minid, $maxid, 0, 1);
+    $windlayer = samplebpf($windlayerbpf, $gnt);
     setseed($id + 300);
     $section = $sections:($id - 1);
     $totdur = getkey($section, 'total_duration') / ($id / 2.0);
-    $numattacks = $id;
-    $numattacks = 1;
     $pcs = getkey($section, 'pitch_classes');
     $mcs = (
         left(
@@ -50,59 +53,58 @@ for $id in $ids do (
         ) 
     );
     $t = 0;
-    $markers = arithmser(0, 1, null, $numattacks + 1).scale(0, 1, 0, $totdur, xrand(0.1, 1/4) * xchoose(-1 1));
-    $mdurs = x2dx($markers);
-    $markers = $markers.left(-1);
     $maxonset = 0;
-    for $t in $markers, $mdur in $mdurs do (
-        $offset = 0;
-        $strum = xrand(20);
-        for $mc in $mcs do (
-            $onset = $t + $offset;
-            $maxonset = max($onset, $maxonset);
-            $maxdur = max(1, min($totdur - $onset, $mdur * 2));
-            $fn = xchoose(ezsol pno @weights 10 1);
-            $b = $fn(
-                @pitch $mc
-                @names family('plucked') 
-                @types 'ord' 'harm' 'pizz' 'harm-in-wood' 
-                @velocity 30
-                @duration $maxdur + 100
-                @useseed 1
-            ).clipnorm(@minlevel -22 @rms 1);
+    $mdur = $totdur;
+    $offset = 0;
+    $strum = xrand(20);
+    $glissdir = xchoose(-1 1);
+    for $mc in $mcs do (
+        $onset = $t + $offset;
+        $maxonset = max($onset, $maxonset);
+        $maxdur = max(1, min($totdur - $onset, $mdur * 2));
+        $fn = xchoose(ezsol pno @weights 10 1);
+        $b = $fn(
+            @pitch $mc
+            @names family('plucked') 
+            @types 'ord' 'harm' 'pizz' 'harm-in-wood' 
+            @velocity 30
+            @duration $maxdur + 100
+            @useseed 1
+        ).clipnorm(@minlevel -22 @rms 1);
+        if xrand() < $windlayer then (
             $wind = ezsol(
                 @pitch $mc
                 @names 'flute' 'sax' 'clar' 'acc' 
                 @velocity 0
-                @types 'flz' 'ord-to-flz' 'bisb' 'reg' 
+                @types 'flz' 'flz-to-ord' 'bisb' 'reg' 
                 @duration $maxdur
                 @useseed 1
-            ).process(trim(@threshold 0.0025)).clipnorm(@minlevel -28 @rms 1);
+            ).clipnorm(@minlevel -20 @rms 1).process(trim(@threshold 0.005));
             $wind.process(reverse()).transcribe(
                 @onset $totdur - $wind.getkey('duration') 
                 @pan mc2pan($mc, 0.3) 
                 @gain [0 0 0] [1 1 xrand(1/5, 2/3)] 
-            );
-            Freeze(
-                @buffer $b
-                @onset $onset
-                @duration $maxdur
-            );
-            $b.process(
-                resample(
-                    [0 1 0] [
-                        1 1/c2r(-xrand(100, 300)) 0.25
-                    ] 
-                ) 
-            ).transcribe(
-                @onset $onset
-                @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
-                @pan for $n in 1...xrandom(4, 10) collect [
-                    $n - 1 abs(($n % 2) - mc2pan($mc, 0.5)) xrand(-0.5, 0.5) 
+            ) 
+        );
+        Freeze(
+            @buffer $b
+            @onset $onset
+            @duration $maxdur
+        );
+        $b.process(
+            resample(
+                [0 1 0] [
+                    1 1/c2r(xrand(100, 300) * $glissdir) 0.25
                 ] 
-            );
-            $offset += $strum
-        ) 
+            ) 
+        ).transcribe(
+            @onset $onset
+            @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
+            @pan for $n in 1...xrandom(4, 10) collect [
+                $n - 1 abs(($n % 2) - mc2pan($mc, 0.5)) xrand(-0.5, 0.5) 
+            ] 
+        );
+        $offset += $strum
     );
     if $preview == 0 then (
         render(
