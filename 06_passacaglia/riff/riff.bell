@@ -1,7 +1,7 @@
 $data = read('./sequence.txt');
 $sections = $data.'sections';
 $numsections = length($sections);
-$layers = 'strings' 'perc' 'sines' 'bass' 'brass';
+$layers = 'strings' 'perc' 'sines' 'bass' 'brass' 'downbeat';
 $t = 0;
 for $i in 1...$numsections do (
     $id = tosymbol($i);
