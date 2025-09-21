@@ -1,0 +1,100 @@
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$root = $sequence.'root';
+$unit = $sequence.'unit';
+$ids = 4...length($sections);
+## $ids = 6;
+$preview = length($ids) == 1;
+$postfx = (
+    freeverb(
+        @roomsize 0.5
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+    ## ---
+    normalize(-12) 
+);
+$fullchord = r2mc(4...48, $root);
+$subdivs = (3...7) / 3;
+$instruments = for $name in family('plucked') collect instrument(
+    @name $name
+    @types 'ord' 'harm' 'near-pegs' 'harm-in-wood' 'stacc' 
+    @join 0
+);
+$instruments _= for $name in family('strings') collect instrument(
+    @name $name
+    @types 'pizz' 'pizz-secco' 
+    @join 0
+);
+for $id in $ids do (
+    setseed($id + 100);
+    $section = $sections:$id;
+    $pcs = getkey($section, 'pitch_classes');
+    $totdur = getkey($section, 'total_duration');
+    $mcs = pcquant($fullchord, $pcs);
+    for $v in 1...5 do (
+        $arp = (
+            randomseq(
+                @llll $mcs
+                @length xrandom(2, 5) 
+                @steps -1 2
+                @useseed 1
+            ) 
+        );
+        $parts = for $mc in $arp collect (
+            $opts = pitchfilter(@instruments $instruments @pitch $mc);
+            xchoose($opts) 
+        );
+        $t = 0;
+        $i = 0;
+        $beat = $unit / xchoose($subdivs);
+        $velbpf = [0 127 0] [1 0 -0.4];
+        $warpbpf = [0 0.8 0] [1 1 0.25];
+        if $v % 2 == 0 then (
+            $velbpf = revbpf($velbpf);
+            $warpbpf = revbpf($warpbpf) 
+        );
+        while $t < $totdur do (
+            $nt = $t / $totdur;
+            $vel = samplebpf($velbpf, $nt);
+            $warp = samplebpf($warpbpf, $nt);
+            $gain = scale($vel, 0, 127, 0.1, 1, 0.125);
+            $addr = ($i % length($arp) + 1);
+            $mc = $arp:$addr;
+            $part = $parts:$addr;
+            sinewave(
+                @pitch $mc + xrandom(2) * 2400
+                @duration $unit * exp2(xrand(2)) 
+                @velocity max(10, $vel) 
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc, 0.2) 
+                @gain $gain
+            );
+            ezsol(
+                @pitch $mc
+                @names getkey($part, 'name') 
+                @types getkey($part, 'types') 
+                @velocity $vel
+                @duration $unit * 3
+                @useseed 1
+            ).process(
+                normalize(-3) trim(@threshold 0.005 @end 0) gain($gain) 
+            ).transcribe(
+                @onset $t
+                @pan mc2pan($mc, 0.9) 
+                @gain [0 1 0] [1 0 0.8] 
+            );
+            $t += $beat * $warp;
+            $i += 1
+        ) 
+    );
+    if $preview == 0 then (
+        render(
+            @reset 1 @process $postfx
+        );
+        ezexport(@data $totdur @id $id) 
+    ) 
+);
+if $preview == 1 then render(@play 1 @process $postfx)
