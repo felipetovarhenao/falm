@@ -3,7 +3,7 @@ $sections = $sequence.'sections';
 $root = $sequence.'root';
 $unit = $sequence.'unit';
 $ids = 4...length($sections);
-## $ids = 6;
+## $ids = 5;
 $preview = length($ids) == 1;
 $postfx = (
     freeverb(
@@ -29,9 +29,9 @@ $instruments _= for $name in family('strings') collect instrument(
 );
 for $id in $ids do (
     setseed($id + 100);
-    $section = $sections:$id;
+    $section = $sections:($id - 1);
     $pcs = getkey($section, 'pitch_classes');
-    $totdur = getkey($section, 'total_duration');
+    $totdur = getkey($section, 'total_duration') / 2;
     $mcs = pcquant($fullchord, $pcs);
     for $v in 1...5 do (
         $arp = (
