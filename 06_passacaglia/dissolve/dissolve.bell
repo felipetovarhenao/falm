@@ -20,7 +20,7 @@ $slopebpf = [0 0.99 0] [1 -0.5 0];
 $speedbpf = [0 1 0] [0.95 0.1 -0.125] [1 0.9 0.33];
 $legatobpf = [0 1 0] [1 0.05 -0.125];
 $gainbpf = [0 1 0] [0.95 0.25 0.25] [1 0.707 1/2];
-$onsetjitbpf = [0 0 0] [1 1 0.25];
+$onsetjitbpf = [0 0 0] [1 1 0.125];
 while $t < $totdur do (
     for $m $mi in $markers, $mdur in $mdurs do (
         $nt = min(1, max(0, $t / $totdur));
