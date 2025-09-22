@@ -1,0 +1,45 @@
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$root = $sequence.'root';
+$unit = $sequence.'unit';
+$ids = 5...length($sections);
+$maxid = maximum($ids);
+## $ids = 5;
+$b = guitar(
+    @duration null
+    @type 'behind-frog' 
+    @velocity 127
+).process(normalize(-3) trim(@threshold 0.001));
+for $id in $ids do (
+    setseed($id);
+    $section = $sections:($id - 1);
+    $pcs = getkey($section, 'pitch_classes');
+    $t = 0;
+    $mcs = r2mc(8...16, $root);
+    $cents = pcquant($mcs - mean($mcs), $pcs);
+    $cents = left(
+        xscramble($cents),  ($maxid + 1) - $id
+    );
+    $beat = $unit * 3/2;
+    for $c in $cents do (
+        $b.setkey('duration', $beat).transcribe(
+            @onset $t
+            @detune $c
+            @gain [0 1 0] [1 0 -xrand(1/8, 1/4)] 
+            @keepduration 0
+            @pan xrand() xrand() 
+        );
+        $t += $beat
+    );
+    render(
+        @reset 1
+        @play 1
+        @process freeverb(
+            @roomsize 0.9
+            @wet 0.0025
+            @damp 1
+            @width 1
+        ) normalize(-9) 
+    );
+    ezexport(@id $id @data $t) 
+)
