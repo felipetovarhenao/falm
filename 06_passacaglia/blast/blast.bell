@@ -13,7 +13,7 @@ $postfx = (
         @damp 1
         @width 1
         @tail 0
-    ) freqshift(@shift $shift @negative 1) normalize(-3) 
+    ) freqshift(@shift $shift @negative 1) normalize(-7) 
 );
 for $id in $ids do (
     setseed($id + 100);
@@ -49,5 +49,5 @@ for $id in $ids do (
     ) 
 );
 if $preview == 1 then render(
-    @play 1 @process $postfx($freqshift)
+    @play 1 @process $postfx($freqshift) 
 )
