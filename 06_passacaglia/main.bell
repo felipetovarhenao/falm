@@ -1,6 +1,6 @@
-$folders = 'run' 'arpeggi' 'strum' 'doppel' 'bell' 'riff';
+$folders = 'run' 'arpeggi' 'blast' 'strum' 'doppel' 'bell' 'riff';
 $t = 0;
-for $i in 1...8 do (
+for $i in 6...8 do (
     $id = tosymbol($i);
     for $folder in $folders do (
         $basefile = './' + $folder + '/' + $folder + '_' + $id ;

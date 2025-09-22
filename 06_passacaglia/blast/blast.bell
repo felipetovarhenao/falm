@@ -1,0 +1,53 @@
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$root = $sequence.'root';
+$maxid = length($sections);
+$minid = 7;
+$ids = $minid...$maxid;
+## $ids = 7;
+$preview = length($ids) == 1;
+$postfx = (
+    $shift -> freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+        @tail 0
+    ) freqshift(@shift $shift @negative 1) normalize(-3) 
+);
+for $id in $ids do (
+    setseed($id + 100);
+    $section = $sections:($id - 1);
+    $pcs = getkey($section, 'pitch_classes');
+    $totdur = getkey($section, 'total_duration');
+    $mcs = r2mc(2...32, $root + 1200);
+    $mcs = pcquant($mcs, $pcs);
+    $totdur = $totdur / 2;
+    for $mc in $mcs do (
+        $gain = [0 0 0] [1 1 0.125];
+        $b = ezsol(
+            @pitch $mc
+            @duration $totdur
+            @useseed 1
+            @velocity 127
+            @names family('brass') family('strings') 
+            @types 'sfz' 'ord' 'crushed-to-ord' 
+        ).process(gain($gain));
+        if xrand() > 0.5 then ($b = $b.process(reverse()));
+        $b.transcribe(
+            @pan abs(mc2pan($mc, 0.25) - (0 1)) 
+        ) 
+    );
+    $freqshift = for $x in 0 1 collect [
+        $x xrand(2, 12) xrand(0.1, 0.25) * xchoose(-1 1) 
+    ];
+    if $preview == 0 then (
+        render(
+            @play 1 @process $postfx($freqshift) 
+        );
+        ezexport(@data $totdur @id $id) 
+    ) 
+);
+if $preview == 1 then render(
+    @play 1 @process $postfx($freqshift)
+)
