@@ -7,7 +7,7 @@ $pcs = getkey($section, 'pitch_classes');
 $mcs = r2mc(1...16, $root);
 $mcs = xscramble(pcquant($mcs, $pcs));
 $t = 0;
-$totdur = 2000;
+$totdur = 1500;
 for $mc in $mcs do (
     if xrand() > 0.85 then (
         ezsol(
