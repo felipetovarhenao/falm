@@ -1,0 +1,47 @@
+setseed(9);
+$sequence = read('../riff/sequence.txt');
+$root = $sequence.'root';
+$id = 8;
+$section = $sequence.'sections':($id - 1);
+$pcs = getkey($section, 'pitch_classes');
+$mcs = r2mc(1...16, $root);
+$mcs = xscramble(pcquant($mcs, $pcs));
+$t = 0;
+$totdur = 2000;
+for $mc in $mcs do (
+    if xrand() > 0.85 then (
+        ezsol(
+            @pitch $mc + 2400
+            @names family('strings') 
+            @types 'crushed-to-ord' 
+            @velocity 127
+            @duration $totdur
+        ).process(reverse() normalize(-8)).transcribe(
+            @pan xrand() @gain [0 0 0] [1 1 xrand(1/4, 3/4)] 
+        ) 
+    );
+    ezsol(
+        @pitch $mc + 1200 * 4
+        @duration $totdur
+        @names family('plucked') family('strings') 
+        @types 'hit-on-body' 'perc' 
+        @velocity 127
+        @useseed 1
+    ).process(normalize(-7)).transcribe(
+        @onset $totdur - $t
+        @pan xrand() 
+        @gain [0 1 0] [1 0 -0.5] 
+    );
+    $t += xrand(5) 
+);
+render(
+    @play 1
+    @fade 2
+    @process freeverb(
+        @roomsize 0.9
+        @wet 0.001
+        @damp 1
+        @width 1
+    ) normalize(-8) 
+);
+ezexport(@data $totdur @id $id)
