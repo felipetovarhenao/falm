@@ -1,4 +1,4 @@
-$folders = 'bell' 'run' 'arpeggi' 'strum' 'riff';
+$folders = 'run' 'arpeggi' 'strum' 'bell' 'riff';
 $t = 0;
 for $i in 1...8 do (
     $id = tosymbol($i);
