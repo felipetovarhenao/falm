@@ -6,7 +6,7 @@ $maxid = length($sections);
 $numids = length($ids);
 $ids = $minid...$maxid;
 $units = for $id $ii in $ids collect [$id $ii];
-## $ids = 6;
+## $ids = 8;
 $preview = length($ids) == 1;
 $postfx = (
     freeverb(
@@ -14,7 +14,7 @@ $postfx = (
         @wet 0.0015
         @damp 1
         @width 1
-    ) normalize(-8) 
+    ) normalize(-7) 
 );
 for $id in $ids do (
     setseed($id);
@@ -38,6 +38,18 @@ for $id in $ids do (
                 @onset $t
                 @pan 0.5
                 @gain [0 1 0] [1 0 0.5] 
+            ) 
+        ) else (
+            ezsol(
+                @pitch xrandom(21, 108) * 100
+                @names family('strings') family('plucked') 
+                @duration $unit * 3
+                @types 'perc' 'hit-on-body' 'tap' 
+                @useseed 1
+            ).process(normalize(-20 @rms 1)).transcribe(
+                @onset $t
+                @pan xrand(0.4, 0.5) 
+                @gain [0 1 0] [1 0 -0.5] 
             ) 
         );
         for $note in left(xscramble($notes), 4) do (
