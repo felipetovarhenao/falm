@@ -3,7 +3,9 @@ $sections = $sequence.'sections';
 $root = $sequence.'root';
 $unit = $sequence.'unit';
 $ids = 4...length($sections);
-## $ids = 5;
+$minid = minimum($ids);
+$maxid = maximum($ids);
+## $ids = 8;
 $preview = length($ids) == 1;
 $postfx = (
     freeverb(
@@ -13,7 +15,7 @@ $postfx = (
         @width 1
     ) 
     ## ---
-    normalize(-12) 
+    normalize(-3) 
 );
 $fullchord = r2mc(4...48, $root);
 $subdivs = (3...7) / 3;
@@ -27,13 +29,46 @@ $instruments _= for $name in family('strings') collect instrument(
     @types 'pizz' 'pizz-secco' 
     @join 0
 );
+$sineprobbpf = [0 0.1 0] [1 1 0.125];
+$numvoicesbpf = [0 2 0] [1 5 0];
+Brass = (
+    $mcs -> (
+        $t = 0;
+        $brass = for $mc in $mcs collect (
+            ezsol(
+                @pitch $mc + xrandom(-1, 1) * 1200
+                @duration 1000
+                @names 'tpt' 'tromb' 'sax' 
+                @types 'stacc' 
+                @velocity 127
+                @useseed 1
+            ).process(normalize(-3) panning(xrand())) 
+        );
+        $brass = $brass.left(1).process(
+            mix(right($brass, 1)) gain([0 1 0] [1 0 0.5]) freeverb(
+                @roomsize 0.9
+                @wet 0.025
+                @damp 1
+                @width 1
+            ) 
+        ).transcribe($t) 
+    ) 
+);
 for $id in $ids do (
+    $gnt = min(
+        1, max(0, scale($id, $minid, $maxid, 0, 1)) 
+    );
+    $sineprob = samplebpf($sineprobbpf, $gnt);
+    $numvoices = int(
+        round(samplebpf($numvoicesbpf, $gnt)) 
+    );
     setseed($id + 100);
     $section = $sections:($id - 1);
     $pcs = getkey($section, 'pitch_classes');
     $totdur = getkey($section, 'total_duration') / 2;
     $mcs = pcquant($fullchord, $pcs);
-    for $v in 1...5 do (
+    Brass($mcs);
+    for $v in 1...$numvoices do (
         $arp = (
             randomseq(
                 @llll $mcs
@@ -63,14 +98,16 @@ for $id in $ids do (
             $addr = ($i % length($arp) + 1);
             $mc = $arp:$addr;
             $part = $parts:$addr;
-            sinewave(
-                @pitch $mc + xrandom(2) * 2400
-                @duration $unit * exp2(xrand(2)) 
-                @velocity max(10, $vel) 
-            ).transcribe(
-                @onset $t
-                @pan mc2pan($mc, 0.2) 
-                @gain $gain
+            if xrand() < $sineprob then (
+                sinewave(
+                    @pitch $mc + xrandom(2) * 2400
+                    @duration $unit * exp2(xrand(2)) 
+                    @velocity max(10, $vel) 
+                ).transcribe(
+                    @onset $t
+                    @pan mc2pan($mc, 0.2) 
+                    @gain $gain
+                ) 
             );
             ezsol(
                 @pitch $mc
