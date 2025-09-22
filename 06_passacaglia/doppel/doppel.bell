@@ -1,0 +1,80 @@
+$sequence = read('../riff/sequence.txt');
+$sections = $sequence.'sections';
+$unit = $sequence.'unit';
+$minid = 6;
+$maxid = length($sections);
+$numids = length($ids);
+$ids = $minid...$maxid;
+$units = for $id $ii in $ids collect [$id $ii];
+## $ids = 6;
+$preview = length($ids) == 1;
+$postfx = (
+    freeverb(
+        @roomsize 0.98
+        @wet 0.0015
+        @damp 1
+        @width 1
+    ) normalize(-8) 
+);
+for $id in $ids do (
+    setseed($id);
+    $section = $sections:($id - 1);
+    $chords = getkey($section, 'chords');
+    $t = 0;
+    $beat = $unit / $units.$id;
+    for $chord $chordid in rev($chords) do (
+        $notes = getkey($chord, 'notes');
+        $timestep = getkey($chord, 'timestep');
+        if $chordid % 2 == 1 then (
+            $bassnote = xchoose($notes);
+            $vel = getkey($bassnote, 'velocity');
+            bass(
+                @pitch getkey($bassnote, 'pitch') - 2400
+                @velocity scale($vel, 0, 127, 0, 127, -0.25) 
+                @duration $beat + 200
+                @type 'pizz' 'pizz-secco' 
+                @useseed 1
+            ).transcribe(
+                @onset $t
+                @pan 0.5
+                @gain [0 1 0] [1 0 0.5] 
+            ) 
+        );
+        for $note in left(xscramble($notes), 4) do (
+            $pitch = getkey($note, 'pitch');
+            $duration = getkey($note, 'duration');
+            $velocity = getkey($note, 'velocity');
+            $gliss = getkey($note, 'gliss');
+            $pitch += xrandom(0, 3) * 1200;
+            $pan = mc2pan($pitch, 1);
+            $b = xchoose(pno ezsol @weights 4 1)(
+                @pitch $pitch
+                @duration $beat + 100
+                @velocity $velocity
+                @names 'flute' 'sax' 'clar' 
+                @types 'keys' 'slap-pitch' 'pizz' 'tongue-ram' 'stacc' 
+                @useseed 1
+            ).process(resample($gliss));
+            sinewave(
+                @pitch $pitch + r2c(xrandom(1, 5)) 
+                @duration $duration * exp2(xrand(2)) 
+                @velocity $velocity
+            ).transcribe(
+                @onset $t
+                @pan $pan
+                @gain 0.09
+            );
+            $b.transcribe(
+                @onset $t
+                @pan $pan
+                @gain [0 1 0] [1 0 xrand(1/4, 3/4)] 
+            ) 
+        );
+        $t += $beat
+    );
+    if $preview == 0 then (
+        render(@reset 1 @process $postfx);
+        ezexport(@data $t @id $id) 
+    ) 
+);
+if $preview == 1 then (render(@play 1 @process $postfx))
