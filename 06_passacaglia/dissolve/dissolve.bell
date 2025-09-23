@@ -9,7 +9,7 @@ $b = importaudio(
 $meta = read(
     '../riff/riff_' + tosymbol($id) + '.txt' 
 );
-$reps = 5;
+$reps = 8;
 $markers = arithmser(0, $meta, $unit);
 $mdurs = x2dx($markers);
 $markers = $markers.left(-1);
@@ -19,7 +19,7 @@ $totdur = $meta * $reps;
 $slopebpf = [0 0.99 0] [1 -0.5 0];
 $speedbpf = [0 1 0] [0.95 0.33 -0.1] [1 1 0.25];
 $legatobpf = [0 1 0] [1 0.05 -0.125];
-$gainbpf = [0 1 0] [0.95 0.25 0.25] [1 0.707 1/2];
+$gainbpf = [0 1 0] [0.95 0.707 0.25] [1 1 1/2];
 $onsetjitbpf = [0 0 0] [1 1 0.25];
 while $t < $totdur do (
     for $m $mi in $markers, $mdur in $mdurs do (
