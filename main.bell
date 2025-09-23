@@ -7,10 +7,12 @@ for $folder $id in $folders with @unwrap 1 do (
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
     $tailsize = 20000;
-    $tail = $b.setkey('offset', $bdur - 15000).setkey('duration', $tailsize).process(
-        reverse() normalize(-3) trim(@threshold 0.001 @end 0) 
-    );
-    $taildur = $tail.getkey('duration');
+    if $folder != '06_passacaglia' then (
+        $tail = $b.setkey('offset', $bdur - 15000).setkey('duration', $tailsize).process(
+            reverse() normalize(-3) trim(@threshold 0.001 @end 0) 
+        );
+        $taildur = $tail.getkey('duration') 
+    ) else $taildur = 0;
     $b = $b.setkey(
         'duration', min($bdur,  ($bdur - $taildur) + 1000) 
     );
