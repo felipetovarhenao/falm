@@ -1,4 +1,4 @@
-$folders = '01_introduction' '04_vespertino' '03_scherzo' ['05_andante' 'post'] '02_folia' '06_passacaglia';
+$folders = '01_introduction' '04_vespertino' '03_scherzo' ['05_andante' 'post'] '02_folia' '06_passacaglia' '08_coda';
 $t = 0;
 for $folder $id in $folders with @unwrap 1 do (
     $file = $folder:2 ||| 'main';
