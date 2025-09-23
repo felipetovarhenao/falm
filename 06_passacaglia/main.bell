@@ -21,6 +21,6 @@ for $i in 1...8 do (
 );
 importaudio('./dissolve/dissolve.wav').transcribe($t);
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process normalize(-3) join(envelope(@duration 2000)) 
 );
 ezexport()
