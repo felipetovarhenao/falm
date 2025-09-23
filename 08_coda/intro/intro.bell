@@ -4,7 +4,7 @@ $chord = thin(
         @harmonics 1...64
         @ratios 1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8
         @root eb2 
-    ))
+    )) 
 );
 $t = 0;
 $names = thin(
@@ -51,7 +51,7 @@ for $i in 0...$N do (
             @names left($names, $numnames) 
             @velocity $vel
             @useseed 1
-        ).clipnorm(@minlevel -36 @rms 1).transcribe(
+        ).clipnorm(@minlevel -42 @rms 1).transcribe(
             @onset $t
             @pan $pan
             @gain [0 1 0] [1 0 1/3] 
