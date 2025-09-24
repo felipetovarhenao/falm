@@ -593,14 +593,16 @@ clipnorm = (
 );
 #(
 ```bell
-nest(
+timeramp(
     @duration 1000
     @length 3
     @slope 0
 ) -> llll
 ```
+
+Generates a list of accelerating or descelerating duration times based on a given `@slope`, whose sum is equal to `@duration`.
 )#
-nest = (
+timeramp = (
     $duration = 1000, $length = 3, $slope = 0 -> (
         if $length > 1 then (
             $x = arithmser(0, 1, null, $length + 1);

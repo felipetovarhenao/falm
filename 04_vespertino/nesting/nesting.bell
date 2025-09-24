@@ -14,7 +14,7 @@ Nestify = (
             $maxlength = max(1, round($duration / 90));
             $length = min($maxlength, xrandom(2, 4));
             $slope = xrand(-0.185, 0.185);
-            $durations = nest(
+            $durations = timeramp(
                 @duration $duration
                 @length $length
                 @slope $slope
