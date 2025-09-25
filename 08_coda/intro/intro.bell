@@ -3,7 +3,7 @@ $chord = thin(
     int(jispectrum(
         @harmonics 1...64
         @ratios 1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8
-        @root eb2 
+        @root d2 
     )) 
 );
 $t = 0;
