@@ -1,80 +1,88 @@
-setseed(0);
+setseed(50);
 $root = eb2;
 $pcroot = mc2pc($root);
-$t = 7000;
+$t = 15000;
 ## $chords = [1 3/2 5/4 5/3 8/7] [1 21/16 12/7 3/2] [9/8 21/16 3/2 15/8] [9/8 21/16 5/3 5/4];
 $chords = group(xscramble(1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8), 4, 2);
-$N = 21;
+$N = 38;
 $velbpf = [0 0 0] [1 127 0.125];
-$minnotesbpf = [0 1 0] [1 2 -0.125];
-$maxnotesbpf = [0 1 0] [1 16 -0.125];
+$minnotesbpf = [0 1 0] [1 4 -0.125];
+$maxnotesbpf = [0 1 0] [1 21 -0.125];
 $gapbpf = [0 5000 0] [1 100 0];
-$gainbpf = [0 0.5 0] [1 1 0.125];
+$gainbpf = [0 0.25 0] [1 1 0.125];
+$numvoicesbpf = [0 1 0] [1 3 0.5];
 $filterbpf = [0 0.6 0] [1 1 0];
 for $i in 1...$N do (
     $nt = scale($i, 1, $N, 0, 1);
-    $vel = samplebpf($velbpf, $nt);
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-1, 1));
-    $filter = samplebpf($filterbpf, $nt) * 32;
-    $maingain = samplebpf($gainbpf, $nt);
-    $minnotes = round(samplebpf($minnotesbpf, $nt));
-    $maxnotes = round(samplebpf($maxnotesbpf, $nt));
-    $numnotes = xrandom($minnotes, $maxnotes);
-    $chord = xchoose($chords)::1;
-    $pcs = r2pc($chord, $pcroot);
-    $mcs = pcquant(r2mc(4...32, $root), $pcs);
-    $mcs = left(
-        $mcs, int(
-            round(length($mcs) * $filter) 
-        ) 
+    $numvoices = int(
+        round(samplebpf($numvoicesbpf, $nt)) 
     );
     $span = 1000 * xchoose(1 3/2 2 4/3);
-    $mcs = randomseq(
-        @llll $mcs
-        @length $numnotes
-        @steps -2...2
-        @useseed 1
-    );
-    $durs = timeramp(
-        @duration $span
-        @slope xrand(-1/3, 1/3) 
-        @length length($mcs) 
-    );
-    $markers = dx2x($durs);
-    $panbias = xrand();
-    for $mc $mci in $mcs do (
-        $next = $mcs:($mci + 1) ||| $mc;
-        $gliss = [0 1 0] [
-            1 1/c2r(minabs($next - $mc, 400)) xrand(1/2, 0.9) 
-        ];
-        $durmul = integrate($gliss):(-1 2);
-        $onset = $markers:$mci;
-        $unit = $durs:$mci;
-        $envslope = xrand(1/2, 3/4);
-        $mingain = xrand(0.01, 0.707);
-        $env = xchoose(
-            [[0 $mingain 0] [1 1 $envslope]] [[0 1 0] [1 $mingain -$envslope]] [hanning()] 
-        )::1;
-        ezsol(
-            @pitch $mc
-            @duration ($unit + 30) / $durmul
-            @names 'horn' 'sax' 
-            @velocity $vel
-            @types 'ord' 'stacc' 'ord+mute' 'stop' 'ord-to-brassy' 'ten' 'bisb' 'flz'
+    $bal = 1.1 ** (1 - $numvoices);
+    for $v in 1...$numvoices do (
+        $delay = xrand($span);
+        $vel = samplebpf($velbpf, $nt);
+        $filter = samplebpf($filterbpf, $nt) * 32;
+        $maingain = samplebpf($gainbpf, $nt);
+        $minnotes = round(samplebpf($minnotesbpf, $nt));
+        $maxnotes = round(samplebpf($maxnotesbpf, $nt));
+        $numnotes = xrandom($minnotes, $maxnotes);
+        $chord = xchoose($chords)::1;
+        $pcs = r2pc($chord, $pcroot);
+        $mcs = pcquant(r2mc(4...32, $root), $pcs);
+        $mcs = left(
+            $mcs, int(
+                round(length($mcs) * $filter) 
+            ) 
+        );
+        $mcs = randomseq(
+            @llll $mcs
+            @length $numnotes
+            @steps -2...2
             @useseed 1
-        ).process(
-            resample($gliss) gain($env) normalize(@level -24 @rms 1) 
-        ).transcribe(
-            @onset $onset + $t
-            @gain $maingain
-            @pan fold($panbias + mc2pan($mc, 0.15)) 
+        );
+        $durs = timeramp(
+            @duration $span
+            @slope xrand(-1/3, 1/3) 
+            @length length($mcs) 
+        );
+        $markers = dx2x($durs);
+        $panbias = xrand();
+        for $mc $mci in $mcs do (
+            $next = $mcs:($mci + 1) ||| $mc;
+            $gliss = [0 1 0] [
+                1 1/c2r(minabs($next - $mc, 400)) xrand(1/2, 0.9) 
+            ];
+            $durmul = integrate($gliss):(-1 2);
+            $onset = $markers:$mci;
+            $unit = $durs:$mci;
+            $envslope = xrand(1/2, 3/4);
+            $mingain = xrand(0.01, 0.707);
+            $env = xchoose(
+                [[0 $mingain 0] [1 1 $envslope]] [[0 1 0] [1 $mingain -$envslope]] [hanning()] 
+            )::1;
+            ezsol(
+                @pitch $mc
+                @duration ($unit + 30) / $durmul
+                @names 'horn' 'sax' 
+                @velocity $vel
+                @types 'ord' 'stacc' 'ord+mute' 'stop' 'ord-to-brassy' 'ten' 'bisb' 'flz' 
+                @useseed 1
+            ).clipnorm(@minlevel -12 @rms 1).process(
+                resample($gliss) gain($env) 
+            ).transcribe(
+                @onset $onset + $t + $delay
+                @gain $maingain * $bal
+                @pan fold($panbias + mc2pan($mc, 0.15)) 
+            ) 
         ) 
     );
     $t += $span + $gap
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.98
+        @roomsize 0.95
         @wet 0.025
         @damp 1
         @width 1
