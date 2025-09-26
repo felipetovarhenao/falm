@@ -1,4 +1,4 @@
-setseed(23);
+setseed(4510);
 $meta = read('../intro/intro.txt');
 $totdur = $meta.'total_duration';
 $globaldelay = ($meta.'markers'):6;
@@ -98,7 +98,7 @@ while $t < $totdur do (
                     @names flat(left($names, $numnames)) 
                     @types left($types, $numtypes) 
                     @useseed 1
-                ).clipnorm(@minlevel -45 @maxlevel -18).process(
+                ).clipnorm(@minlevel -30 @maxlevel -18).process(
                     resample($gliss) multiply(xchoose(-1 1)) gain($env) dcfilter() 
                 );
                 $b.transcribe(
