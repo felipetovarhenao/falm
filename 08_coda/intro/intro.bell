@@ -55,7 +55,7 @@ for $i in 0...$N do (
                 max(0, $vel - xrandom(-10, 10)), 127
             ) 
             @useseed 1
-        ).analyze(effectiveduration(@thresholdratio 0.001));
+        ).analyze(effectiveduration(@thresholdratio 0.01));
         $b.transcribe(
             @onset $t
             @pan $pan
