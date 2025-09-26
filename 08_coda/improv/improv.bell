@@ -1,0 +1,88 @@
+setseed(0);
+$mcroot = d2;
+$pcroot = mc2pc($mcroot);
+$ratios = 1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8;
+$pcs = r2pc($ratios, $pcroot);
+$basechord = r2mc(2...32, $mcroot);
+$basechord = pcquant($basechord, $pcs);
+$t = 0;
+$totdur = 30000;
+$gapbpf = [0 4000 0] [1 1000 -0.125];
+$melspanbpf = [0 2000 0] [1 1000 -0.125];
+$maxnotesbpf = [0 1 0] [1 16 0.125];
+$melvelbpf = [0 0 0] [1 127 0.125];
+$numvoicesbpf = [0 1 0] [1 4 0.25];
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $melspan = samplebpf($melspanbpf, $nt);
+    $gap = samplebpf($gapbpf, $nt);
+    $numvoices = round(samplebpf($numvoicesbpf, $nt));
+    for $v in 1...$numvoices do (
+        $voicedelay = if $v == 1 then xrand(-0.5, 0.5) * $gap else 0;
+        $melvel = samplebpf($melvelbpf, $nt);
+        $maxnotes = int(
+            round(samplebpf($maxnotesbpf, $nt)) 
+        );
+        $numnotes = xrandom(1, $maxnotes);
+        $slope = xrand(-1/2, 1/2);
+        $durs = timeramp(
+            @duration $melspan
+            @length $numnotes
+            @slope $slope
+        );
+        $mcs = randomseq(
+            @llll $basechord
+            @length $numnotes
+            @steps -2...2
+            @usecache 1
+        );
+        $dyads = group($mcs $mcs:-1, 2, 1);
+        $shift = 0;
+        $pan = xrand();
+        for $dyad in $dyads, $dur in $durs with @unwrap 1 do (
+            if $shift + $t < $totdur then (
+                $mc1 = $dyad:1;
+                $mc2 = $dyad:2;
+                $gliss = [0 1 0] [
+                    1 1/c2r(maxabs($mc2 - $mc1, 400)) xrand(1/2, 0.95) 
+                ];
+                $durmul = integrate($gliss):(-1 2);
+                $envslope = xrand(-1/2, 1/2);
+                $minenvgain = xrand(0, 1);
+                $env = xchoose(
+                    ## ---
+                    [[0 $minenvgain 0] [1 1 $envslope]] 
+                    ## ---
+                    [[0 1 0] [1 0 $envslope]] 
+                    ## ---
+                    [hanning()] 
+                )::1;
+                $fn = xchoose(ezsol triwave @weights 9 1);
+                $b = $fn(
+                    @pitch $mc1
+                    @duration $dur / $durmul
+                    @velocity $melvel
+                    @names 'horn' 'sax' 
+                    @types 'ord' 'stacc' 'ord+mute' 'stop' 'ord-to-brassy' 'ten' 'bisb' 'flz' 'dim' 
+                    @useseed 1
+                ).process(resample($gliss));
+                $b.transcribe(
+                    @onset $t + $shift + $voicedelay
+                    @pan fold($pan + mc2pan($mc1, 0.125)) 
+                    @gain $env
+                ) 
+            );
+            $shift += $dur
+        ) 
+    );
+    $t += $gap * exp2(xrand(-0.5, 0.5)) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport()
