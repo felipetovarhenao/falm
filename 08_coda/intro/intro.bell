@@ -22,6 +22,7 @@ $lowpassbpf = [0 2/3. 0] [1 1 0];
 $numtypesbpf = [0 2 0] [1 length($types) 0.125];
 $velbpf = [0 0 0] [1 90 1/2];
 $totalduration = 0;
+$markers = $t;
 for $i in 0...$N do (
     $nt = $i / $N;
     $numnotes = samplebpf($numnotesbpf, $nt);
@@ -64,7 +65,8 @@ for $i in 0...$N do (
         $totalduration = max($totalduration, $t + $b.getkey('effectiveduration'));
         $t += xrand($jitter) 
     );
-    $t += $gap
+    $t += $gap;
+    $markers _= $t
 );
 render(
     @play 1 @process freeverb(
@@ -74,4 +76,6 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport(@data $totalduration)
+ezexport(
+    @data ['total_duration' $totalduration] ['markers' $markers]
+)
