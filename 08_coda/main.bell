@@ -1,5 +1,5 @@
 importaudio('./intro/intro.wav').transcribe(@gain 0.5);
-importaudio('./melody/melody.wav').transcribe();
+importaudio('./improv/improv.wav').transcribe();
 render(
     @play 1 @process normalize(-3) 
 );
