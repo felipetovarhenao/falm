@@ -1,10 +1,10 @@
-setseed(1);
+setseed(2);
 GetExtraTypes = (
     $name -> (
         $extras = null;
         if intersection(
             $name, 'violin' 'viola' 'harp' 
-        ) != null then ($extras _= 'harm' );
+        ) != null then ($extras _= 'harm');
         if intersection(
             $name, 'violin' 'viola' 
         ) != null then ($extras _= 'trem');
@@ -15,6 +15,17 @@ GetExtraTypes = (
             $extras _= 'nonvib' 'nonvib+mute' 'ord+mute' 'trem' 
         );
         $extras
+    ) 
+);
+GetBoost = (
+    $buffer, $slope = -0.125, $rms = 0 -> (
+        $key = if $rms == 1 then 'rms' else 'maxabs';
+        $g1 = getkey($buffer, $key);
+        $g2 = scale(
+            min(1, max(0, $g1)) @slope $slope
+        );
+        $boost = $g2 / $g1;
+        $boost
     ) 
 );
 GetArpeggi = (
@@ -57,17 +68,19 @@ $pcs = r2pc($ratios, $pcroot);
 $basechord = pcquant($basechord, $pcs);
 $numvoices = 24;
 $regionsize = 8;
+$compression = 1/3;
 $arpeggi = GetArpeggi(
     @chord $basechord
     @size $regionsize
     @length $numvoices
 );
 $globalduration = 120 * 1000;
+$slope = 1/3;
 for $arp in $arpeggi do (
-    $stretchbpf = [0 1 0] [1 6 xrand(0.125)];
-    $velbpf = [0 1 0] [1 0 -xrand(0.125)];
-    $sinethreshbpf = [0 1/3 0] [1 0 -xrand(0.125)];
-    $totdur = $globalduration * exp2(xrand(-0.25, 0));
+    $stretchbpf = [0 1 0] [1 6 $slope];
+    $velbpf = [0 1 0] [1 0 $slope];
+    $sinethreshbpf = [0 1/3 0] [1 0 $slope];
+    $totdur = $globalduration * exp2(xrand(-1/3, 0));
     $region = getkey($arp, 'region');
     $instrument = getkey($arp, 'instrument');
     $name = getkey($instrument, 'name');
@@ -89,10 +102,16 @@ for $arp in $arpeggi do (
         $mcs _= $mcsrev
     );
     $dynamics = scale(
-        hanning(@length length($mcs)), 0, 1, 0.01, 1
+        @x hanning(
+            @length round(length($mcs) * xrand(1, 2)) 
+        ) 
+        @inmin 0
+        @inmax 1
+        @outmin xrand(0.01, 0.125) 
+        @outmax 1
     );
     $t = 0;
-    $unit = xrand(75, 150);
+    $unit = xrand(70, 140);
     $panbpf = [0 xrand() 0] [1 xrand() xrand(-0.25, -0.25)];
     while $t < $totdur do (
         $nt = $t / $totdur;
@@ -111,22 +130,28 @@ for $arp in $arpeggi do (
         if xrand() < $sinethresh then (
             sinewave(
                 @pitch $mc + xrandom(-1, 4) * 1200
-                @duration $notedur * exp2(xrand(-1, 1.25)) 
+                @duration $notedur * exp2(xrand(-1, 2)) 
                 @velocity max(2, $vel) 
             ).transcribe(
                 @onset $t
                 @pan $pan
-                @gain $dyn * 0.1
+                @gain $dyn * xrand(0.05, 0.125) 
             ) 
         );
         $b = ezsol(
             @pitch $mc
-            @duration $notedur + 20
+            @duration $notedur + 33
             @velocity $vel + xrandom(-6, 6) 
             @names $name
             @useseed 1
             @types $type
-        ).process(gain($dyn)).analyze(envmaxtime());
+        );
+        $boost = GetBoost(
+            @buffer $b
+            @slope $compression * -1
+            @rms 1
+        );
+        $b = $b.process(gain($dyn * $boost)).analyze(envmaxtime());
         $b.transcribe(
             @onset $t - $b.getkey('envmaxtime') 
             @gain $env
