@@ -1,7 +1,7 @@
 setseed(18);
 $meta = read('../intro/intro.txt');
 $totdur = $meta.'total_duration';
-$globaldelay = ($meta.'markers':3) + 2000;
+$globaldelay = ($meta.'markers':2) + 2000;
 $totdur -= $globaldelay;
 $mcroot = d2;
 $pcroot = mc2pc($mcroot);
