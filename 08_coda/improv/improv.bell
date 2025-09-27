@@ -1,27 +1,28 @@
-setseed(6);
+setseed(18);
 $meta = read('../intro/intro.txt');
 $totdur = $meta.'total_duration';
 $globaldelay = ($meta.'markers':3) + 2000;
 $totdur -= $globaldelay;
 $mcroot = d2;
 $pcroot = mc2pc($mcroot);
-$basechord = r2mc(2...34, $mcroot);
+$basechord = r2mc(4...42, $mcroot);
 $ratios = thin(sort(1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8));
 $pcs = r2pc($ratios, $pcroot);
+$pcslen = length($pcs);
 $t = 0;
 $gapbpf = [0 5000 0] [1 250 -0.125];
 $melspanbpf = [0 3000 0] [1 1500 -0.125];
-$maxnotesbpf = [0 1 0] [1 20 0.05];
+$maxnotesbpf = [0 0 0] [1 1 0.05];
 $melvelbpf = [0 0 0] [1 127 0.25];
 $numvoicesbpf = [0 1 0] [1 4 2/3];
-$gainbpf = [0 0.25 0] [1 1 0.125];
-$filterbpf = [0 0.5 0] [1 1 0.125];
+$gainbpf = [0 0.1 0] [1 1 0.125];
+$filterbpf = [0 2/3 0] [1 1 0.125];
 $types = thin(
     'ord' 'stacc' 'ten' 'stop' 'flz' 'bisb' 'dim' 'stop-to-open' 'open-to-stop' 'ord+mute' 'sfz' 'ord-high' 'ord-micro' 'ord-to-brassy' 'flz-stop' 'flz+mute' 'flz-to-ord' 
 );
 $numtypesbpf = [0 2 0] [1 length($types) 0.05];
-$names = 'horn' 'sax' 'tromb' 'flute' 'clar';
-$numnamesbpf = [0 1 0] [1 length($names) 1/2];
+$names = 'horn' 'sax' 'clar' 'tromb' 'flute';
+$numnamesbpf = [0 1 0] [1 length($names) 1/3];
 $pcfilter = (
     $mcs, $pcs -> (
         for $mc in $mcs collect (
@@ -40,10 +41,10 @@ while $t < $totdur do (
         $maxnotes = samplebpf($maxnotesbpf, $nt);
         $maxnotes = max(
             1, int(
-                round(min($maxnotes, $melspan / 90)) 
+                round($maxnotes * ($melspan / 100)) 
             ) 
         );
-        $numnotes = xrandom(ceil($maxnotes / 5), $maxnotes);
+        $numnotes = xrandom(ceil($maxnotes / 6), $maxnotes);
         $slope = xrand(-1/2, 1/2);
         $durs = timeramp(
             @duration $melspan
@@ -55,12 +56,14 @@ while $t < $totdur do (
         );
         $chord = left($basechord, $filter);
         $chord = $pcfilter(
-            $chord, left(xscramble($pcs), xrandom(4, 7)) 
+            $chord, left(
+                xscramble($pcs), xrandom($pcslen - 3, $pcslen) 
+            ) 
         );
         $mcs = randomseq(
             @llll $chord
             @length $numnotes
-            @steps (-2 1) * xchoose(-1 1) 
+            @steps (-1 1) (2 * xchoose(-1 1)) 
             @useseed 1
         );
         $dyads = group($mcs $mcs:-1, 2, 1);
@@ -84,8 +87,8 @@ while $t < $totdur do (
                     1 1/c2r(minabs($mc2 - $mc1, 400)) xrand(1/2, 0.95) 
                 ];
                 $durmul = integrate($gliss):(-1 2);
-                $envslope = xrand(-1/2, 1/2);
-                $minenvgain = xrand(0.01, 0.707);
+                $envslope = xrand(-2/3, 2/3);
+                $minenvgain = xrand(0.01, 0.707) * $gain;
                 $env = xchoose(
                     ## ---
                     [[0 $minenvgain 0] [1 $gain $envslope]] 
@@ -103,8 +106,8 @@ while $t < $totdur do (
                     @names flat(left($names, $numnames)) 
                     @types left($types, $numtypes) 
                     @useseed 1
-                ).clipnorm(@minlevel -40 @maxlevel -18).process(
-                    resample($gliss) multiply(xchoose(-1 1)) gain($env) dcfilter() 
+                ).clipnorm(@minlevel -32 @maxlevel -24).process(
+                    resample($gliss) multiply(xchoose(-1 1)) dcfilter() gain($env) 
                 );
                 $dur = $b.getkey('duration');
                 $b.transcribe(
@@ -118,12 +121,22 @@ while $t < $totdur do (
     );
     $t += $melspan + $gap
 );
+$tail = 5000;
 render(
     @play 1 @process freeverb(
         @roomsize 0.95
-        @wet 0.025
+        @wet 0.05
         @damp 1
         @width 1
-    ) normalize(-3) 
+        @tail $tail
+    ) 
+    ## ----
+    fade(
+        @fadein 0
+        @fadeout $tail
+        @fadeoutcurve 2/3.
+    ) 
+    ## ----
+    normalize(-3) 
 );
 ezexport(@data $globaldelay)
