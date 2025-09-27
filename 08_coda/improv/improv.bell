@@ -22,11 +22,6 @@ $types = thin(
 $numtypesbpf = [0 2 0] [1 length($types) 0.05];
 $names = 'horn' 'sax' 'tromb' 'flute' 'clar';
 $numnamesbpf = [0 1 0] [1 length($names) 1/2];
-$maxsteps = 3;
-$steps = 0...$maxsteps;
-$stepsweights = (
-    sgn(abs($steps)) * ($maxsteps - abs($steps)) + 1
-);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-1/2, 1/2));
@@ -47,7 +42,6 @@ while $t < $totdur do (
             @length $numnotes
             @slope $slope
         );
-        $stepsize = xchoose(@choices $steps @weights $stepsweights);
         $filter = int(
             round(samplebpf($filterbpf, $nt) * length($basechord)) 
         );
@@ -58,7 +52,7 @@ while $t < $totdur do (
         $mcs = randomseq(
             @llll $chord
             @length $numnotes
-            @steps (rev(1...$stepsize) * -1) (1...$stepsize) 
+            @steps (-2 1) * xchoose(-1 1) 
             @useseed 1
         );
         $dyads = group($mcs $mcs:-1, 2, 1);
