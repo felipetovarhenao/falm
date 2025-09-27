@@ -2,6 +2,8 @@ $t = 0;
 importaudio('./intro/intro.wav').transcribe(@onset $t @gain 0.707);
 $t += read('./improv/improv.txt');
 importaudio('./improv/improv.wav').transcribe(@onset $t);
+$end = read('./intro/intro.txt').'markers':-1;
+importaudio('./arpeggi/arpeggi.wav').transcribe($end);
 render(
     @play 1 @process normalize(-3) 
 );
