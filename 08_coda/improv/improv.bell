@@ -1,4 +1,4 @@
-setseed(20);
+setseed(6);
 $meta = read('../intro/intro.txt');
 $totdur = $meta.'total_duration';
 $globaldelay = ($meta.'markers':3) + 2000;
@@ -22,6 +22,14 @@ $types = thin(
 $numtypesbpf = [0 2 0] [1 length($types) 0.05];
 $names = 'horn' 'sax' 'tromb' 'flute' 'clar';
 $numnamesbpf = [0 1 0] [1 length($names) 1/2];
+$pcfilter = (
+    $mcs, $pcs -> (
+        for $mc in $mcs collect (
+            $diff = pitchdiff($mc, $pcs);
+            if abs($diff) <= 1 then $mc
+        ) 
+    ) 
+);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-1/2, 1/2));
@@ -46,8 +54,8 @@ while $t < $totdur do (
             round(samplebpf($filterbpf, $nt) * length($basechord)) 
         );
         $chord = left($basechord, $filter);
-        $chord = pcquant(
-            $chord, left(xscramble($pcs), xrandom(3, 6)) 
+        $chord = $pcfilter(
+            $chord, left(xscramble($pcs), xrandom(4, 7)) 
         );
         $mcs = randomseq(
             @llll $chord
