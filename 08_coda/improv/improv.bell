@@ -1,7 +1,7 @@
-setseed(20);
+setseed(47);
 $meta = read('../intro/intro.txt');
 $totdur = $meta.'total_duration';
-$globaldelay = $meta.'markers':3;
+$globaldelay = $meta.'markers':3 + 1000;
 $totdur -= $globaldelay;
 $mcroot = d2;
 $pcroot = mc2pc($mcroot);
@@ -9,8 +9,8 @@ $basechord = r2mc(2...40, $mcroot);
 $ratios = thin(sort(1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8));
 $pcs = r2pc($ratios, $pcroot);
 $t = 0;
-$gapbpf = [0 3000 0] [1 250 -0.125];
-$melspanbpf = [0 3500 0] [1 1500 -0.125];
+$gapbpf = [0 5000 0] [1 250 -0.125];
+$melspanbpf = [0 3000 0] [1 1500 -0.125];
 $maxnotesbpf = [0 1 0] [1 25 0.05];
 $melvelbpf = [0 0 0] [1 127 0.25];
 $numvoicesbpf = [0 1 0] [1 4 2/3];
@@ -58,7 +58,7 @@ while $t < $totdur do (
         $mcs = randomseq(
             @llll $chord
             @length $numnotes
-            @steps -$stepsize...$stepsize
+            @steps (rev(1...$stepsize) * -1) 1...$stepsize
             @useseed 1
         );
         $dyads = group($mcs $mcs:-1, 2, 1);
@@ -101,7 +101,7 @@ while $t < $totdur do (
                     @names flat(left($names, $numnames)) 
                     @types left($types, $numtypes) 
                     @useseed 1
-                ).clipnorm(@minlevel -27 @maxlevel -15).process(
+                ).clipnorm(@minlevel -40 @maxlevel -18).process(
                     resample($gliss) multiply(xchoose(-1 1)) gain($env) dcfilter() 
                 );
                 $dur = $b.getkey('duration');
