@@ -4,8 +4,11 @@ $t += read('./02_solo/solo.txt');
 importaudio('./02_solo/solo.wav').transcribe(@onset $t);
 $end = read('./01_intro/intro.txt').'markers':-1;
 ## $end = 0;
+$peak = read('./05_climax/climax.txt');
+## $end = $peak;
 importaudio('./03_arpeggi/arpeggi.wav').transcribe($end);
 importaudio('./04_sustain/sustain.wav').transcribe($end);
+importaudio('./05_climax/climax.wav').transcribe($end - $peak);
 render(
     @play 1 @process normalize(-3) 
 );
