@@ -629,7 +629,7 @@ Returns the gain boost factor for a buffer, given a slope, based on either its t
 gainboost = (
     $buffer = null, $inmin = 0, $inmax = 1, $outmin = 0, $outmax = 1, $slope = -0.125, $rms = 0 -> (
         $key = if $rms == 1 then 'rms' else 'maxabs';
-        $g1 = getkey($buffer, $key);
+        $g1 = getkey(detach($buffer), $key);
         $g2 = scale(
             @x $g1
             @inmin $inmin
