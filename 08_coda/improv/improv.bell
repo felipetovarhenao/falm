@@ -15,7 +15,7 @@ $melspanbpf = [0 3000 0] [1 1500 -0.125];
 $maxnotesbpf = [0 0 0] [1 1 0.05];
 $melvelbpf = [0 0 0] [1 127 0.25];
 $numvoicesbpf = [0 1 0] [1 4 2/3];
-$gainbpf = [0 0.1 0] [1 1 0.125];
+$gainbpf = [0 0.5 0] [1 1 0.125];
 $filterbpf = [0 2/3 0] [1 1 0.125];
 $types = thin(
     'ord' 'stacc' 'ten' 'stop' 'flz' 'bisb' 'dim' 'stop-to-open' 'open-to-stop' 'ord+mute' 'sfz' 'ord-high' 'ord-micro' 'ord-to-brassy' 'flz-stop' 'flz+mute' 'flz-to-ord' 
@@ -35,6 +35,7 @@ while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-1/2, 1/2));
     $numvoices = round(samplebpf($numvoicesbpf, $nt));
+    $balance = 1.1 ** (1 - $numvoices);
     for $v in 1...$numvoices do (
         $melspan = samplebpf($melspanbpf, $nt) * exp2(xrand(-1/2, 1/2));
         $voicedelay = if $v > 1 then xrand(-0.5, 0.5) * $melspan else 0;
@@ -112,7 +113,7 @@ while $t < $totdur do (
                 $dur = $b.getkey('duration');
                 $b.transcribe(
                     @onset $onset
-                    ## ----
+                    @gain $balance
                     @pan fold(mc2pan($mc1, 0.125) + $pan) 
                 ) 
             );
