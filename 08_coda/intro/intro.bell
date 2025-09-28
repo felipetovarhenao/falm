@@ -24,6 +24,7 @@ $velbpf = [0 0 0] [1 90 1/2];
 $totalduration = 0;
 $markers = $t;
 $sections = 0...$N;
+$sinesgain = 0.4;
 for $i in $sections do (
     $nt = $i / $N;
     $numnotes = samplebpf($numnotesbpf, $nt);
@@ -43,7 +44,7 @@ for $i in $sections do (
             @frequency mc2f($mc) * exp2(xrandom(-1, 3)) 
             @duration xrand(100, 1000) 
             @phase xrand() 
-        ).transcribe(
+        ).process(gain($sinesgain)).transcribe(
             @onset $t
             @pan $pan
             @gain [0 xrand(0.001, 0.025) 0] [1 0 -xrand(1/4, 3/4)] 
