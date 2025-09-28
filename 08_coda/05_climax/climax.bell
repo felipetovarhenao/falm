@@ -32,14 +32,19 @@ while $t < $totdur do (
     );
     $t += $incr
 );
-$b = perc(
-    @resample 0
-    @type 'drawn' 
-    @velocity 127
-    @duration null
-).analyze(envmaxtime());
-$b.transcribe(
-    @onset $totdur - $b.getkey('envmaxtime') + $delay @pan xrand() xrand() 
+for $type in 'mid' 'drawn' do (
+    $b = perc(
+        @pitch 4100
+        @resample 0
+        @type $type
+        @velocity 127
+        @duration null
+    ).analyze(envmaxtime() effectiveduration(@thresholdratio 0.01));
+    $b.setkey('duration', $b.getkey('effectiveduration')).transcribe(
+        @onset $t - $b.getkey('envmaxtime') + $delay
+        @pan xrand() xrand() 
+        @gain [0 1 0] [1 0 0.25] 
+    ) 
 );
 render(
     @play 1 @process freeverb(
