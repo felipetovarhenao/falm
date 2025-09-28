@@ -1,12 +1,13 @@
 setseed(18);
-$meta = read('../intro/intro.txt');
+$harmony = read('../00_harmony/harmony.txt');
+$mcroot = $harmony.'root';
+$pcroot = $harmony.'pc';
+$ratios = $harmony.'ratios';
+$meta = read('../01_intro/intro.txt');
 $totdur = $meta.'total_duration';
 $globaldelay = ($meta.'markers':2) + 2000;
 $totdur -= $globaldelay;
-$mcroot = d2;
-$pcroot = mc2pc($mcroot);
 $basechord = r2mc(4...42, $mcroot);
-$ratios = thin(sort(1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8));
 $pcs = r2pc($ratios, $pcroot);
 $pcslen = length($pcs);
 $t = 0;

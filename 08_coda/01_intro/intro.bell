@@ -1,9 +1,12 @@
 setseed(125);
+$harmony = read('../00_harmony/harmony.txt');
+$ratios = $harmony.'ratios';
+$root = $harmony.'root';
 $chord = thin(
     int(jispectrum(
         @harmonics 1...64
-        @ratios 1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8
-        @root d2 
+        @ratios $ratios
+        @root $root
     )) 
 );
 $t = 0;

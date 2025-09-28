@@ -1,9 +1,10 @@
 setseed(1);
-$meta = read('../arpeggi/arpeggi.txt');
-$mcroot = d2;
-$pcroot = mc2pc($mcroot);
+$harmony = read('../00_harmony/harmony.txt');
+$mcroot = $harmony.'root';
+$ratios = $harmony.'ratios';
+$pcroot = $harmony.'pc';
+$meta = read('../03_arpeggi/arpeggi.txt');
 $basechord = r2mc(1...48, $mcroot);
-$ratios = thin(sort(1 9/8 8/7 5/4 9/7 3/2 7/5 11/8 5/3 15/8));
 $pcs = r2pc($ratios, $pcroot);
 $basechord = pcquant($basechord, $pcs);
 $globalduration = $meta.'total_duration';
