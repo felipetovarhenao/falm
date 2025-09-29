@@ -114,12 +114,19 @@ while $t < $totaldur do (
         $name = $instrument.getkey('name');
         $fn = $instrument.getkey('fn');
         $type = $instrument.getkey('types').xchoose();
-        $fn(
+        $b = $fn(
             @pitch $mc
             @duration null
             @velocity $vel + xrand(-0.5, 0.5) * $velvar
             @type $type
-        ).transcribe(
+        );
+        $boost = gainboost(
+            @buffer $b.process(trim(@threshold 0.001)) 
+            @outmin dbtoa(-50) 
+            @rms 1
+            @slope -0.05
+        );
+        $b.process(gain($boost)).transcribe(
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
             @pan $pan
