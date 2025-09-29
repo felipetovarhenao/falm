@@ -135,13 +135,19 @@ while $t < $totaldur do (
     );
     $t += $timestep
 );
+$tail = 6000;
 render(
     @play 1 @process freeverb(
         @roomsize 0.95
         @wet [0 0.005 0] [1 0.025 0.25] 
-        @tail 5000
+        @tail $tail
         @width 1
         @damp 1
+    ) fade(
+        @fadein 0
+        @fadeout $tail
+        @fadeoutcurve 1/3
+        @fadeouttype 1
     ) normalize(-3) 
 );
 $metadata = [['totdur' $totaldur] ['events' $chordseq]];

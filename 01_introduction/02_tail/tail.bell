@@ -25,12 +25,19 @@ for $mc in $chord do (
     $durs _= $b.getkey('duration');
     $b.transcribe(@pan xrand()) 
 );
+$tail = 3000;
 render(
     @play 1 @process freeverb(
         @roomsize 0.9
         @wet 0.2
         @damp 1
         @width 1
+        @tail $tail
+    ) fade(
+        @fadein 0
+        @fadeout $tail
+        @fadeoutcurve 1/3
+        @fadeouttype 1
     ) 
 );
 ezexport(maximum($durs))

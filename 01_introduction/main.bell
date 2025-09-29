@@ -1,25 +1,19 @@
 $onset = 0;
-$metadata = read('./strings.txt');
-importaudio('./strings.wav').transcribe(@onset $onset);
-importaudio('./runs.wav').transcribe(@onset $onset @gain 0.25);
+$metadata = read('./00_strings/strings.txt');
+importaudio('./00_strings/strings.wav').transcribe(@onset $onset);
+importaudio('./01_runs/runs.wav').transcribe(@onset $onset @gain 0.25);
 $lastevent = $metadata.getkey('events'):-1;
 $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.3;
-importaudio('./tail.wav').transcribe($onset);
-$onset += read('./tail.txt') * 0.7;
+importaudio('./02_tail/tail.wav').transcribe($onset);
+$onset += read('./02_tail/tail.txt') * 0.7;
 render(
     @play 1 @process (
-        ## dynamics(
-        ##     @knee 0.33
-        ##     @thresh -30
-        ##     @ratio 4
+        ## freeverb(
+        ##     @roomsize 0.95
+        ##     @wet 0.025
+        ##     @damp 1
+        ##     @width 1
         ## ) 
-        ## 
-        freeverb(
-            @roomsize 0.95
-            @wet 0.025
-            @damp 1
-            @width 1
-        ) 
         ## 
         normalize(-3) 
     ) 
