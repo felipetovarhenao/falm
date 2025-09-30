@@ -1,8 +1,8 @@
-setseed(1);
+setseed(2);
 $t = 0;
 for $i in 1...20 do (
     $pcs = r2pc(1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 13/7);
-    $mcs = r2mc(3...32, c2).pcquant($pcs);
+    $mcs = r2mc(2...32, c2).pcquant($pcs);
     $mcs = randomseq(
         @llll $mcs
         @length xrandom(12, 23) 
@@ -30,12 +30,14 @@ for $i in 1...20 do (
             @velocity 0
             @useseed 1
         ).process(resample($gliss));
-        if xrand() > 0.9 then (
+        if xrand() > 0.7 then (
             $sine = cycle(
                 @frequency $mc + r2c(xrandom(1, 8)) @duration $dur
             ).process(
                 gain(
-                    [0 $b.getkey('rms') 0] [1 0 -0.125] 
+                    [
+                        0 $b.getkey('rms') ** xrand(1, 2) 0
+                    ] [1 0 -0.125] 
                 ) 
             );
             $b = $b.process(mix($sine)) 
@@ -48,7 +50,8 @@ for $i in 1...20 do (
         $b = $b.process(
             gain([0 $boost 0] [1 0 0.75]) 
         );
-        if xrand() > 0.5 then (
+        ## if xrand() > 0.8 then ($b = $b.process(reverse()));
+        if xrand() > 1/3 then (
             $b.transcribe(
                 @onset $t @pan mc2pan($mc, 0.25) 
             ) 
