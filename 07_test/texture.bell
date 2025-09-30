@@ -26,7 +26,7 @@ for $i in 1...20 do (
             @pitch $mc
             @duration $dur / $durmul
             @names 'clar' 'sax' 'flute' 'horn' 
-            @types 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 
+            @types 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord' 
             @velocity 0
             @useseed 1
         ).process(resample($gliss));
