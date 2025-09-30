@@ -1,38 +1,36 @@
-$mcroot = c4;
+$mcroot = c5;
 $pcroot = mc2pc($mcroot);
-$chords = [
-    C2 E3 G3 B3 D4 F#4 A4 
-] [
-    F2 A3 C4 E4 G4 B4 
-] [
-    Bb2 D3 F3 A3 C4 E4 G4 
-] [
-    Eb2 G3 Bb3 D4 F4 A4 
-] [
-    Ab2 C3 Eb3 G3 Bb3 D4 
-] [
-    Db2 F3 Ab3 C4 Eb4 
-] [
-    G2 B3 D4 F4 A4 C5 E5 
-] [
-    C2 E3 G3 Bb3 D4 F4 
-];
-$ratios = 1 15/16 8/7 7/6 5/4 21/16 7/5 11/8 3/2 12/7 5/3 7/4 13/7;
-$dens = sort(
-    thin(den($ratios)) 
+$chords = (
+    [
+        C2 E3 G3 B3 D4 F#4 A4 
+    ] [
+        F2 A3 C4 E4 G4 B4 
+    ] [
+        Bb2 D3 F3 A3 C4 E4 G4 
+    ] [
+        Eb2 G3 Bb3 D4 F4 A4 
+    ] [
+        Ab2 C3 Eb3 G3 Bb3 D4 
+    ] [
+        Db2 F3 Ab3 C4 Eb4 
+    ] [
+        G2 B3 D4 F4 A4 C5 E5 
+    ] [
+        C2 E3 G3 Bb3 D4 F4 
+    ] 
 );
+$ratios = octreduce(sort(1 15/16 8/7 7/6 5/4 21/16 7/5 11/8 3/2 12/7 5/3 7/4 13/7));
 $pcs = r2pc($ratios, $pcroot);
-$fqroot = mc2f($mcroot);
 $chords = for $chord in $chords with @unwrap 1 collect (
-    $chord = [
+    [
         for $mc in $chord collect (
             $diffs = for $pc in $pcs collect pitchdiff($mc, $pc);
-            $argdiffs = argsort(abs($diffs));
-            $ratios:($argdiffs:1) 
+            $index = argsort(abs($diffs)):1;
+            $rc = $ratios:($index);
+            octreduce($rc) 
         ) 
-    ];
-    print($chord) 
+    ] 
 );
 write(
-    @data $chords @path './harmony.txt' 
+    @data ['root' $mcroot] ['chords' $chords] @path './harmony.txt' 
 )
