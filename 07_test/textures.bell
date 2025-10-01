@@ -1,0 +1,124 @@
+setseed(2);
+$mcroot = c2;
+$pcroot = mc2pc($mcroot);
+$ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 13/7;
+$pcs = r2pc($ratios, $pcroot);
+$spectrum = pcquant(r2mc(2...32, $mcroot), $pcs);
+$t = 0;
+$totdur = 30000;
+$names = 'clar' 'sax' 'flute' 'horn';
+$types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
+$dryenv = [0 0.001 0];
+$gapbpf = [0 0 0] [0.5 1000 0.125] [1 0 -0.125];
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
+    $seqlen = xrandom(10, 23);
+    $steps = (-1 2 -3 0) * xchoose(-1 1);
+    $mcs = randomseq(
+        @llll $spectrum
+        @length $seqlen
+        @steps $steps
+        @useseed 1
+    );
+    $span = xrand(1000, 5000);
+    $dyads = group($mcs $mcs:-1, 2, 1);
+    $durations = timeramp(
+        @duration $span
+        @length length($mcs) 
+        @slope xrand(-1/3, 1/3) 
+    );
+    for $dyad in $dyads, $dur in $durations with @unwrap 1 do (
+        $mc1 = $dyad:1;
+        $mc2 = $dyad:2;
+        $glidefactor =1/c2r(minabs($mc2 - $mc1, 125));
+        $glideslope = xrand(0.75, 0.9);
+        $glidebpf = [0 1 0] [1 $glidefactor $glideslope];
+        $durmul = integrate($glidebpf):(-1 2);
+        $b = ezsol(
+            @pitch $mc1
+            @duration $dur / $durmul
+            @names $names
+            @types $types
+            @velocity 0
+            @useseed 1
+        ).process(resample($glidebpf));
+        if xrand() > 0.75 then (
+            $sine = cycle(
+                @frequency $mc1 + r2c(xchoose(1/2 1...8)) 
+                @duration $dur
+                @phase xrand() 
+            ).process(
+                gain(
+                    [
+                        0 $b.getkey('rms') ** xrand(1, 2) 0
+                    ] [1 0 -xrand(1/8, 2/3)] 
+                ) 
+            );
+            $b = $b.process(mix($sine)) 
+        );
+        $boost = gainboost(
+            @buffer $b
+            @outmin dbtoa(-50) 
+            @slope -0.125
+            @rms 1
+        );
+        $b = $b.process(
+            gain([0 $boost 0] [1 0 0.75]) 
+        );
+        if xrand() > 1/3 then (
+            $b.transcribe(
+                @onset $t @pan mc2pan($mc1, 0.25) 
+            ) 
+        ) else (
+            $deldur = $dur * exp2(xrand(4));
+            $dels = timeramp(
+                @duration $deldur
+                @length xrandom(4, 22) 
+                @slope xrand(-1/3, 1/3) 
+            );
+            $d = 0;
+            $delgainbpf = [0 1 0] [1 0.001 -xrand(1/9, 3/4)];
+            $detunings = $spectrum - $mc1;
+            $detunings = $detunings:[
+                left(
+                    argsort(abs($detunings)), 5
+                ) 
+            ];
+            $detunings = thin($detunings (-1...1) * 1200);
+            if xrand() > 0.5 then ($delgainbpf = revbpf($delgainbpf));
+            for $del in $dels do (
+                $dt = $d / $deldur;
+                $gain = samplebpf($delgainbpf, $dt);
+                $b.setkey('duration', $del).transcribe(
+                    @onset $t + $d
+                    @gain $gain
+                    @pan xrand() 
+                    @detune xchoose($detunings) 
+                    @keepduration 0
+                );
+                $d += $del
+            ) 
+        );
+        $t += $dur
+    );
+    $t += $gap;
+    $dryenv _= [
+        $t scale(xrand(), 0, 1, 0.01, 1, -0.125) xrand(-0.125, 0.125) 
+    ] 
+);
+$b = render(
+    @reset 1 @process normalize(-3) 
+);
+$b.process(gain($dryenv) freeverb(
+    @roomsize 0.98
+    @wet 0.015
+    @dry 0
+    @damp 1
+    @width 1
+)).transcribe();
+$b.transcribe();
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport()
