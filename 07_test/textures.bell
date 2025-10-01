@@ -1,5 +1,5 @@
-setseed(1);
-$mcroot = e2;
+setseed(10);
+$mcroot = bb1;
 $pcroot = mc2pc($mcroot);
 $ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 15/8 13/7;
 $pcs = r2pc($ratios, $pcroot);
@@ -9,18 +9,18 @@ $totdur = 60000;
 $names = 'clar' 'sax' 'flute' 'horn' 'tromb';
 $types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
 $dryenv = [0 0.001 0];
-$midpoint = 0.3;
-$gapbpf = [0 0 0] [$midpoint 1500 -0.125] [1 0 -0.125];
-$delthreshbpf = [0 1 0] [$midpoint 0.33 0.25] [1 1 0.125];
+$midpoint = 0;
+$gapbpf = [$midpoint 1500 -0.125] [1 0 -0.125];
+$delthreshbpf = [$midpoint 0.125 0.25] [1 1 0.125];
 $maxrms = dbtoa(-14);
-$minrms = dbtoa(-50);
+$minrms = dbtoa(-45);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
     $delthresh = samplebpf($delthreshbpf, $nt);
     $span = xrand(500, 4000);
     $maxlen = round(max(2, $span / 90));
-    $minlen = round(max(2, $maxlen / 3.));
+    $minlen = round(max(2, $maxlen / 4.));
     $seqlen = xrandom($minlen, $maxlen);
     $steps = (-1 2 -3 0) * xchoose(-1 1);
     $mcs = randomseq(
@@ -96,15 +96,13 @@ while $t < $totdur do (
         $b = $b.process(
             gain([0 $boost 0] [1 0 0.75]) 
         );
-        if xrand() > $delthresh then (
-            $b.transcribe(
-                @onset $t @pan mc2pan($mc1, 0.25) 
-            ) 
-        ) else (
+        if xrand() < $delthresh then (
             $deldur = $dur * exp2(xrand(4));
+            $maxdels = max(2, round($deldur / 90));
+            $mindels = max(2, round($maxdels / 3.));
             $dels = timeramp(
                 @duration $deldur
-                @length xrandom(4, 22) 
+                @length xrandom($mindels, $maxdels) 
                 @slope xrand(-1/3, 1/3) 
             );
             $d = 0;
@@ -121,6 +119,7 @@ while $t < $totdur do (
                 ) 
             ];
             $detunings = thin($detunings (-1...1) * 1200);
+            $legato = exp2(xrand());
             for $del in $dels do (
                 $dt = $d / $deldur;
                 $gain = samplebpf($delgainbpf, $dt);
@@ -128,14 +127,23 @@ while $t < $totdur do (
                 $delenv = xchoose(
                     [[0 $gain 0] [1 0 -$delenvslope]] [[0 0 0] [1 $gain $delenvslope]] [hanning()] [$gain] 
                 )::1;
-                $b.setkey('duration', $del).transcribe(
-                    @onset $t + $d + $deloffset
-                    @gain $delenv
-                    @pan xrand() 
-                    @detune xchoose($detunings) 
-                    @keepduration 0
+                $onset = $t + $d + $deloffset;
+                $pan = xrand();
+                $det = xchoose($detunings);
+                if $onset >= 0 then (
+                    $b.setkey('duration', $del * $legato).transcribe(
+                        @onset $onset
+                        @gain $delenv
+                        @pan $pan
+                        @detune $det
+                        @keepduration 0
+                    ) 
                 );
                 $d += $del
+            ) 
+        ) else (
+            $b.transcribe(
+                @onset $t @pan mc2pan($mc1, 0.25) 
             ) 
         );
         $t += $dur
