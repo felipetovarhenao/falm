@@ -5,4 +5,5 @@ importaudio('./hits/hits.wav').transcribe($t);
 $t += read('./hits/hits.txt');
 render(
     @play 1 @process normalize(-3)
-)
+);
+ezexport()
