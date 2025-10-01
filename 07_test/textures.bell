@@ -1,4 +1,4 @@
-setseed(10);
+setseed(107);
 $mcroot = bb1;
 $pcroot = mc2pc($mcroot);
 $ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 15/8 13/7;
@@ -6,7 +6,7 @@ $pcs = r2pc($ratios, $pcroot);
 $spectrum = pcquant(r2mc(2...32, $mcroot), $pcs);
 $t = 0;
 $totdur = 60000;
-$names = 'clar' 'sax' 'flute' 'horn' 'tromb';
+$names = 'clar' 'sax' 'flute' 'horn' 'tromb' 'viola' 'acc';
 $types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
 $dryenv = [0 0.001 0];
 $midpoint = 0;

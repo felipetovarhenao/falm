@@ -638,7 +638,7 @@ gainboost = (
             @outmax $outmax
             @slope $slope
         );
-        $boost = $g2 / $g1;
+        $boost = if $g1 > 0 then $g2 / $g1 else 1;
         $boost
     ) 
 )
