@@ -18,7 +18,10 @@ while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
     $delthresh = samplebpf($delthreshbpf, $nt);
-    $seqlen = xrandom(7, 23);
+    $span = xrand(500, 4000);
+    $maxlen = round(max(2, $span / 90));
+    $minlen = round(max(2, $maxlen * 0.2));
+    $seqlen = xrandom($minlen, $maxlen);
     $steps = (-1 2 -3 0) * xchoose(-1 1);
     $mcs = randomseq(
         @llll $spectrum
@@ -26,7 +29,6 @@ while $t < $totdur do (
         @steps $steps
         @useseed 1
     );
-    $span = xrand(500, 4000);
     $dyads = group($mcs $mcs:-1, 2, 1);
     $durations = timeramp(
         @duration $span
@@ -151,6 +153,7 @@ $b.process(gain($dryenv) freeverb(
     @wet 0.02
     @dry 0
     @damp 1
+    @tail 4000
     @width 1
 )).transcribe();
 $b.transcribe();
