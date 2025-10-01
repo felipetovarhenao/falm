@@ -1,0 +1,8 @@
+$t = 0;
+importaudio('./loop/loop.wav').transcribe($t);
+$t += read('./loop/loop.txt');
+importaudio('./hits/hits.wav').transcribe($t);
+$t += read('./hits/hits.txt');
+render(
+    @play 1 @process normalize(-3)
+)
