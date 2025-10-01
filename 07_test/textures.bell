@@ -1,19 +1,22 @@
-setseed(2);
-$mcroot = c2;
+setseed(45);
+$mcroot = f2;
 $pcroot = mc2pc($mcroot);
-$ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 13/7;
+$ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 15/8 13/7;
 $pcs = r2pc($ratios, $pcroot);
 $spectrum = pcquant(r2mc(2...32, $mcroot), $pcs);
 $t = 0;
-$totdur = 30000;
+$totdur = 45000;
 $names = 'clar' 'sax' 'flute' 'horn';
 $types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
 $dryenv = [0 0.001 0];
-$gapbpf = [0 0 0] [0.5 1000 0.125] [1 0 -0.125];
+$midpoint = 0.3;
+$gapbpf = [0 0 0] [$midpoint 2000 0.25] [1 0 0.125];
+$delthreshbpf = [0 1 0] [$midpoint 0.33 0.25] [1 1 0.125];
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
-    $seqlen = xrandom(10, 23);
+    $delthresh = samplebpf($delthreshbpf, $nt);
+    $seqlen = xrandom(7, 23);
     $steps = (-1 2 -3 0) * xchoose(-1 1);
     $mcs = randomseq(
         @llll $spectrum
@@ -21,7 +24,7 @@ while $t < $totdur do (
         @steps $steps
         @useseed 1
     );
-    $span = xrand(1000, 5000);
+    $span = xrand(500, 5000);
     $dyads = group($mcs $mcs:-1, 2, 1);
     $durations = timeramp(
         @duration $span
@@ -31,8 +34,8 @@ while $t < $totdur do (
     for $dyad in $dyads, $dur in $durations with @unwrap 1 do (
         $mc1 = $dyad:1;
         $mc2 = $dyad:2;
-        $glidefactor =1/c2r(minabs($mc2 - $mc1, 125));
-        $glideslope = xrand(0.75, 0.9);
+        $glidefactor =1/c2r(minabs($mc2 - $mc1, 200));
+        $glideslope = xrand(0.6, 0.9);
         $glidebpf = [0 1 0] [1 $glidefactor $glideslope];
         $durmul = integrate($glidebpf):(-1 2);
         $b = ezsol(
@@ -66,7 +69,7 @@ while $t < $totdur do (
         $b = $b.process(
             gain([0 $boost 0] [1 0 0.75]) 
         );
-        if xrand() > 1/3 then (
+        if xrand() > $delthresh then (
             $b.transcribe(
                 @onset $t @pan mc2pan($mc1, 0.25) 
             ) 
@@ -82,7 +85,7 @@ while $t < $totdur do (
             $detunings = $spectrum - $mc1;
             $detunings = $detunings:[
                 left(
-                    argsort(abs($detunings)), 5
+                    argsort(abs($detunings)), 3
                 ) 
             ];
             $detunings = thin($detunings (-1...1) * 1200);
@@ -112,7 +115,7 @@ $b = render(
 );
 $b.process(gain($dryenv) freeverb(
     @roomsize 0.98
-    @wet 0.015
+    @wet 0.02
     @dry 0
     @damp 1
     @width 1
