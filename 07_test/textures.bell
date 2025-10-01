@@ -1,24 +1,28 @@
-setseed(107);
+$seed = 101;
 $mcroot = bb1;
 $pcroot = mc2pc($mcroot);
 $ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 15/8 13/7;
 $pcs = r2pc($ratios, $pcroot);
 $spectrum = pcquant(r2mc(2...32, $mcroot), $pcs);
 $t = 0;
-$totdur = 40000;
+$totdur = 60000;
+## $clipdur = 20000;
 $names = 'clar' 'sax' 'flute' 'horn' 'tromb' 'viola' 'acc';
 $types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'pizz' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
 $dryenv = [0 0.001 0];
-$midpoint = 0;
-$gapbpf = [$midpoint 1500 -0.125] [1 0 -0.125];
-$delthreshbpf = [$midpoint 0.125 0.25] [1 1 0.125];
-$velbpf = [$midpoint 0 0.25] [1 127 0.125];
+$gapbpf = [0 1500 0] [1 0 -0.125];
+$delthreshbpf = [0 0.125 0] [1 1 0.125];
+$overlapbpf = [0 1 0] [1 0.25 0.125];
+$velbpf = [0 0 0] [1 127 0.125];
+$seqlenbpf = [0 0 0] [1 1 0.125];
 $maxrms = dbtoa(-14);
 $minrms = dbtoa(-45);
-while $t < $totdur do (
+while $t < ($clipdur ||| $totdur) do (
+    setseed($seed);
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
-    $span = xrand(500, 4000);
+    $overlap = samplebpf($overlapbpf, $nt);
+    $span = xrand(1000, 4000);
     $maxlen = round(max(2, $span / 90));
     $minlen = round(max(2, $maxlen / 4.));
     $seqlen = xrandom($minlen, $maxlen);
@@ -29,6 +33,12 @@ while $t < $totdur do (
         @steps $steps
         @useseed 1
     );
+    $nummcs = round(
+        scale(
+            samplebpf($seqlenbpf, $nt), 0, 1, 2, length($mcs) + 1
+        ) 
+    );
+    $mcs = left($mcs, $nummcs);
     $dyads = group($mcs $mcs:-1, 2, 1);
     $durations = timeramp(
         @duration $span
@@ -37,7 +47,9 @@ while $t < $totdur do (
     );
     $t2 = 0;
     for $dyad in $dyads, $dur in $durations with @unwrap 1 do (
-        $nt = ($t + $t2) / $totdur;
+        $nt = min(
+            1, max(0,  ($t + $t2) / $totdur) 
+        );
         $vel = samplebpf($velbpf, $nt);
         $delthresh = samplebpf($delthreshbpf, $nt);
         $mc1 = $dyad:1;
@@ -134,7 +146,7 @@ while $t < $totdur do (
                 $onset = $t + $t2 + $d + $deloffset;
                 $pan = xrand();
                 $det = xchoose($detunings);
-                if $onset >= 0 then (
+                if $onset >= 0 && $onset < $totdur then (
                     $b.setkey('duration', $del * $legato).transcribe(
                         @onset $onset
                         @gain $delenv
@@ -146,13 +158,16 @@ while $t < $totdur do (
                 $d += $del
             ) 
         ) else (
-            $b.transcribe(
-                @onset $t + $t2 @pan mc2pan($mc1, 0.25) 
+            $onset = $t + $t2;
+            if $onset < $totdur then (
+                $b.transcribe(
+                    @onset $onset @pan mc2pan($mc1, 0.25) 
+                ) 
             ) 
         );
         $t2 += $dur
     );
-    $t += $span;
+    $t += $span * $overlap;
     $t += $gap;
     $dryenv _= [
         $t scale(xrand(), 0, 1, 0.01, 1, -0.125) xrand(-0.25, 0.25) 
@@ -163,7 +178,7 @@ $b = render(
 );
 $b.process(gain($dryenv) freeverb(
     @roomsize 0.98
-    @wet 0.02
+    @wet 0.0125
     @dry 0
     @damp 1
     @tail 4000
