@@ -10,7 +10,7 @@ $names = 'clar' 'sax' 'flute' 'horn' 'tromb';
 $types = 'ord' 'sfz' 'flz' 'ord-high' 'ord-micro' 'keys' 'stacc' 'slap-pitch' 'tongue-ram' 'harm' 'air' 'air-to-ord' 'ord-to-air' 'air-and-ord';
 $dryenv = [0 0.001 0];
 $midpoint = 0.3;
-$gapbpf = [0 0 0] [$midpoint 2000 0.25] [1 0 0.125];
+$gapbpf = [0 0 0] [$midpoint 1500 0.25] [1 0 -0.125];
 $delthreshbpf = [0 1 0] [$midpoint 0.33 0.25] [1 1 0.125];
 while $t < $totdur do (
     $nt = $t / $totdur;
@@ -83,6 +83,11 @@ while $t < $totdur do (
             );
             $d = 0;
             $delgainbpf = [0 1 0] [1 0.001 -xrand(1/9, 3/4)];
+            $deloffset = 0;
+            if xrand() > 0.5 then (
+                $delgainbpf = revbpf($delgainbpf);
+                $deloffset -= $deldur
+            );
             $detunings = $spectrum - $mc1;
             $detunings = $detunings:[
                 left(
@@ -90,12 +95,11 @@ while $t < $totdur do (
                 ) 
             ];
             $detunings = thin($detunings (-1...1) * 1200);
-            if xrand() > 0.5 then ($delgainbpf = revbpf($delgainbpf));
             for $del in $dels do (
                 $dt = $d / $deldur;
                 $gain = samplebpf($delgainbpf, $dt);
                 $b.setkey('duration', $del).transcribe(
-                    @onset $t + $d
+                    @onset $t + $d + $deloffset
                     @gain $gain
                     @pan xrand() 
                     @detune xchoose($detunings) 
