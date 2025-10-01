@@ -12,12 +12,14 @@ $dryenv = [0 0.001 0];
 $midpoint = 0;
 $gapbpf = [$midpoint 1500 -0.125] [1 0 -0.125];
 $delthreshbpf = [$midpoint 0.125 0.25] [1 1 0.125];
+$velbpf = [$midpoint 0 0.25] [1 127 0.125];
 $maxrms = dbtoa(-14);
 $minrms = dbtoa(-45);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
     $delthresh = samplebpf($delthreshbpf, $nt);
+    $vel = samplebpf($velbpf, $nt);
     $span = xrand(500, 4000);
     $maxlen = round(max(2, $span / 90));
     $minlen = round(max(2, $maxlen / 4.));
@@ -47,7 +49,7 @@ while $t < $totdur do (
             @duration $dur / $durmul
             @names $names
             @types $types
-            @velocity 0
+            @velocity $vel
             @useseed 1
         ).process(resample($glidebpf) dcfilter());
         if $b.getkey('rms') > dbtoa(-23) then (
