@@ -20,7 +20,7 @@ while $t < $totdur do (
     $delthresh = samplebpf($delthreshbpf, $nt);
     $span = xrand(500, 4000);
     $maxlen = round(max(2, $span / 90));
-    $minlen = round(max(2, $maxlen * 0.2));
+    $minlen = round(max(2, $maxlen / 3.));
     $seqlen = xrandom($minlen, $maxlen);
     $steps = (-1 2 -3 0) * xchoose(-1 1);
     $mcs = randomseq(
