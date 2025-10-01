@@ -1,4 +1,4 @@
-$seed = 890;
+$seed = 26;
 $mcroot = bb1;
 $pcroot = mc2pc($mcroot);
 $ratios = 1 9/8 8/7 5/4 21/16 11/8 3/2 5/3 15/8 13/7;
@@ -25,7 +25,7 @@ while $t < ($clipdur ||| $totdur) do (
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-0.5, 0.5));
     $overlap = samplebpf($overlapbpf, $nt);
     $quant = samplebpf($quantbpf, $nt);
-    $span = xrand(1000, 4000);
+    $span = xrand(2000, 4000);
     $maxlen = round(max(2, $span / 90));
     $minlen = round(max(2, $maxlen / 4.));
     $seqlen = xrandom($minlen, $maxlen);
