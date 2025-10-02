@@ -10,12 +10,22 @@ Compress = (
     ) 
 );
 $mcroot = b1;
-$pcrootprog = r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot));
+$progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) collect (
+    for $i in 1 2 collect (
+        $n7 = (13/7 7/4):$i;
+        $n4 = ([11/8 7/5] [21/16 4/3])::$i;
+        [
+            ['pc' $pc] ['ratios' 1 9/8 8/7 5/4 $n4 3/2 5/3 $n7] 
+        ] 
+    ) 
+);
 setseed(0);
-$ratios = 1 9/8 8/7 5/4 11/8 7/5 3/2 5/3 13/7;
 $t = 0;
 $order = xscramble(1...12);
-for $pcroot in $pcrootprog do (
+$reps = 2;
+for $harmony in $progression do (
+    $ratios = $harmony.getkey('ratios');
+    $pcroot = $harmony.getkey('pc');
     $pcs = r2pc($ratios, $pcroot);
     $arp = (
         pcquant(r2mc(4...16, $mcroot), $pcs) 
@@ -25,7 +35,6 @@ for $pcroot in $pcrootprog do (
         @length length($arp) 
         @slope -0.2
     );
-    $reps = 4;
     for $mc in $arp :* $reps, $dur in $durs :* $reps do (
         $pan = fold(0.9 + mc2pan($mc, 0.15));
         if xrand() > 0.8 then (
