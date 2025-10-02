@@ -1,72 +1,92 @@
-setseed(0);
-$mcroot = b1;
-$pcroot = mc2pc($mcroot);
-$ratios = 1 9/8 8/7 5/4 11/8 7/5 3/2 5/3 13/7;
-$pcs = r2pc($ratios, $pcroot);
-$arp = pcquant(r2mc(8...16, $mcroot), $pcs);
-$durs = timeramp(
-    @duration 1400
-    @length length($arp) 
-    @slope -0.2
-);
-$reps = 9;
-$arp = for $i in 1...$reps collect xscramble($arp);
-$t = 0;
 Compress = (
     $b -> (
         $g = gainboost(
-            $b @outmin dbtoa(-60) @outmax dbtoa(-12) 
+            @buffer $b
+            @outmin dbtoa(-60) 
+            @outmax dbtoa(-12) 
+            @rms 1
         );
         $b.process(gain($g)) 
     ) 
 );
-for $mc in $arp, $dur in $durs :* $reps do (
-    $pan = fold(0.9 + mc2pan($mc, 0.15));
-    ezsol(
-        @pitch $mc
-        @names 'flute' 'clar' 'sax' 
-        @types 'keys' 
-        @useseed 1
-    ).Compress().transcribe(
-        @onset $t
-        @pan $pan
-        @gain 0.5
+$mcroot = b1;
+$pcrootprog = r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot));
+setseed(0);
+$ratios = 1 9/8 8/7 5/4 11/8 7/5 3/2 5/3 13/7;
+$t = 0;
+$order = xscramble(1...12);
+for $pcroot in $pcrootprog do (
+    $pcs = r2pc($ratios, $pcroot);
+    $arp = (
+        pcquant(r2mc(4...16, $mcroot), $pcs) 
+    ):[$order];
+    $durs = timeramp(
+        @duration 1400
+        @length length($arp) 
+        @slope -0.2
     );
-    if xrand() > 0.5 then (
-        $V = xrandom(1, 4);
-        $vg = 2 ** (1 - $V);
-        for $v in 1...$V do (
-            sinewave(
-                @pitch $mc + xrandom(0, 4) * 1200 + xrand(-5, 5) 
-                @duration $dur * exp2(xrand(0.5, 3)) 
-                @velocity xrandom(5, 15) 
-                @envelope [0 0.1 0] [0.05 0.05 -0.125] [1 0 -xrand(1/4, 3/4)] 
-            ).transcribe(
+    $reps = 4;
+    for $mc in $arp :* $reps, $dur in $durs :* $reps do (
+        $pan = fold(0.9 + mc2pan($mc, 0.15));
+        if xrand() > 0.8 then (
+            ezsol(
+                @pitch $mc + xrandom(0, 2) * 1200
+                @names family('strings') 
+                @types 'pizz' 'pizz-secco' 
+                @velocity 0
+                @duration $dur * 4
+            ).Compress().transcribe(
                 @onset $t
                 @pan xrand() 
-                @gain 0.125 * $vg
+                @gain [0 0.25 0] [1 0 0.5] 
             ) 
-        ) 
-    );
-    ezsol(
-        @pitch $mc
-        @names 'flute' 'clar' 
-        @types 'flz' 'air' 
-        @velocity 0
-        @duration $dur * 9
-        @useseed 1
-    ).Compress().transcribe(
-        @onset $t
-        @gain [0 1 0] [0.05 0.125 -0.25] [1 0 -0.125] 
-        @pan fold($pan - 0.5) 
-    );
-    $t += $dur
+        );
+        ezsol(
+            @pitch $mc
+            @names 'flute' 'clar' 'sax' 
+            @types 'keys' 
+            @useseed 1
+        ).Compress().transcribe(
+            @onset $t
+            @pan $pan
+            @gain 0.5
+        );
+        if xrand() > 0.5 then (
+            $V = xrandom(1, 4);
+            $vg = 2 ** (1 - $V);
+            for $v in 1...$V do (
+                sinewave(
+                    @pitch $mc + xrandom(0, 4) * 1200 + xrand(-5, 5) 
+                    @duration $dur * exp2(xrand(0.5, 3)) 
+                    @velocity xrandom(5, 15) 
+                    @envelope [0 0.1 0] [0.05 0.05 -0.125] [1 0 -xrand(1/4, 3/4)] 
+                ).transcribe(
+                    @onset $t
+                    @pan xrand() 
+                    @gain 0.125 * $vg
+                ) 
+            ) 
+        );
+        ezsol(
+            @pitch $mc
+            @names 'flute' 'clar' 
+            @types 'flz' 'air' 
+            @velocity 0
+            @duration $dur * 9
+            @useseed 1
+        ).Compress().transcribe(
+            @onset $t
+            @gain [0 1 0] [0.05 0.125 -0.25] [1 0 -0.125] 
+            @pan fold($pan - 0.5) 
+        );
+        $t += $dur
+    ) 
 );
 render(
     @play 1 @process freeverb(
         @roomsize 0.6
         @wet 0.0125
         @damp 1
-    ) normalize(-9) 
+    ) normalize(-3) 
 );
 ezexport($t)
