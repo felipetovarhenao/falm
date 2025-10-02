@@ -33,7 +33,7 @@ for $harmony in $progression do (
     $durs = timeramp(
         @duration 1400
         @length length($arp) 
-        @slope -0.2
+        @slope xrand(-1/3, 1/3) 
     );
     for $mc in $arp :* $reps, $dur in $durs :* $reps do (
         $pan = fold(0.9 + mc2pan($mc, 0.15));
