@@ -3,7 +3,7 @@ Compress = (
         $g = gainboost(
             @buffer $b
             @outmin dbtoa(-60) 
-            @outmax dbtoa(-12) 
+            @outmax dbtoa(-14) 
             @rms 1
         );
         $b.process(gain($g)) 
@@ -110,9 +110,10 @@ for $harmony in $progression do (
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.6
-        @wet 0.005
+        @roomsize 0.9
+        @wet 0.001
         @damp 1
+        @width 1
     ) normalize(-3) 
 );
 ezexport($t)
