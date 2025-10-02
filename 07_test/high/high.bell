@@ -1,0 +1,30 @@
+setseed(0);
+$mcroot = b1;
+$pcroot = mc2pc($mcroot);
+$pcs = r2pc(1 9/8 8/7 5/4 7/5 11/8 3/2 5/3 13/7 15/8, $pcroot);
+$mcs = pcquant(r2mc(16...32, $mcroot), $pcs);
+$cluster = group($mcs, 3, 1).xchoose()::1;
+$t = 0;
+for $mc in $cluster do (
+    ezsol(
+        @pitch $mc
+        @velocity 0
+        @names 'flute' 'clar' 
+        @types 'flz' 
+        @duration null
+    ).transcribe(
+        @onset $t
+        @pan xrand() xrand() 
+        @gain hanning() 
+    );
+    $t += xrand(10, 400) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.98
+        @wet 0.05
+        @dry 0
+        @damp 1
+        @width 1
+    ) normalize(-8) 
+)

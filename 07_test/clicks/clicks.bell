@@ -10,6 +10,17 @@ Compress = (
         process($buffer, gain($g)) 
     ) 
 );
+#(
+```bell
+KeyClicks(
+    @onset 0
+    @spectrum r2mc(1...32, c1)
+    @duration 1500
+    @reps 2
+    @rangesplit 3
+) -> ...
+```
+)#
 KeyClicks = (
     $onset = 0, $spectrum = r2mc(4...16, c1), $duration = 1500, $reps = 2, $rangesplit = 3 -> (
         init $order = xscramble(
@@ -17,18 +28,17 @@ KeyClicks = (
         );
         keep $order;
         $onset;
-        $period = $duration;
         $arp = right($spectrum, $rangesplit):[$order];
         for $rep in 1...$reps do (
             $durs = timeramp(
-                @duration $period
+                @duration $duration
                 @length length($arp) 
                 @slope xrand(-1/3, 1/3) 
             );
             $mc = xchoose(left($spectrum, $rangesplit));
             ezsol(
                 @pitch $mc
-                @duration $period
+                @duration $duration
                 @velocity 50
                 @useseed 1
                 @names family('strings') 
@@ -58,12 +68,12 @@ KeyClicks = (
                     @pitch $mc
                     @names 'flute' 'clar' 'sax' 
                     @types 'keys' 
-                    @duration $period
+                    @duration max(250, $dur) 
                     @useseed 1
                 ).Compress().transcribe(
                     @onset $onset
                     @pan $pan
-                    @gain 0.5
+                    @gain [0 0.5 0] [1 0 0.5] 
                 );
                 if xrand() > 0.5 then (
                     $V = xrandom(1, 4);
@@ -97,19 +107,27 @@ KeyClicks = (
                 $onset += $dur
             ) 
         );
-        $period * $reps
+        $duration * $reps
+    ) 
+);
+$mcroot = b1;
+$base = r2mc(1...16, $mcroot);
+$progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) collect (
+    for $i in 1 2 collect (
+        $n7 = (13/7 7/4):$i;
+        $n4 = ([11/8 7/5] [21/16 4/3])::$i;
+        [
+            pcquant($base, r2pc(1 9/8 8/7 5/4 $n4 3/2 5/3 $n7, $pc)) 
+        ] 
     ) 
 );
 $t = 0;
-for $mc in r2mc(1 1 1, c2) do (
-    $mcs = r2mc(4...16, $mc);
-    $t += KeyClicks(
-        @onset $t
-        @spectrum $mcs
-        @duration 1000
-        @reps 4
-    ) 
-);
+for $chord in $progression with @unwrap 1 do ($t += KeyClicks(
+    @onset $t
+    @spectrum $chord
+    @rangesplit 4
+    @duration 2000
+));
 render(
     @play 1 @process normalize(-3) 
 );
