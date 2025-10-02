@@ -1,9 +1,11 @@
 $t = 0;
 importaudio('./loop/loop.wav').transcribe($t);
 $t += read('./loop/loop.txt');
+importaudio('./wave/wave.wav').transcribe($t);
+$t += read('./wave/wave.txt');
 importaudio('./hits/hits.wav').transcribe($t);
 $t += read('./hits/hits.txt');
 render(
-    @play 1 @process normalize(-3)
+    @play 1 @process normalize(-3) 
 );
 ezexport()
