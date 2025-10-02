@@ -19,7 +19,7 @@ $progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) co
         ] 
     ) 
 );
-setseed(1);
+setseed(2);
 $t = 0;
 $order = xscramble(1...12);
 $reps = 2;
@@ -44,7 +44,7 @@ for $harmony in $progression do (
             @velocity 50
             @useseed 1
             @names family('strings') 
-            @types 'pizz' 
+            @types 'pizz' 'pizz-secco' 
         ).Compress().transcribe(
             @onset $t
             @pan mc2pan($mc, 0.125) 
@@ -56,7 +56,7 @@ for $harmony in $progression do (
                 ezsol(
                     @pitch $mc + xrandom(0, 2) * 1200
                     @names family('strings') 
-                    @types 'pizz' 'pizz-secco' 
+                    @types 'pizz' 'pizz-secco' 'legno-batt' 
                     @velocity 0
                     @duration $dur * 4
                 ).Compress().transcribe(
@@ -78,16 +78,17 @@ for $harmony in $progression do (
             if xrand() > 0.5 then (
                 $V = xrandom(1, 4);
                 $vg = 2 ** (1 - $V);
+                $oct = xrandom(-1, 4) * 1200;
                 for $v in 1...$V do (
                     sinewave(
-                        @pitch $mc + xrandom(0, 4) * 1200 + xrand(-5, 5) 
-                        @duration $dur * exp2(xrand(0.5, 3)) 
+                        @pitch $mc + $oct + xrand(-2, 2) 
+                        @duration $dur * exp2(xrand(1.25, 4)) 
                         @velocity xrandom(5, 15) 
-                        @envelope [0 0.1 0] [0.05 0.05 -0.125] [1 0 -xrand(1/4, 3/4)] 
+                        @envelope [0 1 0] [0.05 0.05 -0.125] [1 0 -xrand(1/4, 4/5)] 
                     ).transcribe(
                         @onset $t
                         @pan xrand() 
-                        @gain 0.125 * $vg
+                        @gain 0.05 * $vg
                     ) 
                 ) 
             );
