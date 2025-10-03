@@ -12,13 +12,13 @@ Compress = (
 );
 Beats = (
     $onset = 0, $spectrum, $duration = 2000, $subdivs = 12 -> (
+        $spectrum = xscramble($spectrum).left(4);
+        $pan = xrand() - 0.5;
         for $dur in timeramp(
             @duration $duration
             @length $subdivs
             @slope xrand(-0.2, 0.2) 
         ) do (
-            $spectrum = xscramble($spectrum).left(4);
-            $pan = xrand() - 0.5;
             for $mc in $spectrum do (
                 $b = ezsol(
                     @pitch $mc
@@ -188,8 +188,8 @@ $progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) co
     ) 
 );
 $t = 0;
-for $chord in $progression.left(4) with @unwrap 1 do (
-    $fns = KeyClicks Tremolo Beats;
+for $chord $chordid in $progression.left(4) with @unwrap 1 do (
+    $fns = rot(KeyClicks Tremolo Beats, $chordid - 1);
     for $fn in $fns do $t += $fn(
         @onset $t
         @spectrum $chord
