@@ -1,4 +1,4 @@
-setseed(1);
+setseed(10);
 Compress = (
     $buffer -> (
         $g = gainboost(
@@ -27,7 +27,7 @@ Beats = (
                     @names family('brass') 'sax' 
                     @types 'slap-pitch' 'slap-unpitch' 'perc-emb' 'keys' 'kiss' 
                     @useseed 1
-                ).Compress().process(gain(0.125));
+                ).Compress().process(gain(0.25));
                 $b.transcribe(
                     @onset $onset
                     @gain [0 1 0] [0.1 xrand(0.1, 0.5) -0.125] [1 0 0.5] 
@@ -196,6 +196,8 @@ Arpeggio = (
                 ) 
             ] 
         );
+        $mode = xchoose(1...3);
+        if $mode == 2 then ($mcs = rev($mcs)) else if $mode == 3 then ($mcs = xscramble($mcs));
         $durs = timeramp(
             @duration $duration
             @length length($mcs) 
@@ -235,8 +237,7 @@ Arpeggio = (
 $t = 0;
 $objects = KeyClicks Tremolo Beats Arpeggio;
 for $chord $chordid in $progression.left(3) with @unwrap 1 do (
-    $fns = rot($objects, $chordid - 1);
-    for $fn in $fns do $t += $fn(
+    for $fn in $objects do $t += $fn(
         @onset $t
         @spectrum $chord
         @rangesplit 4
