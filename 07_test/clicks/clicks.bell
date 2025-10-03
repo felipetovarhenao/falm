@@ -233,9 +233,9 @@ Arpeggio = (
     ) 
 );
 $t = 0;
-$objects = Arpeggio KeyClicks Tremolo Beats;
+$objects = KeyClicks Tremolo Beats Arpeggio;
 for $chord $chordid in $progression.left(3) with @unwrap 1 do (
-    $fns = rot($objects, 1 - $chordid);
+    $fns = rot($objects, $chordid - 1);
     for $fn in $fns do $t += $fn(
         @onset $t
         @spectrum $chord
