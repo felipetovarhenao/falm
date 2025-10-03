@@ -1,4 +1,4 @@
-setseed(10);
+setseed(20);
 Compress = (
     $buffer -> (
         $g = gainboost(
@@ -236,7 +236,7 @@ Arpeggio = (
 );
 $t = 0;
 $objects = KeyClicks Tremolo Beats Arpeggio;
-for $chord $chordid in $progression.left(3) with @unwrap 1 do (
+for $chord $chordid in $progression.left(5) with @unwrap 1 do (
     for $fn in $objects do $t += $fn(
         @onset $t
         @spectrum $chord
