@@ -192,7 +192,7 @@ Arpeggio = (
         $mcs = sort(
             $spectrum:[
                 left(
-                    argsort(abs($spectrum - c7)), 12
+                    argsort(abs($spectrum - c7)), xrandom(7, 13) 
                 ) 
             ] 
         );
@@ -242,7 +242,7 @@ for $chord $chordid in $progression.left(5) with @unwrap 1 do (
         @spectrum $chord
         @rangesplit 4
         @subdivs xrandom(3, 20) 
-        @duration 2000
+        @duration 2500
     ) 
 );
 render(
