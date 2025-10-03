@@ -60,9 +60,10 @@ Tremolo = (
                 @useseed 1
             ).Compress();
             if xrand() > 0.5 then (
+                $phase = xchoose(-1 1);
                 $trem = (
                     xchoose(saw tri cycle rect)(
-                        @frequency [0 xrand(12) 0] [1 xrand(12) xrand(-1/3, 1/3)] @duration $b.getkey('duration') 
+                        @frequency [0 xrand(12) * $phase 0] [1 xrand(12) * $phase xrand(-1/3, 1/3)] @duration $b.getkey('duration') 
                     ) 
                 ).process(scaling(-1, 1, $envmin, 1) rampsmooth(16, 16));
                 $b = $b.process(multiply($trem)) 
@@ -249,7 +250,7 @@ Swirl = (
         );
         $seq = $spectrum:[$addrs];
         $t = 0;
-        $durrange = sort(for $i in 1 2 collect xrand(50, 200));
+        $durrange = sort(for $i in 1 2 collect xrand(50, 300));
         $durbpf = [0 $durrange:1 0] [1 $durrange:2 xrand(-1/3, 1/3)];
         if xrand() > 0.5 then ($durbpf = revbpf($durbpf));
         if xrand() > 0.5 then ($durrange = rev($durrange));
@@ -321,9 +322,8 @@ Swirl = (
 $t = 0;
 $objects = KeyClicks Tremolo Swirl Arpeggio Beats;
 $order = xscramble(1...length($objects));
-for $chord $chordid in $progression.left(6) with @unwrap 1 do (
-    $fns = KeyClicks :* length($objects);
-    for $o $oi in $order.left($chordid) do ($fns:$o = $objects:$oi);
+for $chord $chordid in $progression with @unwrap 1 do (
+    $fns = KeyClicks xchoose($objects);
     for $fn in $fns do $t += $fn(
         @onset $t
         @spectrum $chord
