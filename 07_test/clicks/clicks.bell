@@ -236,16 +236,24 @@ Arpeggio = (
 );
 $t = 0;
 $objects = KeyClicks Tremolo Beats Arpeggio;
-for $chord $chordid in $progression.left(5) with @unwrap 1 do (
-    for $fn in $objects do $t += $fn(
+$order = 1 xscramble(2...length($objects));
+for $chord $chordid in $progression.left(4) with @unwrap 1 do (
+    $fns = KeyClicks :* length($objects);
+    for $o in $order.left($chordid) do ($fns:$o = $objects:$o);
+    for $fn in $fns do $t += $fn(
         @onset $t
         @spectrum $chord
         @rangesplit 4
         @subdivs xrandom(3, 20) 
-        @duration 2500
+        @duration 2250
     ) 
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process freeverb(
+        @roomsize 0.98
+        @wet 0.005
+        @damp 0.5
+        @width 1
+    ) normalize(-3) 
 );
 ezexport()
