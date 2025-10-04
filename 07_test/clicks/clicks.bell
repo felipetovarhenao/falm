@@ -456,12 +456,20 @@ $progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) co
 );
 $t = 0;
 $objects = KeyClicks Tremolo Swirl Arpeggio Beats;
-$durationbpf = [0 2250 0] [1 1500 0.125];
-for $chord $chordid in $progression with @unwrap 1 do (
-    $nt = scale($chordid, 1, length($progression), 0, 1);
+$durationbpf = [0 2250 0] [1 1750 0.125];
+$objseq = for $chord in $progression with @unwrap 1 collect (
+    $fns = xscramble(
+        KeyClicks xchoose(right($objects, 1)) 
+    );
+    for $fn in $fns collect [['chord' $chord] ['fn' $fn]] 
+);
+$t = 0;
+for $obj $objid in $objseq do (
+    $nt = scale($objid, 1, length($objseq), 0, 1);
     $duration = samplebpf($durationbpf, $nt);
-    $fns = xscramble(KeyClicks xchoose($objects));
-    for $fn in $fns do $t += $fn(
+    $chord = getkey($obj, 'chord');
+    $fn = getkey($obj, 'fn');
+    $t += $fn(
         @onset $t
         @spectrum $chord
         @duration $duration
