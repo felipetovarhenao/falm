@@ -30,23 +30,55 @@ Beats(
 ```
 )#
 Beats = (
-    $onset = 0, $spectrum, $duration = 2000, $subdivs = 12 -> (
-        $spectrum = xscramble($spectrum).left(4);
+    $onset = 0, $spectrum, $duration = 2000, $ctrl = 0 -> (
+        $maxsubdivs = max(
+            2, int(round($duration / 120)) 
+        );
+        $slope = 0.125;
+        $subdivsbpf = [0 4 0] [1 $maxsubdivs $slope];
+        $subdivs = int(
+            round(
+                min(
+                    max(
+                        2, samplebpf($subdivsbpf, $ctrl) + xrand(-1, 1) * 2.5
+                    ), $maxsubdivs
+                ) 
+            ) 
+        );
+        $maxnotes = 10;
+        $numnotesbpf = [0 4 0] [1 $maxnotes $slope];
+        $numnotes = int(
+            round(samplebpf($numnotesbpf, $ctrl)) 
+        );
+        $velbpf = [0 0 0] [1 127 $slope];
+        $vel = samplebpf($velbpf, $ctrl);
+        $gainbpf = [0 0.25 0] [1 1 $slope];
+        $gain = samplebpf($gainbpf, $ctrl);
+        $addrs = left(
+            argsort(abs($spectrum - c5)), $maxnotes
+        );
+        $spectrum = left(
+            xscramble($spectrum:[$addrs]), $numnotes
+        );
         $pan = xrand() - 0.5;
         for $dur in timeramp(
             @duration $duration
             @length $subdivs
-            @slope xrand(-0.2, 0.2) 
+            @slope xrand(-1/4, 1/4) 
         ) 0 do (
             for $mc in $spectrum do (
-                $b = ezsol(
-                    @pitch $mc
-                    @duration $duration
-                    @velocity 0
-                    @names family('brass') 'sax' 
-                    @types 'slap-pitch' 'slap-unpitch' 'perc-emb' 'keys' 'kiss' 
-                    @useseed 1
-                ).Compress().process(gain(0.25));
+                $b = process(
+                    @buffer Compress(
+                        ezsol(
+                            @pitch $mc
+                            @duration $duration
+                            @velocity $vel
+                            @names family('brass') 'sax' 
+                            @types 'slap-pitch' 'slap-unpitch' 'perc-emb' 'keys' 
+                            @useseed 1
+                        ) 
+                    ) @operations gain($gain) 
+                );
                 $b.transcribe(
                     @onset $onset
                     @gain [0 1 0] [0.1 xrand(0.1, 0.5) -0.125] [1 0 0.5] 
