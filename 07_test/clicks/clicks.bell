@@ -1,4 +1,13 @@
 setseed(7);
+#(
+```bell
+Compress(
+    @buffer null
+) -> llll
+```
+
+Scales the gain of a buffer based on its RMS.
+)#
 Compress = (
     $buffer -> (
         $g = gainboost(
@@ -10,6 +19,16 @@ Compress = (
         process($buffer, gain($g)) 
     ) 
 );
+#(
+```bell
+Beats(
+    @onset 0
+    @spectrum null
+    @duration 2000
+    @subdivs 12
+) -> float/int
+```
+)#
 Beats = (
     $onset = 0, $spectrum, $duration = 2000, $subdivs = 12 -> (
         $spectrum = xscramble($spectrum).left(4);
@@ -39,6 +58,15 @@ Beats = (
         $duration
     ) 
 );
+#(
+```bell
+Tremolo(
+    @onset 0
+    @spectrum null
+    @duration 1000
+) -> float/int
+```
+)#
 Tremolo = (
     $onset = 0, $spectrum, $duration = 1000 -> (
         $spectrum = sort($spectrum).right(-4);
@@ -85,7 +113,7 @@ KeyClicks(
     @duration 1500
     @reps 2
     @rangesplit 3
-) -> ...
+) -> float/int
 ```
 )#
 KeyClicks = (
@@ -177,17 +205,15 @@ KeyClicks = (
         $duration * $reps
     ) 
 );
-$mcroot = b1;
-$base = r2mc(1...16, $mcroot);
-$progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) collect (
-    for $i in 1 2 collect (
-        $n7 = (13/7 7/4):$i;
-        $n4 = ([11/8 7/5] [21/16 4/3])::$i;
-        [
-            pcquant($base, r2pc(1 9/8 8/7 5/4 $n4 3/2 5/3 $n7, $pc)) 
-        ] 
-    ) 
-);
+#(
+```bell
+Arpeggio(
+    @onset 0
+    @spectrum null
+    @duration 1000
+) -> float/int
+```
+)#
 Arpeggio = (
     $onset = 0, $spectrum = null, $duration = 1000 -> (
         $mcs = sort(
@@ -235,6 +261,15 @@ Arpeggio = (
         $duration
     ) 
 );
+#(
+```bell
+Swirl(
+    @onset 0
+    @duration 2000
+    @spectrum null
+) -> float/int
+```
+)#
 Swirl = (
     $onset = 0, $duration = 2000, $spectrum = null -> (
         $spectrum = $spectrum:[
@@ -317,6 +352,17 @@ Swirl = (
             $t += $dur
         );
         $duration
+    ) 
+);
+$mcroot = b1;
+$base = r2mc(1...16, $mcroot);
+$progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) collect (
+    for $i in 1 2 collect (
+        $n7 = (13/7 7/4):$i;
+        $n4 = ([11/8 7/5] [21/16 4/3])::$i;
+        [
+            pcquant($base, r2pc(1 9/8 8/7 5/4 $n4 3/2 5/3 $n7, $pc)) 
+        ] 
     ) 
 );
 $t = 0;
