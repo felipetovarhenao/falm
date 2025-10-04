@@ -477,11 +477,6 @@ for $obj $objid in $objseq do (
     ) 
 );
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.98
-        @wet 0.005
-        @damp 0.5
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process normalize(-3) 
 );
 ezexport()
