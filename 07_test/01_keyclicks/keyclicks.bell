@@ -7,6 +7,9 @@ for $file in $files with @unwrap 1 do (
     $snd = importaudio($basepath + '.wav');
     $txt = read($basepath + '.txt');
     $snd.transcribe($t);
+    if $name == 'cresc' then (
+        importaudio('./05_transient/transient.wav').transcribe($t - read('./05_transient/transient.txt')) 
+    );
     $t += $txt
 );
 render(

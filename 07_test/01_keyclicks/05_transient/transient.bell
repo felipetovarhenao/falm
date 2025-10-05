@@ -1,0 +1,25 @@
+$b = Compress(perc(
+    @pitch c9 
+    @type 'soft-brush' 
+    @duration null
+    @velocity 127
+).setkey('duration', 400)).process(
+    reverse() gain([0 0 0] [1 1 2/3]) 
+);
+$b.transcribe(@pan for $x in 0 1 collect [$x $x 2/3]);
+$harmony = read('../../00_harmony/harmony.txt');
+$mc = getkey(($harmony.'cadence'):1, 'mcs'):1;
+$totdur = $b.getkey('duration');
+Compress(bass(
+    @pitch $mc
+    @type 'pizz' 
+    @duration null
+    @velocity 127
+    @useseed 1
+)).transcribe(
+    @onset $totdur @pan mc2pan($mc, 0.25) 
+);
+render(
+    @play 1 @process normalize(-9) 
+);
+ezexport($totdur)
