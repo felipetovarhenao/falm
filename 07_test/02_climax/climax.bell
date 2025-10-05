@@ -1,0 +1,83 @@
+setseed(13);
+$harmony = read('../00_harmony/harmony.txt');
+$cadence = $harmony.'cadence';
+$mcs = getkey($cadence:2, 'mcs');
+$mcs = left($mcs, 32);
+$t = 0;
+$totdur = 60000;
+$spanbpf = [0 50 0] [1 7000 0.25];
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $span = samplebpf($spanbpf, $nt);
+    $maxnotes = round($span / 80);
+    $chord = left(
+        xscramble($mcs), xrandom(7, min($maxnotes, 18)) 
+    );
+    $onsets = arithmser(0, $span, null, length($chord));
+    $onsets = dx2x(
+        timeramp(
+            @duration $span
+            @length length($chord) 
+            @slope xrand(-1/4, 1/4) 
+        ) 
+    ).left(-1);
+    for $onset in $onsets, $mc in $chord do (
+        $names = 'flute' 'clar' 'bass' 'sax';
+        $types = 'air' 'nonvib';
+        ## if xrand() ** 2 > $nt then ($types _= 'sfz');
+        if xrand() ** 1.5 > $nt then ($types _= 'flz');
+        $b = analyze(
+            @buffer ezsol(
+                @pitch $mc
+                @duration null
+                @names $names
+                @types $types
+                @useseed 1
+                @velocity 0
+            ) 
+            ## ---
+            @descriptors envmaxtime() 
+        );
+        transcribe(
+            @buffer Compress($b) 
+            @onset $t + $onset
+            @pan xrand() 
+            @gain [0 1 0] [1 0 0.7] 
+        );
+        if xrand() > 0.8 then (
+            $peak = $b.getkey('envmaxtime');
+            $sine = Compress(
+                sinewave(
+                    @pitch $mc + r2c(xchoose(1/2 1...8)) 
+                    @duration $b.getkey('duration') * exp2(xrand(-1, 0)) 
+                    @velocity max(1, $b.getkey('rms') * 65) 
+                    @envelope [0 0 0] [xrand(0.1, 0.9) 0.25 0.125] [1 0 -0.25] 
+                ) 
+            );
+            $V = xrandom(1, 3);
+            $pan = xrand();
+            $vbal = 1.1 ** (1 - $V);
+            for $v in 1...$V do (
+                $det = xrand(-5, 5) * ($v > 1);
+                transcribe(
+                    @buffer $sine
+                    @onset $t + $onset + $peak
+                    @pan $pan xrand() 
+                    @detune $det
+                    @keepduration 0
+                    @gain 0.25 * $vbal
+                ) 
+            ) 
+        ) 
+    );
+    $t += $span * 0.8
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport($totdur)

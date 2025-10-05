@@ -1,11 +1,13 @@
 $t = 0;
+importaudio('./01_keyclicks/main.wav').transcribe($t);
+$t += read('./01_keyclicks/main.txt');
+$t += 300;
+importaudio('./02_climax/climax.wav').transcribe(
+    @onset $t @gain [0 0.5 0] [1 0 -0.25] 
+);
+importaudio('./03_sparkles/sparkles.wav').transcribe($t @gain 0.707);
+$t += read('./02_climax/climax.txt') * 0.5;
 importaudio('./loop/loop.wav').transcribe($t);
 $t += read('./loop/loop.txt');
-importaudio('./wave/wave.wav').transcribe($t);
-$t += read('./wave/wave.txt');
-importaudio('./hits/hits.wav').transcribe($t);
-$t += read('./hits/hits.txt');
-render(
-    @play 1 @process normalize(-3) 
-);
+render(@play 1);
 ezexport()
