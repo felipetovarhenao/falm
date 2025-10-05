@@ -1,6 +1,7 @@
 $mcroot = b1;
+$pcroot = mc2pc($mcroot);
 $base = r2mc(1...64, $mcroot);
-$pcroots = r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4, mc2pc($mcroot));
+$pcroots = r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4, $pcroot);
 $progression = for $pc in $pcroots collect (
     for $i in 1 2 collect (
         $n7 = (13/7 7/4):$i;
@@ -13,6 +14,12 @@ $progression = for $pc in $pcroots collect (
         ] 
     ) 
 );
+$ratios = 1 8/7 9/8 5/4 3/2 7/4 16/9;
+$pcdom = $pcroots:-1;
+$pcs = r2pc($ratios, $pcdom);
+$cadence = [
+    ['pc' $pcdom] ['ratios' $ratios] ['pcs' $pcs] ['mcs' pcquant($base, $pcs)] 
+] $progression:1;
 write(
-    @data ['root' $mcroot] ['progression' $progression] @path './harmony.txt' 
+    @data ['root' $mcroot] ['progression' $progression] ['cadence' $cadence] @path './harmony.txt' 
 )

@@ -478,7 +478,7 @@ Swirl = (
                 @velocity $vel
                 @names $group.'names' 
                 @types $group.'types' 
-                @useseed 0
+                @useseed 1
             );
             if xrand() > 0.5 then (
                 $s = sinewave(

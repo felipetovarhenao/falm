@@ -1,5 +1,6 @@
-$objects = read('../01_objects/objects.txt');
-$obj = ($objects.'sequence'):-1;
+$harmony = read('../../00_harmony/harmony.txt');
+$cadence = $harmony.'cadence';
+$chord = getkey($cadence:1, 'mcs');
 $t = 0;
 $pts = arithmser(0, 1, null, 8);
 $spanbpf = [0 10000 0] [1 800 -0.125];
@@ -18,9 +19,8 @@ for $x $i in $pts do (
     for $dur $j in $durs do (
         $nnt = scale($j, 1, length($durs), 0, 1);
         $ctrl = samplebpf($ctrlbpf, $nnt);
-        $chord = getkey($obj, 'chord');
         for $fn in Swirl Tremolo KeyClicks do (
-            setseed($i * 2 + 40);
+            setseed($i * 3 + 40);
             $fn(
                 @onset $t
                 @spectrum $chord

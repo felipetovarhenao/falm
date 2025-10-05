@@ -1,11 +1,10 @@
 setseed(3);
-$objects = read('../01_objects/objects.txt');
-setseed($objects.'seed');
-$obj = ($objects.'sequence'):-1;
+$cadence = read('../../00_harmony/harmony.txt').'cadence';
+$spectrum = getkey($cadence:1, 'mcs');
 $t = 0;
 $t += Tremolo(
     @onset $t
-    @spectrum getkey($obj, 'chord') 
+    @spectrum $spectrum
     @duration 8000
     @ctrl 0
 );
