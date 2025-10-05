@@ -1,4 +1,4 @@
-setseed(7);
+setseed(8);
 #(
 ```bell
 Compress(
@@ -12,8 +12,9 @@ Compress = (
     $buffer -> (
         $g = gainboost(
             @buffer $buffer
-            @outmin dbtoa(-60) 
+            @outmin dbtoa(-54) 
             @outmax dbtoa(-14) 
+            @slope -0.0707
             @rms 1
         );
         process($buffer, gain($g)) 
@@ -38,15 +39,21 @@ Scratch = (
             @end 0
             @threshold 0.0025
         ));
-        $b = $b.setkey('duration', $duration).process(
-            reverse() gain(
-                [0 0 0] [1 1 $slope] 
+        $b = process(
+            @buffer $b.setkey('duration', $duration) 
+            ## ---
+            @operations (
+                reverse() 
+                ## ---
+                gain(
+                    [0 0 0] [1 1 $slope] 
+                ) 
             ) 
         );
         transcribe(
             @buffer Compress($b) 
             @onset $onset + $duration - $b.getkey('duration') 
-            @gain 0.5
+            @gain 0.33
             @pan [0 xrand() 0] [1 xrand() $slope] 
         ) 
     ) 
@@ -92,12 +99,13 @@ Beats = (
         $spectrum = left(
             xscramble($spectrum:[$addrs]), $numnotes
         );
-        $pan = xrand() - 0.5;
-        for $dur in timeramp(
+        $panbpf = for $x in 0 1 collect [$x xrand() - 0.5 $slope];
+        for $dur $durid in timeramp(
             @duration $duration
             @length $subdivs
             @slope xrand(-1/4, 1/4) 
         ) 0 do (
+            $panshift = samplebpf($panbpf, scale($durid, 1, $subdivs, 0, 1));
             for $mc in $spectrum do (
                 $b = process(
                     @buffer Compress(
@@ -114,7 +122,7 @@ Beats = (
                 $b.transcribe(
                     @onset $onset
                     @gain [0 1 0] [0.1 xrand(0.1, 0.5) -0.125] [1 0 0.5] 
-                    @pan fold($pan + mc2pan($mc, 0.25)) 
+                    @pan fold($pan + mc2pan($mc, 0.125) + $panshift) 
                 ) 
             );
             $onset += $dur
@@ -313,12 +321,12 @@ Arpeggio(
 )#
 Arpeggio = (
     $onset = 0, $spectrum = null, $duration = 1000, $ctrl = 0 -> (
-        Scratch(
+        if $ctrl > 0.5 then (Scratch(
             @onset $onset
             @spectrum $spectrum
             @duration $duration
             @ctrl $ctrl
-        );
+        ) );
         $numnotes = int(
             round(
                 samplebpf([0 7 0] [1 15 0.125], $ctrl) 
@@ -525,6 +533,11 @@ for $obj $objid in $objseq do (
     ) 
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process freeverb(
+        @roomsize 0.85
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
 );
 ezexport()
