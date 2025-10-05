@@ -10,6 +10,6 @@ for $file in $files with @unwrap 1 do (
     $t += $txt
 );
 render(
-    @play 1 @process normalize(-3)
+    @play 1 @process normalize(-3) 
 );
 ezexport($t)
