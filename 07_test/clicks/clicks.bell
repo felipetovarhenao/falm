@@ -100,6 +100,7 @@ Beats = (
             xscramble($spectrum:[$addrs]), $numnotes
         );
         $panbpf = for $x in 0 1 collect [$x xrand() - 0.5 $slope];
+        $bal = 1.05 ** (1 - length($spectrum));
         for $dur $durid in timeramp(
             @duration $duration
             @length $subdivs
@@ -117,7 +118,7 @@ Beats = (
                             @types 'slap-pitch' 'slap-unpitch' 'perc-emb' 'keys' 
                             @useseed 1
                         ) 
-                    ) @operations gain($gain) 
+                    ) @operations gain($gain * $bal) 
                 );
                 $b.transcribe(
                     @onset $onset
@@ -530,6 +531,27 @@ for $obj $objid in $objseq do (
         @spectrum $chord
         @duration $duration
         @ctrl $nt
+    ) 
+);
+for $i in 1...4, $span in rev(2000 4000 6000), $len in rev(6 9 12) do (
+    $durs = timeramp(
+        @duration $span
+        @length $len
+        @slope -0.25
+    );
+    for $dur in $durs do (
+        $obj = $objseq:1;
+        $chord = getkey($obj, 'chord');
+        for $fn in Swirl Tremolo, $ctrl in 1 0.125 do (
+            setseed($i * 2 + 40);
+            $fn(
+                @onset $t
+                @spectrum $chord
+                @ctrl $ctrl
+                @duration $dur
+            ) 
+        );
+        $t += $dur
     ) 
 );
 render(
