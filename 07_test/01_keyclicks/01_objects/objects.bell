@@ -1,0 +1,522 @@
+#(
+```bell
+Compress(
+    @buffer null
+) -> llll
+```
+
+Scales the gain of a buffer based on its RMS.
+)#
+Compress = (
+    $buffer -> (
+        $g = gainboost(
+            @buffer $buffer
+            @outmin dbtoa(-54) 
+            @outmax dbtoa(-14) 
+            @slope -0.0707
+            @rms 1
+        );
+        process($buffer, gain($g)) 
+    ) 
+);
+Scratch = (
+    $onset = 0, $spectrum = null, $duration = 1000, $ctrl = 0 -> (
+        $vel = samplebpf([0 0 0] [1 127 0.125], $ctrl);
+        $mode = xrandom(1, 2);
+        $b = ezsol(
+            @pitch ($spectrum:xrandom(1, 3) % 1200) + 2400
+            @velocity $vel
+            @duration null
+            @names 'bass' 'cello' 
+            @types if $mode == 1 then 'crushed-to-ord' else 'ord-to-crushed' 
+            @useseed 1
+        );
+        if $mode == 2 then ($b = $b.process(reverse()));
+        $slope = xrand(1/4, 2/3);
+        $b = $b.process(trim(
+            @start 1
+            @end 0
+            @threshold 0.0025
+        ));
+        $b = process(
+            @buffer $b.setkey('duration', $duration) 
+            ## ---
+            @operations (
+                reverse() 
+                ## ---
+                gain(
+                    [0 0 0] [1 1 $slope] 
+                ) 
+            ) 
+        );
+        transcribe(
+            @buffer Compress($b) 
+            @onset $onset + $duration - $b.getkey('duration') 
+            @gain 0.33
+            @pan [0 xrand() 0] [1 xrand() $slope] 
+        ) 
+    ) 
+);
+#(
+```bell
+Beats(
+    @onset 0
+    @spectrum null
+    @duration 2000
+    @subdivs 12
+) -> float/int
+```
+)#
+Beats = (
+    $onset = 0, $spectrum, $duration = 2000, $ctrl = 0 -> (
+        $maxsubdivs = max(
+            2, int(round($duration / 120)) 
+        );
+        $slope = 0.125;
+        $subdivsbpf = [0 4 0] [1 $maxsubdivs $slope];
+        $subdivs = int(
+            round(
+                min(
+                    max(
+                        2, samplebpf($subdivsbpf, $ctrl) + xrand(-1, 1) * 2.5
+                    ), $maxsubdivs
+                ) 
+            ) 
+        );
+        $maxnotes = 10;
+        $numnotesbpf = [0 4 0] [1 $maxnotes $slope];
+        $numnotes = int(
+            round(samplebpf($numnotesbpf, $ctrl)) 
+        );
+        $velbpf = [0 0 0] [1 127 $slope];
+        $vel = samplebpf($velbpf, $ctrl);
+        $gainbpf = [0 0.1 0] [1 0.2 $slope];
+        $gain = samplebpf($gainbpf, $ctrl);
+        $addrs = left(
+            argsort(abs($spectrum - c5)), $maxnotes
+        );
+        $spectrum = left(
+            xscramble($spectrum:[$addrs]), $numnotes
+        );
+        $panbpf = for $x in 0 1 collect [$x xrand() - 0.5 $slope];
+        $bal = 1.05 ** (1 - length($spectrum));
+        for $dur $durid in timeramp(
+            @duration $duration
+            @length $subdivs
+            @slope xrand(-1/4, 1/4) 
+        ) 0 do (
+            $panshift = samplebpf($panbpf, scale($durid, 1, $subdivs, 0, 1));
+            for $mc in $spectrum do (
+                $b = process(
+                    @buffer Compress(
+                        ezsol(
+                            @pitch $mc
+                            @duration $duration
+                            @velocity $vel
+                            @names family('brass') 'sax' 
+                            @types 'slap-pitch' 'slap-unpitch' 'perc-emb' 'keys' 
+                            @useseed 1
+                        ) 
+                    ) @operations gain($gain * $bal) 
+                );
+                $b.transcribe(
+                    @onset $onset
+                    @gain [0 1 0] [0.1 xrand(0.1, 0.5) -0.125] [1 0 0.5] 
+                    @pan fold($pan + mc2pan($mc, 0.125) + $panshift) 
+                ) 
+            );
+            $onset += $dur
+        );
+        $duration
+    ) 
+);
+#(
+```bell
+Tremolo(
+    @onset 0
+    @spectrum null
+    @duration 1000
+    @ctrl 0
+) -> float/int
+```
+)#
+Tremolo = (
+    $onset = 0, $spectrum = null, $duration = 1000, $ctrl = 0 -> (
+        $slope = 0.125;
+        $numnotesbpf = [0 4 0] [1 8 $slope];
+        $numnotes = int(
+            round(samplebpf($numnotesbpf, $ctrl)) 
+        );
+        $velbpf = [0 0 0] [1 50 $slope];
+        $vel = samplebpf($velbpf, $ctrl);
+        $modprobbpf = [0 0.5 0] [1 1 -$slope];
+        $modprob = samplebpf($modprobbpf, $ctrl);
+        $addrs = argsort(abs($spectrum - c6));
+        $spectrum = left($spectrum:[$addrs], $numnotes);
+        for $mc in xscramble($spectrum) do (
+            $slope = xrand(1/8, 6/7) * xchoose(-1 1);
+            $envmin = xrand(0.125) ** 2;
+            $gain = 0.5;
+            $env = xchoose(
+                [[0 $envmin 0] [1 $gain $slope]] [[0 $gain 0] [1 $envmin -$slope]] [
+                    [0 0 0] [xrand(0.1, 0.9) $gain $slope] [1 0 -$slope] 
+                ] [$gain] 
+            )::1;
+            $b = Compress(ezsol(
+                @pitch $mc
+                @names 'flute' 'clar' 'sax' 
+                @duration $duration
+                @types 'ord' 'air' 
+                @velocity $vel
+                @useseed 1
+            ));
+            if xrand() < $modprob then (
+                $phase = xchoose(-1 1);
+                $trem = (
+                    xchoose(saw tri cycle rect)(
+                        @frequency [0 xrand(12) * $phase 0] [1 xrand(12) * $phase xrand(-1/3, 1/3)] @duration $b.getkey('duration') 
+                    ) 
+                ).process(scaling(-1, 1, $envmin, 1) rampsmooth(16, 16));
+                $b = $b.process(multiply($trem)) 
+            );
+            $b.transcribe(
+                @onset $onset
+                @gain $env
+                @pan mc2pan($mc, 0.3) 
+            ) 
+        );
+        $duration
+    ) 
+);
+#(
+```bell
+KeyClicks(
+    @onset 0
+    @spectrum r2mc(1...32, c1)
+    @duration 1500
+    @ctrl 0
+) -> float/int
+```
+)#
+KeyClicks = (
+    $onset = 0, $spectrum = r2mc(4...16, c1), $duration = 1500, $ctrl = 0 -> (
+        init $order = xscramble(1...length($spectrum));
+        keep $order;
+        $reps = 2;
+        $slope = 0.25;
+        $rangesplit = 3;
+        $vel = samplebpf([0 0 0] [1 80 $slope], $ctrl);
+        $pizzgain = samplebpf([0 1/3 0] [1 0.125 -$slope], $ctrl);
+        $keysgain = samplebpf([0 0.25 0] [1 0.5 $slope], $ctrl);
+        $flzgain = samplebpf([0 1 0] [1 0.5 $slope], $ctrl);
+        $pizzprob = samplebpf([0 0.25 0] [1 2/3 $slope], $ctrl);
+        $sineprob = samplebpf([0 0.25 0] [1 2/3 $slope], $ctrl);
+        $spectrumsize = int(
+            round(
+                samplebpf([0 12 0] [1 18 $slope], $ctrl) 
+            ) 
+        );
+        $spectrum = left($spectrum, $spectrumsize);
+        $onset;
+        $arp = right($spectrum, $rangesplit):[$order];
+        $panoffset = xrand() - 0.5;
+        for $rep in 1...$reps do (
+            $durs = timeramp(
+                @duration $duration
+                @length length($arp) 
+                @slope xrand(-1/3, 1/3) 
+            );
+            $mc = xchoose(left($spectrum, $rangesplit));
+            ezsol(
+                @pitch $mc
+                @duration $duration
+                @velocity $vel
+                @names family('strings') 
+                @types 'pizz' 'pizz-secco' 
+                @useseed 1
+            ).Compress().transcribe(
+                @onset $onset
+                @pan mc2pan($mc, 0.125) 
+                @gain [0 $pizzgain 0] [1 0 0.5] 
+            );
+            for $mc in $arp , $dur in $durs do (
+                $pan = fold($panoffset + mc2pan($mc, 0.15));
+                if xrand() < $pizzprob then (
+                    transcribe(
+                        @buffer Compress(
+                            ezsol(
+                                @pitch $mc + xrandom(0, 2) * 1200
+                                @names family('strings') 
+                                @types 'pizz' 'pizz-secco' 'legno-batt' 
+                                @velocity 0
+                                @duration $dur * 4
+                                @useseed 1
+                            ) 
+                        ) 
+                        @onset $onset
+                        @pan xrand() 
+                        @gain [0 $pizzgain 0] [1 0 0.5] 
+                    ) 
+                );
+                transcribe(
+                    @buffer Compress(
+                        ezsol(
+                            @pitch $mc
+                            @names 'flute' 'clar' 'sax' 
+                            @types 'keys' 
+                            @duration max(250, $dur) 
+                            @velocity $vel
+                            @useseed 1
+                        ) 
+                    ) 
+                    @onset $onset
+                    @pan $pan
+                    @gain [0 $keysgain 0] [1 0 0.5] 
+                );
+                if xrand() < $sineprob then (
+                    $V = xrandom(1, 4);
+                    $vg = 2 ** (1 - $V);
+                    $oct = xrandom(-1, 4) * 1200;
+                    for $v in 1...$V do (
+                        sinewave(
+                            @pitch $mc + $oct + xrand(-2, 2) 
+                            @duration $dur * exp2(xrand(1.25, 4)) 
+                            @velocity xrandom(5, 15) 
+                            @envelope [0 1 0] [0.05 0.05 -0.125] [1 0 -xrand(1/4, 4/5)] 
+                        ).transcribe(
+                            @onset $onset
+                            @pan xrand() 
+                            @gain 0.05 * $vg
+                        ) 
+                    ) 
+                );
+                transcribe(
+                    @buffer Compress(ezsol(
+                        @pitch $mc
+                        @names 'flute' 'clar' 
+                        @types 'flz' 'air' 
+                        @velocity $vel
+                        @duration $dur * 9
+                        @useseed 1
+                    )) 
+                    @onset $onset
+                    @gain [0 1 * $flzgain 0] [0.05 0.125 * $flzgain -xrand(1/8, 1/3)] [1 0 -0.125] 
+                    @pan fold($pan + $panoffset) 
+                );
+                $onset += $dur
+            ) 
+        );
+        $duration * $reps
+    ) 
+);
+#(
+```bell
+Arpeggio(
+    @onset 0
+    @spectrum null
+    @duration 1000
+    @ctrl 0
+) -> float/int
+```
+)#
+Arpeggio = (
+    $onset = 0, $spectrum = null, $duration = 1000, $ctrl = 0 -> (
+        if $ctrl > 0.5 then (Scratch(
+            @onset $onset
+            @spectrum $spectrum
+            @duration $duration
+            @ctrl $ctrl
+        ) );
+        $numnotes = int(
+            round(
+                samplebpf([0 7 0] [1 15 0.125], $ctrl) 
+            ) 
+        );
+        $sineprob = samplebpf([0 0.5 0] [1 1 0.125], $ctrl);
+        $gain = samplebpf([0 0.707 0] [1 0.3 0], $ctrl);
+        $vel = samplebpf([0 0 0] [1 127 0.25], $ctrl);
+        $legato = samplebpf([0 0.5 0] [1 2 0.125], $ctrl);
+        $mcs = sort(
+            $spectrum:[
+                left(
+                    argsort(abs($spectrum - c5)), $numnotes
+                ) 
+            ] 
+        );
+        $mode = xchoose(1...3);
+        if $mode == 2 then ($mcs = rev($mcs)) else if $mode == 3 then ($mcs = xscramble($mcs));
+        $durs = timeramp(
+            @duration $duration
+            @length length($mcs) 
+            @slope xrand(-1/3, 1/3) 
+        );
+        $t = 0;
+        $names = 'flute' 'clar' 'sax';
+        $types = 'ord' 'ord-high' 'ord-micro';
+        if $vel > 80 then (
+            $names _= 'horn';
+            $types _= 'sfz' 'stacc' 
+        );
+        $panoffset = xrand() - 0.5;
+        for $mc in $mcs, $dur in $durs do (
+            $pan = fold(mc2pan($mc, .25) + $panoffset);
+            $b = Compress(
+                process(
+                    @buffer ezsol(
+                        @pitch $mc
+                        @duration $dur * $legato
+                        @names $names
+                        @types $types
+                        @velocity $vel
+                        @useseed 1
+                    ) @operations gain(
+                        [0 0.5 0] [1 0 -xrand(1/8, 2/3)] 
+                    ) 
+                ) 
+            );
+            if xrand() < $sineprob then (
+                transcribe(
+                    @buffer sinewave(
+                        @pitch $mc + xrandom(0, 3) * 1200
+                        @duration max(50, $dur * $legato) 
+                        @velocity max(2, $vel + xrandom(2, -2)) 
+                    ) 
+                    @onset $onset + $t
+                    @pan $pan
+                    @gain 0.005
+                ) 
+            );
+            transcribe(
+                @buffer $b
+                @onset $onset + $t
+                @pan $pan
+                @gain $gain
+            );
+            $t += $dur
+        );
+        $duration
+    ) 
+);
+#(
+```bell
+Swirl(
+    @onset 0
+    @duration 2000
+    @spectrum null
+    @ctrl 0
+) -> float/int
+```
+)#
+Swirl = (
+    $onset = 0, $spectrum = null, $duration = 2000, $ctrl = 0 -> (
+        $center = samplebpf([0 c5 0] [1 c6 0.25], $ctrl);
+        $numnotes = round(
+            samplebpf([0 10 0] [1 15 0.125], $ctrl) 
+        );
+        $seqlen = round(
+            samplebpf([0 3 0] [1 7 0.125], $ctrl) + xrand(-1.25, 1.25) 
+        );
+        $maxvel = samplebpf([0 25 0] [1 127 0.25], $ctrl);
+        $spectrum = $spectrum:[
+            left(
+                argsort(abs($spectrum - $center)), $numnotes
+            ) 
+        ] + 1200;
+        $addrs = randomseq(
+            @llll 1...length($spectrum) 
+            @length $seqlen
+            @steps (-1 1 -2) * xchoose(-1 1) 
+            @useseed 1
+        );
+        $seq = $spectrum:[$addrs];
+        $t = 0;
+        $durrange = sort(for $i in 1 2 collect xrand(50, 300));
+        $durbpf = [0 $durrange:1 0] [1 $durrange:2 xrand(-1/3, 1/3)];
+        if xrand() > 0.5 then ($durbpf = revbpf($durbpf));
+        if xrand() > 0.5 then ($durrange = rev($durrange));
+        for $mc in $seq do (
+            for $type in 'keys' 'air-and-ord' do (
+                if $type != 'keys' then (
+                    $env = xchoose(
+                        [[0 1 0] [1 0 -0.25]] [[0 0 0] [1 1 0.25]] 
+                    )::1
+                ) else $env = 1;
+                ezsol(
+                    @pitch $mc
+                    @duration $duration
+                    @velocity $maxvel
+                    @names 'clar' 
+                    @types $type
+                    @useseed 1
+                ).process(gain($env)).Compress().transcribe(
+                    @onset $t + $onset
+                    @pan xrand() 
+                    @gain 0.125
+                ) 
+            ) 
+        );
+        while $t < $duration do (
+            $nt = min(1, max(0, $t / $duration));
+            $dur = samplebpf($durbpf, $nt);
+            $mc = $seq:1;
+            $seq = rot($seq, 1);
+            $vel = scale($dur, $durrange:1, $durrange:2, 0, $maxvel);
+            $group = xchoose(
+                [
+                    ['names' family('strings')] [
+                        'types' 'pizz-secco' 'pizz' 
+                    ] 
+                ] [
+                    ['names' 'harp'] [
+                        'types' 'harm' 'harm-in-wood' 
+                    ] 
+                ] 
+            )::1;
+            $b = ezsol(
+                @pitch $mc
+                @duration $duration
+                @velocity $vel
+                @names $group.'names' 
+                @types $group.'types' 
+                @useseed 0
+            );
+            if xrand() > 0.5 then (
+                $s = sinewave(
+                    @pitch $mc + r2c(xchoose(1/2 1...8)) 
+                    @velocity $vel * 0.5
+                    @duration $dur * exp2(xrand(0, 6)) 
+                    @phase xrand() 
+                ).process(gain(0.05));
+                $b = $b.process(mix($s)) 
+            );
+            $b.Compress().transcribe(
+                @onset $t + $onset
+                @pan mc2pan($mc, 0.125) 
+                @gain [0 0.125 0] [0.125 0.01 -0.125] [1 0 xrand(1/8, 9/10)] 
+            );
+            $t += $dur
+        );
+        $duration
+    ) 
+);
+$seed = 101;
+ObjectMap = ['keyclicks' KeyClicks] ['tremolo' Tremolo] ['swirl' Swirl] ['arpeggio' Arpeggio] ['beats' Beats];
+$harmony = read('../../00_harmony/harmony.txt');
+$progression = $harmony.'progression';
+$durationbpf = [0 2500 0] [1 1250 0.35];
+$objseq = for $chord $idx in $progression collect (
+    $nt = scale($idx, 1, length($progression), 0, 1);
+    $duration = samplebpf($durationbpf, $nt);
+    $mcs = getkey($chord, 'mcs');
+    $shift = floor(($idx - 1) / 2);
+    $objs = ObjectMap:1 rot(right(ObjectMap, 1), $idx - 1):1;
+    $objs = rot(
+        @llll $objs @shift $shift
+    );
+    for $obj in $objs collect [
+        ['chord' $mcs] ['duration' $duration] ['key' $obj:(1 1)] ['nt' $nt] 
+    ] 
+);
+write(
+    @data ['sequence' $objseq] ['seed' $seed] @path './objects.txt' 
+)

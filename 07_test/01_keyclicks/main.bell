@@ -1,0 +1,14 @@
+$files = [2 'intro'] [3 'break'] [4 'cresc'];
+$t = 0;
+for $file in $files with @unwrap 1 do (
+    $id = $file:1;
+    $name = $file:2;
+    $basepath = './' + '0' + tosymbol($id) + '_' + $name + '/' + $name;
+    $snd = importaudio($basepath + '.wav');
+    $txt = read($basepath + '.txt');
+    $snd.transcribe($t);
+    $t += $txt
+);
+render(
+    @play 1 @process normalize(-3)
+)

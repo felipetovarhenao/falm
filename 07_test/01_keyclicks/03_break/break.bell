@@ -1,0 +1,15 @@
+setseed(3);
+$objects = read('../01_objects/objects.txt');
+setseed($objects.'seed');
+$obj = ($objects.'sequence'):-1;
+$t = 0;
+$t += Tremolo(
+    @onset $t
+    @spectrum getkey($obj, 'chord') 
+    @duration 8000
+    @ctrl 0
+);
+render(
+    @play 1 @process normalize(-20) 
+);
+ezexport($t)

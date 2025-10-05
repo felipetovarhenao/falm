@@ -1,0 +1,21 @@
+$objects = read('../01_objects/objects.txt');
+setseed($objects.'seed');
+$objseq = $objects.'sequence';
+$t = 0;
+for $obj in $objseq do (
+    $key = getkey($obj, 'key');
+    $duration = getkey($obj, 'duration');
+    $nt = getkey($obj, 'nt');
+    $chord = getkey($obj, 'chord');
+    $fn = ObjectMap.$key;
+    $t += $fn(
+        @onset $t
+        @spectrum $chord
+        @duration $duration
+        @ctrl $nt
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport($t)
