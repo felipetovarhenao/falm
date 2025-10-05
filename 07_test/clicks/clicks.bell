@@ -511,12 +511,14 @@ $progression = for $pc in r2pc(1 21/16 7/8 7/6 5/4 8/7 3/4 1, mc2pc($mcroot)) co
         ] 
     ) 
 );
-$t = 0;
 $objects = KeyClicks Tremolo Swirl Arpeggio Beats;
+$numobjbpf = [0 1 0] [1 length($objects) -0.125];
 $durationbpf = [0 2500 0] [1 1250 0.35];
-$objseq = for $chord in $progression with @unwrap 1 collect (
+$objseq = for $chord $chorid in $progression with @unwrap 1 collect (
+    $nt = scale($chorid, 1, length($progression), 0, 1);
+    $numobj = round(samplebpf($numobjbpf, $nt));
     $fns = xscramble(
-        KeyClicks xchoose(right($objects, 1)) 
+        KeyClicks xchoose(right($objects, 1):[1...$numobj]) 
     );
     for $fn in $fns collect [['chord' $chord] ['fn' $fn]] 
 );
@@ -533,10 +535,17 @@ for $obj $objid in $objseq do (
         @ctrl $nt
     ) 
 );
-$pts = arithmser(0, 1, null, 8);
-$spanbpf = [0 6000 0] [1 800 -0.125];
-$lenbpf = [0 12 0] [1 8 -0.125];
 $obj = $objseq:1;
+setseed(3);
+$t += Tremolo(
+    @onset $t
+    @spectrum getkey($obj, 'chord') 
+    @duration 8000
+    @ctrl 0
+);
+$pts = arithmser(0, 1, null, 8);
+$spanbpf = [0 10000 0] [1 800 -0.125];
+$lenbpf = [0 12 0] [1 8 -0.125];
 for $x $i in $pts do (
     $span = round(samplebpf($spanbpf, $x));
     $len = round(samplebpf($lenbpf, $x));
