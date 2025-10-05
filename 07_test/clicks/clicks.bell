@@ -168,6 +168,7 @@ KeyClicks = (
         $vel = samplebpf([0 0 0] [1 80 $slope], $ctrl);
         $pizzgain = samplebpf([0 1/3 0] [1 0.125 -$slope], $ctrl);
         $keysgain = samplebpf([0 0.25 0] [1 0.5 $slope], $ctrl);
+        $flzgain = samplebpf([0 1 0] [1 0.5 $slope], $ctrl);
         $pizzprob = samplebpf([0 0.25 0] [1 2/3 $slope], $ctrl);
         $sineprob = samplebpf([0 0.25 0] [1 2/3 $slope], $ctrl);
         $spectrumsize = int(
@@ -259,7 +260,7 @@ KeyClicks = (
                         @useseed 1
                     )) 
                     @onset $onset
-                    @gain [0 1 0] [0.05 0.125 -0.25] [1 0 -0.125] 
+                    @gain [0 1 * $flzgain 0] [0.05 0.125 * $flzgain -xrand(1/8, 1/3)] [1 0 -0.125] 
                     @pan fold($pan + $panoffset) 
                 );
                 $onset += $dur
@@ -286,13 +287,13 @@ Arpeggio = (
             ) 
         );
         $sineprob = samplebpf([0 0.5 0] [1 1 0.125], $ctrl);
-        $gain = samplebpf([0 0.5 0] [1 0.3 -0.125], $ctrl);
+        $gain = samplebpf([0 0.707 0] [1 0.3 0], $ctrl);
         $vel = samplebpf([0 0 0] [1 127 0.25], $ctrl);
-        $legato = samplebpf([0 0.25 0] [1 2 -0.125], $ctrl);
+        $legato = samplebpf([0 0.5 0] [1 2 0.125], $ctrl);
         $mcs = sort(
             $spectrum:[
                 left(
-                    argsort(abs($spectrum - g4)), $numnotes
+                    argsort(abs($spectrum - c5)), $numnotes
                 ) 
             ] 
         );
@@ -304,32 +305,39 @@ Arpeggio = (
             @slope xrand(-1/3, 1/3) 
         );
         $t = 0;
+        $names = 'flute' 'clar';
+        $types = 'ord' 'ord-high' 'ord-micro';
+        if $vel > 80 then (
+            $names _= 'horn';
+            $types _= 'sfz' 'stacc' 
+        );
+        $panoffset = xrand() - 0.5;
         for $mc in $mcs, $dur in $durs do (
-            $pan = mc2pan($mc, .25);
+            $pan = fold(mc2pan($mc, .25) + $panoffset);
             $b = Compress(
                 process(
                     @buffer ezsol(
                         @pitch $mc
                         @duration $dur * $legato
-                        @names 'flute' 'clar' 
-                        @types 'ord' 'ord-high' 'ord-micro' 
+                        @names $names
+                        @types $types
                         @velocity $vel
                         @useseed 1
                     ) @operations gain(
-                        [0 1 0] [1 0 -xrand(1/4, 4/5)] 
+                        [0 0.5 0] [1 0 -xrand(1/8, 2/3)] 
                     ) 
                 ) 
             );
             if xrand() < $sineprob then (
                 transcribe(
                     @buffer sinewave(
-                        @pitch $mc + xrandom(2, 5) * 1200
+                        @pitch $mc + xrandom(0, 3) * 1200
                         @duration max(50, $dur * $legato) 
-                        @velocity xrandom(2, 10) 
+                        @velocity max(2, $vel + xrandom(2, -2)) 
                     ) 
                     @onset $onset + $t
-                    @pan 1 - $pan
-                    @gain 0.01
+                    @pan $pan
+                    @gain 0.005
                 ) 
             );
             transcribe(
