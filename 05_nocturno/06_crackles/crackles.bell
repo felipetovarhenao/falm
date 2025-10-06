@@ -1,0 +1,48 @@
+setseed(2);
+$t = 0;
+$totdur = 60000;
+$bufs = null;
+$bufs = for $samps in (
+    ['acc' 'keys'] ['flute' 'keys'] [
+        'sax' 'keys' 
+    ] ['clar' 'keys'] (
+        for $name in 'violin' 'viola' collect [$name 'hit-on-body'] 
+    ) ['harp' 'tap'] 
+) with @unwrap 1 collect (
+    $name = $samps:1;
+    $types = right($samps, 1);
+    for $type in $types collect (
+        samples(
+            @name $name
+            @type $type
+            @preload 1
+        ).process(normalize(-12 @rms 1)) 
+    ) 
+);
+$gainbpf = [0 1 0] [1 0 -0.25];
+$incrbpf = [0 5 0] [1 400 0.125];
+while $t < $totdur do (
+    $nt = $t / $totdur;
+    $gain = samplebpf($gainbpf, $nt);
+    $incr = samplebpf($incrbpf, $nt);
+    $dur = xrand(15, 100);
+    $b = xchoose($bufs);
+    $maxoffset = $b.getkey('duration') - $dur;
+    $seg = $b.setkey('offset', xrand($maxoffset)).setkey('duration', $dur);
+    $seg.process(
+        resample(
+            1/c2r(xrand(0, 4) * 1200) 
+        ) 
+    ).transcribe(
+        @onset $t + $incr * exp2(xrand(-0.5, 0.5)) 
+        @pan xrand() 
+        @gain [
+            0 $gain * exp2(xrand(-1, 0)) 0
+        ] [1 0 -xrand(1/8, 4/5)] 
+    );
+    $t += $incr
+);
+render(
+    @play 1 @process normalize(0) dynamics(@thresh -20 @ratio 2) normalize(-9) 
+);
+ezexport($totdur)
