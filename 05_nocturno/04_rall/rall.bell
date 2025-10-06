@@ -1,41 +1,63 @@
-setseed(201);
+setseed(230);
 $harmony = read('../00_harmony/harmony.txt');
-$mcs = left(
+$spectrum = left(
     getkey(($harmony.'cadence'):1, 'mcs'), 32
 );
 $t = 0;
-$totdur = 6500;
+$totdur = 7200;
 $durs = timeramp(
     @duration $totdur
-    @length 6
-    @slope 0.125
+    @length 7
+    @slope 0.18
 );
-$sineprobbpf = [0 0.125 0] [1 0.8 0.125];
-$bassgainbpf = [0 0.25 0] [1 0.8 0.125];
+$sineprobbpf = [0 0.125 0] [1 1 0.125];
+$bassgainbpf = [0 0.1 0] [1 0.5 0.125];
+$numnotesbpf = [0 16 0] [1 length($spectrum) 0.125];
+$rollbpf = [0 0 0] [
+    1 ($durs:-1) / (length($spectrum) * 3) 1/3
+];
 for $dur in $durs do (
     $nt = $t / $totdur;
     $sineprob = samplebpf($sineprobbpf, $nt);
     $bassgain = samplebpf($bassgainbpf, $nt);
-    Compress(ezsol(
+    $numnotes = int(
+        round(samplebpf($numnotesbpf, $nt)) 
+    );
+    $mcs = left($spectrum, $numnotes);
+    $bassbuf = Compress(ezsol(
         @pitch $mcs:1
         @duration $dur * 4
         @names 'bass' 
         @types 'pizz' 'pizz-secco' 
         @useseed 1
         @velocity 127
-    )).transcribe(
+    ));
+    $basspan = mc2pan($mc, 0.12) + xrand(-0.05, 0.05);
+    $bassbuf.setkey('duration', $dur).process(
+        reverse() gain([0 0 0] [1 1 0.33]) 
+    ).transcribe(
         @onset $t
-        @pan mc2pan($mc, 0.12) + xrand(-0.05, 0.05) 
+        @pan $basspan
+        @gain 0.125 * $bassgain
+    );
+    $bassbuf.transcribe(
+        @onset $t
+        @pan $basspan
         @gain [0 $bassgain 0] [1 0 -0.5] 
     );
-    for $mc in $mcs do (
+    $shift = 0;
+    for $mc in xscramble($mcs) do (
+        $nt = max(
+            0, min(1,  ($t + $shift) / $totdur) 
+        );
+        $roll = samplebpf($rollbpf, $nt);
         $b = Compress(
             ezsol(
                 @pitch $mc
-                @duration max(500, $dur) 
+                @duration max(1000, $dur) 
                 @velocity 127
-                @names 'flute' 'clar' 'sax' family('brass') 
-                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 
+                @names 'flute' 'clar' 'sax' family('brass') family('strings') 
+                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 
                 @useseed 1
             ) 
         );
@@ -48,35 +70,57 @@ for $dur in $durs do (
             Compress(
                 sinewave(
                     @pitch $mc + r2c(xchoose(1/2 1...8)) 
-                    @duration $dur * exp2($rms) * $durmul
+                    @duration $dur * exp2($rms ** 0.707) * $durmul
                     @velocity $rms * 127
                     @envelope [0 0.25 0] [1 0 -xrand(1/8, 4/5)] 
                     @phase xrand() 
                 ) 
             ).transcribe(
-                @onset $t
+                @onset $t + $shift
                 @pan $pan
-                @gain 0.05
+                @gain 0.125
             ) 
         );
         transcribe(
             @buffer $b
-            @onset $t
+            @onset $t + $shift
             @pan $pan
-            @gain [0 1 0] [1 0 0.5] 
-        ) 
+            @gain [0 1 0] [1 0 -0.125] 
+        );
+        $shift -= xrand($roll) 
     );
     $t += $dur
 );
-$tail = 1000;
+$peakdur = $durs:-1;
+for $type in 'ord' 'mid' do (
+    $perc = perc(
+        @pitch c6 
+        @type $type
+        @duration $peakdur
+        @useseed 1
+        @velocity 127
+    ).process(
+        reverse() gain([0 0 0] [1 1 2/3]) 
+    );
+    $perc = $perc.Compress().analyze(envmaxtime());
+    $perc.transcribe(
+        @onset $t - $perc.getkey('envmaxtime') @pan [0 0 0] [1 xrand() 2/3] 
+    ) 
+);
+$tail = 500;
 render(
-    @play 1 @process freeverb(
+    @play 1 @process normalize(0) arctan() freeverb(
         @roomsize 0.9
-        @wet 0.0125
+        @wet [0 0.00125 0] [1 0.0707 0.125] 
         @damp 1
         @width 1
         @damp 1
         @tail $tail
-    ) fade(0, $tail) normalize(-3) 
+    ) fade(
+        @fadein 0
+        @fadeout $tail
+        @fadeouttype 2
+        @fadeoutcurve 0.125
+    ) normalize(-3) 
 );
 ezexport($totdur)
