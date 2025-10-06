@@ -1,4 +1,4 @@
-setseed(20);
+setseed(208);
 $harmony = read('../00_harmony/harmony.txt');
 $spectrum = left(
     getkey(($harmony.'cadence'):1, 'mcs'), 32
@@ -58,18 +58,15 @@ for $dur in $durs do (
         $sinegain = samplebpf($sinegainbpf, $nt);
         $mc += pitchdiff($mc, $spectrum2) * $mix;
         $roll = samplebpf($rollbpf, $nt);
-        $gliss = [0 1 0] [
-            1 1/c2r(-xrand(100)) xrand(0.5, 0.9) 
-        ];
         $b = Compress(
             ezsol(
                 @pitch $mc
                 @duration max(1000, $dur) 
                 @velocity 127
                 @names 'flute' 'clar' 'sax' family('brass') family('strings') family('plucked') 
-                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'legno-batt' 'perc' 'hit-on-body' 
+                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'legno-batt' 'perc' 'hit-on-body' 'air' 'air-and-ord' 'air-to-ord' 
                 @useseed 1
-            ).process(resample($gliss)) 
+            )
         );
         $pan = mc2pan($mc, 0.707);
         $rms = $b.getkey('rms');
@@ -82,7 +79,7 @@ for $dur in $durs do (
                     @pitch $mc + r2c(xchoose(1/2 1...8)) 
                     @duration $dur * exp2($rms ** 0.707) * $durmul
                     @velocity $rms * 127
-                    @envelope [0 0.25 0] [1 0 -xrand(1/8, 4/5)] 
+                    @envelope [0 0.25 0] [1 0 xchoose(-1 1) * xrand(1/8, 4/5)] 
                     @phase xrand() 
                 ) 
             ).transcribe(
