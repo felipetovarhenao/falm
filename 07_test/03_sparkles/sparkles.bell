@@ -28,10 +28,10 @@ for $type in 'bartok' 'pizz' do (
     )).transcribe(@pan xrand() * 0.1 + 0.5) 
 );
 $mcs = right($mcs, 4);
-$totdur = 15000;
+$totdur = 20000;
 $t = 0;
 $incrbpf = [0 20 0] [1 1000 0.125];
-$gainbpf = [0 0.125 0] [1 0 -0.25];
+$gainbpf = [0 1 0] [1 0.125 -0.25];
 $velbpf = [0 127 0] [1 0 -0.25];
 while $t < $totdur do (
     $nt = $t / $totdur;
@@ -47,19 +47,21 @@ while $t < $totdur do (
         ) 
     );
     $onset = $t + xrand(-0.5, 0.5) * $incr;
-    ezsol(
+    $pan = xrand();
+    Compress(ezsol(
         @pitch $mc
         @duration 500
         @names 'flute' 'sax' 'clar' 
         @types 'keys' 'pizz' 
         @useseed 1
         @velocity $vel
-    ).transcribe(
-        @onset $onset @pan xrand() 
+    )).transcribe(
+        @onset $onset
+        @pan $pan
+        @gain $gain * 0.707
     );
-    $pan = xrand();
     $V = xrandom(1, 5);
-    $gain *= 1.25 ** (1 - $V);
+    $gain *= 2 ** (1 - $V);
     for $i in 1...$V do (
         $b.transcribe(
             @onset $onset
@@ -67,18 +69,20 @@ while $t < $totdur do (
             @detune if $i > 1 then xrand(-2, 2) 
             @keepduration 0
             @gain [
-                0 $gain * exp2(xrand(-1, 0)) 0
+                0 $gain * exp2(xrand(-1, 0)) * 0.05 0
             ] [1 0 -xrand(0.125, 0.75)] 
         ) 
     );
     $t += $incr
 );
+$tail = 5000;
 render(
     @play 1 @process freeverb(
         @roomsize 0.98
-        @wet 0.025
+        @wet [0 0.025 0] [1 0.05 0.25] 
         @damp 1
         @width 1
-    ) normalize(-3) 
+        @tail $tail
+    ) fade(0, $tail) normalize(-3) 
 );
 ezexport($totdur)
