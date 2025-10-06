@@ -9,4 +9,4 @@
 5. Nocturno
 6. Passacaglia
 7. Follia
-8. Epilogo (a _Victoria_)
+8. Epilogo (_a Victoria_)
