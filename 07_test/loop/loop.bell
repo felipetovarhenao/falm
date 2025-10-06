@@ -95,7 +95,7 @@ $tail = 4000;
 $b.process(
     gain($dryenv) freeverb(
         @roomsize 0.98
-        @wet [0 0.015 0] [1 0.05 0.25] 
+        @wet [0 0.015 0] [1 0.025 0.25] 
         @dry 0
         @damp 1
         @width 1
