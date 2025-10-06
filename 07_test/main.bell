@@ -1,7 +1,7 @@
 $t = 0;
-## importaudio('./01_keyclicks/keyclicks.wav').transcribe($t);
-## $t += read('./01_keyclicks/keyclicks.txt');
-## $t += 300;
+importaudio('./01_keyclicks/keyclicks.wav').transcribe($t);
+$t += read('./01_keyclicks/keyclicks.txt');
+$t += 300;
 importaudio('./02_climax/climax.wav').setkey('offset', 2000).transcribe(
     @onset $t @gain [0 0.707 0] [1 0.125 -0.125] 
 );
