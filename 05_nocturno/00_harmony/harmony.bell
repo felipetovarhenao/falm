@@ -14,7 +14,7 @@ $progression = for $pc in $pcroots collect (
         ] 
     ) 
 );
-$ratios = 1 8/7 9/8 5/4 3/2 7/4 16/9;
+$ratios = 1 16/15 11/8 9/7 5/4 3/2 7/4 16/9;
 $pcdom = $pcroots:-1;
 $pcs = r2pc($ratios, $pcdom);
 $cadence = [
