@@ -13,7 +13,7 @@ $durs = timeramp(
     @length 7
     @slope 0.18
 );
-$sineprobbpf = [0 0.25 0] [1 1 0.125];
+$sineprobbpf = [0 0.01 0] [1 1 0.125];
 $sinegainbpf = [0 0.125 0] [1 0.25 0.125];
 $bassgainbpf = [0 0.25 0] [1 0.66 0.125];
 $numnotesbpf = [0 24 0] [1 length($spectrum) 0.125];
@@ -54,7 +54,7 @@ for $dur in $durs do (
     for $mc in xscramble(right($mcs, 1)) do (
         $onset = $t + $shift;
         $nt = max(0, min(1, $onset / $totdur) );
-        $mix = samplebpf($mixbpf, $nt);
+        $mix = round(samplebpf($mixbpf, $nt));
         $sinegain = samplebpf($sinegainbpf, $nt);
         $mc += pitchdiff($mc, $spectrum2) * $mix;
         $roll = samplebpf($rollbpf, $nt);
@@ -119,18 +119,41 @@ for $type in 'ord' 'mid' do (
 );
 $tail = 500;
 render(
-    @play 1 @process normalize(3) arctan() freeverb(
-        @roomsize 0.98
-        @wet [0 0.0125 0] [1 0.025 0.125] 
-        @damp 1
-        @width 1
-        @damp 1
-        @tail $tail
-    ) fade(
-        @fadein 0
-        @fadeout $tail
-        @fadeouttype 2
-        @fadeoutcurve 0.125
-    ) normalize(-3) 
+    @play 1 @process (
+        normalize(3) 
+        ## ---
+        arctan() 
+        ## ---
+        reverse() 
+        ## ---
+        freeverb(
+            @roomsize 0.98
+            @wet 0.025
+            @damp 1
+            @width 1
+            @damp 1
+            @tail 0
+        ) 
+        ## ---
+        reverse() 
+        ## ---
+        freeverb(
+            @roomsize 0.98
+            @wet [0 0.0125 0] [1 0.025 0.125] 
+            @damp 1
+            @width 1
+            @damp 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+            @fadeoutcurve 0.125
+        ) 
+        ## ---
+        normalize(-3) 
+    ) 
 );
 ezexport($totdur)
