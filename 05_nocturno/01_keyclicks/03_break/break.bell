@@ -8,11 +8,11 @@ $t += Tremolo(
     @duration 8000
     @ctrl 0
 );
-$tail = 400;
+$tail = 2000;
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.85
-        @wet [0 0.015 0] [1 0.025 0.125] 
+    @play 1 @process normalize(0) freeverb(
+        @roomsize 0.95
+        @wet [0 0.015 0] [1 0.25 0.125] 
         @damp 1
         @width 1
         @tail $tail
@@ -21,6 +21,6 @@ render(
         @fadeout $tail
         @fadeoutcurve 0.8
         @fadeouttype 2
-    ) normalize(-20) 
+    ) normalize(-19) 
 );
 ezexport($t)
