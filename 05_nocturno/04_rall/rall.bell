@@ -1,0 +1,82 @@
+setseed(201);
+$harmony = read('../00_harmony/harmony.txt');
+$mcs = left(
+    getkey(($harmony.'cadence'):1, 'mcs'), 32
+);
+$t = 0;
+$totdur = 6500;
+$durs = timeramp(
+    @duration $totdur
+    @length 6
+    @slope 0.125
+);
+$sineprobbpf = [0 0.125 0] [1 0.8 0.125];
+$bassgainbpf = [0 0.25 0] [1 0.8 0.125];
+for $dur in $durs do (
+    $nt = $t / $totdur;
+    $sineprob = samplebpf($sineprobbpf, $nt);
+    $bassgain = samplebpf($bassgainbpf, $nt);
+    Compress(ezsol(
+        @pitch $mcs:1
+        @duration $dur * 4
+        @names 'bass' 
+        @types 'pizz' 'pizz-secco' 
+        @useseed 1
+        @velocity 127
+    )).transcribe(
+        @onset $t
+        @pan mc2pan($mc, 0.12) + xrand(-0.05, 0.05) 
+        @gain [0 $bassgain 0] [1 0 -0.5] 
+    );
+    for $mc in $mcs do (
+        $b = Compress(
+            ezsol(
+                @pitch $mc
+                @duration max(500, $dur) 
+                @velocity 127
+                @names 'flute' 'clar' 'sax' family('brass') 
+                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 
+                @useseed 1
+            ) 
+        );
+        $pan = mc2pan($mc, 0.707);
+        $rms = $b.getkey('rms');
+        if xrand() < $sineprob then (
+            $durmul = scale(
+                $mc, minimum($mcs), maximum($mcs), 4, 1, 0.125
+            );
+            Compress(
+                sinewave(
+                    @pitch $mc + r2c(xchoose(1/2 1...8)) 
+                    @duration $dur * exp2($rms) * $durmul
+                    @velocity $rms * 127
+                    @envelope [0 0.25 0] [1 0 -xrand(1/8, 4/5)] 
+                    @phase xrand() 
+                ) 
+            ).transcribe(
+                @onset $t
+                @pan $pan
+                @gain 0.05
+            ) 
+        );
+        transcribe(
+            @buffer $b
+            @onset $t
+            @pan $pan
+            @gain [0 1 0] [1 0 0.5] 
+        ) 
+    );
+    $t += $dur
+);
+$tail = 1000;
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+        @damp 1
+        @tail $tail
+    ) fade(0, $tail) normalize(-3) 
+);
+ezexport($totdur)
