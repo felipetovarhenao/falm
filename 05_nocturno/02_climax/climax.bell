@@ -4,7 +4,7 @@ $cadence = $harmony.'cadence';
 $mcs = getkey($cadence:2, 'mcs');
 $mcs = left($mcs, 32);
 $t = 0;
-$totdur = 60000;
+$totdur = 70000;
 $spanbpf = [0 50 0] [1 7000 0.25];
 while $t < $totdur do (
     $nt = $t / $totdur;

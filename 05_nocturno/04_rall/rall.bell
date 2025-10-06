@@ -7,7 +7,7 @@ $spectrum2 = left(
     getkey(($harmony.'cadence'):2, 'mcs'), 32
 );
 $t = 0;
-$totdur = 7200;
+$totdur = 7900;
 $durs = timeramp(
     @duration $totdur
     @length 7
@@ -127,7 +127,7 @@ render(
         reverse() 
         ## ---
         freeverb(
-            @roomsize 0.98
+            @roomsize 0.87
             @wet 0.025
             @damp 1
             @width 1
@@ -139,7 +139,7 @@ render(
         ## ---
         freeverb(
             @roomsize 0.98
-            @wet [0 0.0125 0] [1 0.025 0.125] 
+            @wet 0.0125
             @damp 1
             @width 1
             @damp 1
