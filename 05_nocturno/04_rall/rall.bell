@@ -127,19 +127,21 @@ render(
         reverse() 
         ## ---
         freeverb(
-            @roomsize 0.87
-            @wet 0.025
+            @roomsize 0.9
+            @wet [1 0.025 0] [0 0.02 -0.125] 
             @damp 1
             @width 1
             @damp 1
-            @tail 0
+            @tail 10
         ) 
+        ## ---
+        fade(0, 10) 
         ## ---
         reverse() 
         ## ---
         freeverb(
-            @roomsize 0.98
-            @wet 0.0125
+            @roomsize 0.85
+            @wet [0 0.005 0] [1 0.0125 0.125] 
             @damp 1
             @width 1
             @damp 1
