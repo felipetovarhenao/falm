@@ -6,18 +6,8 @@ for $folder $id in $folders with @unwrap 1 do (
     $path = './' + $folder + '/' + $file + '.wav';
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
-    $tailsize = 20000;
-    if $folder != '06_passacaglia' then (
-        $tail = $b.setkey('offset', $bdur - 15000).setkey('duration', $tailsize).process(
-            reverse() normalize(-3) trim(@threshold 0.001 @end 0) 
-        );
-        $taildur = $tail.getkey('duration') 
-    ) else $taildur = 0;
-    $b = $b.setkey(
-        'duration', min($bdur,  ($bdur - $taildur) + 1000) 
-    );
     $b.transcribe($t);
-    $t += $b.getkey('duration') 
+    $t += $bdur
 );
 render(
     @play 1 @process normalize(-3) 
