@@ -8,8 +8,8 @@ importaudio('./02_climax/climax.wav').setkey('offset', 2000).transcribe(
 );
 importaudio('./03_sparkles/sparkles.wav').transcribe($t);
 $t += read('./03_sparkles/sparkles.txt');
-importaudio('./loop/loop.wav').transcribe($t);
-$t += read('./loop/loop.txt');
+importaudio('./05_granular/granular.wav').transcribe($t);
+$t += read('./05_granular/granular.txt');
 render(
     @play 1 @process normalize(-3) 
 );
