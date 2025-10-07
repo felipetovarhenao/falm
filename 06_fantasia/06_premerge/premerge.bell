@@ -80,7 +80,7 @@ for $seg $segid in $segs do (
     );
     $t += $unit * $speed
 );
-if $gates:(-1 2) == 1 then ($gates:-1 = [$t 1]) else ($gates _= [$t 1]);
+$gates _= [$t $reset];
 render(
     @play 1 @process normalize(-3) 
 );
