@@ -617,8 +617,8 @@ gainboost(
     @buffer ## required
     @inmin 0
     @inmax 1
-    @ioutmin 0
-    @ioutmax 1
+    @outmin 0
+    @outmax 1
     @slope -0.125
     @rms 0
 ) -> llll
