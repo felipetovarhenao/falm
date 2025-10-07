@@ -2,14 +2,15 @@ $data = read('../06_premerge/premerge.txt');
 $data2 = read('../01_foreground/foreground.txt');
 $bassfq = $data2.'final_chord'.minimum().mc2f();
 $gates = $data.'gates';
-if length($gates) % 2 == 1 then ($gates = $gates.left(-1));
+## if length($gates) % 2 == 1 then ($gates = $gates.left(-1));
 $gates = group($gates, 2);
+
 $offset = $gates::(1 1 1);
 $b = importaudio('../06_premerge/premerge.wav').setkey('offset', $offset);
 $c = importaudio('../04_glide/glide.wav');
 $t = 0;
-$minlevel = -20;
-$maxlevel = -6;
+$minlevel = -12;
+$maxlevel = -3;
 $rate = 0.125;
 $bass = (
     $onset, $fq, $dur, $gain -> (
@@ -20,7 +21,7 @@ $bass = (
         ) 
     ) 
 );
-$gainbpf = [0 0.00001 0] [1 1 -0.125];
+$gainbpf = [0 0.25 0] [1 1 -0.125];
 for $g $gi in $gates with @unwrap 1 do (
     $nt = scale($gi, 1, length($gates), 0, 1);
     $gain = samplebpf($gainbpf, $nt);
@@ -34,6 +35,7 @@ for $g $gi in $gates with @unwrap 1 do (
 );
 $c.setkey('offset', max(0, $start * $rate)).detach().clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe($start);
 $bass($start, $bassfq, $dur * 4);
+$tail = 1000;
 render(
     @play 1
     @fade 3
@@ -43,7 +45,17 @@ render(
             @wet [0 0.0001 0] [1 0.015 0.45] 
             @damp 1
             @width 1
-        ) normalize(-3) 
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+            @fadeoutcurve 0.5
+        ) 
+        ## ---
+        normalize(-3) 
         ## 
         ## mix($b @gains 1 0.5) normalize(-3) 
         

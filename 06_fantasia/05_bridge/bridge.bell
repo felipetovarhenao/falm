@@ -1,4 +1,4 @@
-setseed(920);
+setseed(909);
 Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
@@ -15,7 +15,6 @@ Swirl = (
         );
         $seq = $seq :* $numreps;
         $seq = $seq.left($numnotes);
-        $unit = $duration / $numnotes;
         $panoffset = xrand();
         $onsets = $onset + arithmser(0, 1, null, length($seq) + 1).scale(@outmax $duration @slope $slope);
         $durs = x2dx($onsets $duration);
@@ -47,7 +46,7 @@ $bardur = $beatdur * 4;
 $chord = $meta.'next_chord'.sort();
 $totdur = $bardur * 3/8 * 7;
 $finalunit = $bardur * 1/16;
-$velocity = [0 15 0] [1 127 0.3];
+$velocity = [0 45 0] [1 127 0.3];
 $numvoices = 3;
 for $vel $id in (
     ## [revbpf($velocity)] 
@@ -151,12 +150,21 @@ $bl = $b.setkey('duration', $totdur);
 $bl.detach().process(normalize(-3)).transcribe();
 $shift = 0;
 $shift += $totdur;
-for $dur in arithmser(0, 1, null, 32).scale(0, 1, 25, $finalunit, 0.25) do (
-    $bm = $b.setkey('offset', $totdur - $dur).setkey('duration', $dur);
-    $bm.process(
-        gain([0 1 0] [1 0 -0.1]) normalize(-3) 
-    ).transcribe( @onset $shift);
-    $shift += $dur
+for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtime in arithmser(-5, 5, null, 4) do (
+    $timeramp = timeramp(
+        @duration $rampdur
+        @length 15
+        @slope 0.22
+    );
+    for $dur in $timeramp do (
+        $bm = $b.setkey(
+            'offset',  (($totdur - $dur) + $headtime) 
+        ).setkey('duration', max(25 , $dur));
+        $bm.process(
+            gain([0 1 0] [1 0 -0.125]) normalize(@level -18 @rms 1) arctan() normalize(-3) 
+        ).transcribe(@onset $shift);
+        $shift += $dur
+    ) 
 );
 $br = $b.setkey('offset', $totdur);
 $br.process(normalize(-3)).transcribe($shift);
@@ -165,7 +173,7 @@ cycle(
     @frequency $chord:1.mc2f() / 2 @duration $bassdur
 ).transcribe(
     @onset $shift - $bassdur
-    @gain [0 0 0] [1 0.5 0.5] 
+    @gain [0 0 0] [1 0.125 2/3.] 
     @pan 0 1 0.5
 );
 render(

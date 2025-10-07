@@ -36,10 +36,16 @@ PianoRoll = (
                 @useseed 1
                 @names family('plucked') 
                 @types 'ord' 'harm' 
-                @gain 0.2
+                @gain 0.125
                 @norm 0.25
             );
-            $b.transcribe(
+            $boost = gainboost(
+                @buffer $b
+                @outmin dbtoa(-60) 
+                @outmax dbtoa(-12) 
+                @rms 1
+            );
+            $b.process(gain($boost)).transcribe(
                 @onset $t
                 @pan mc2pan($mc, 0.1) 
                 @gain [0 1 0] [1 0 0.7] 
@@ -60,17 +66,24 @@ PercGap = (
         if xrand() > 0.5 then ($mcs = $mcs.rev());
         $onsetvar = xrand().scale(@slope 0.25) * 90;
         for $mc in $mcs do (
-            ezsol(
+            $b = ezsol(
                 @pitch $mc
                 @names 'sax' 'flute' 'clar' family('strings') 'harp' 
                 @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 'exp-slap-pitch' 'harm-in-wood' 
                 @velocity $velocity ||| xrandom(60, 127) 
                 @useseed 1
                 @duration $duration * 2
-            ).transcribe(
+            );
+            $boost = gainboost(
+                @buffer $b
+                @outmin dbtoa(-50) 
+                @outmax dbtoa(-12) 
+                @rms 1
+            );
+            $b.process(gain($boost)).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
-                @gain [0 0.5 0] [1 0 0.7] 
+                @gain [0 0.25 0] [1 0 0.7] 
             );
             $onset += $onsetvar
         ) 
@@ -106,9 +119,17 @@ Arpeggi = (
                     'clar' 'flute' 'sax' 'acc' 
                 ) 
                 @types 'ord' 'ord-high' 'ord-micro' 
-                @velocity $velocity
+                @velocity $velocity + xrand(-7, 7) 
                 @useseed 1
             );
+            $boost = gainboost(
+                @buffer $b
+                @outmin dbtoa(-60) 
+                @outmax dbtoa(-12) 
+                @slope -0.25
+                @rms 1
+            );
+            $b = $b.process(gain($boost));
             if $mc > 4500 && xrand() > 0.9 then (Freeze(@buffer $b @onset $onset));
             $b.transcribe(
                 @onset $onset
@@ -150,16 +171,16 @@ Freeze = (
         ) 
     ) 
 );
-setseed(777);
+setseed(507);
 $t = 0;
 $meta = read('../01_foreground/foreground.txt');
 $chord = $meta.'final_chord';
-$chord = for $mc in $chord collect if $mc > 3600 && $mc < 8500 then $mc;
+$chord = for $mc in $chord collect if $mc > 3600 && $mc < 8700 then $mc;
 $N = 13;
 for $i in 1...$N do (
     $dur = scale($i, 1, $N, 3000, 7000, 0.125);
     $tempo = scale($i, 1, $N, 150, 90, 0.125);
-    $vel = scale($i, 1, $N, 127, 1, -0.125);
+    $vel = scale($i, 1, $N, 127, 1, 0.125);
     PercGap(
         @onset $t
         @duration $dur
@@ -175,6 +196,7 @@ for $i in 1...$N do (
     );
     $t += $dur
 );
+$tail = 2000;
 render(
     @play 1 @process (
         freeverb(
@@ -182,6 +204,12 @@ render(
             @wet 0.0125
             @damp 1
             @width 1
+            @tail $tail
+        ) fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+            @fadeoutcurve 0.5
         ) normalize(-3) 
     ) 
 );

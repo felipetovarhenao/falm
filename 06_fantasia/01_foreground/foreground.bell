@@ -6,7 +6,7 @@ $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $harmonicpulse = $bardur * (3/4) * 1.125;
-$root = F#3;
+$root = f#3;
 $pcroot = $root.mc2pc();
 $t = 0;
 $totalbars = 200;
@@ -29,10 +29,18 @@ $numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
 ## ----------------------
 ## Helpers
 ## ----------------------
-$ampmod = (
-    $c, $m, $minlevel = -60 , $maxlevel = -10 -> (
-        $m = $m.process(scaling(-1, 1, 0, 1) rampsmooth(16, 16));
-        $c.process(multiply($m)).clipnorm(@minlevel $minlevel @maxlevel $maxlevel) 
+AmpMod = (
+    $car, $mod, $minlevel = -60 , $maxlevel = -10 -> (
+        $mod = process(
+            @buffer $mod @operations scaling(-1, 1, 0, 1) rampsmooth(16, 16) 
+        );
+        clipnorm(
+            @buffer process(
+                @buffer $car @operations multiply($mod) 
+            ) 
+            @minlevel $minlevel
+            @maxlevel $maxlevel
+        ) 
     ) 
 );
 ## ----------------------
@@ -52,7 +60,7 @@ Stutter = (
         $readbpf = [0 0 0] [1 1 0];
         $speed = xrand(0.125) ** 2;
         $slope = xrand(1/5, 2/3) * xchoose(-1 1);
-        $env = [0 0 0] [xrand(0.0001, 0.9999) 1 0] [1 0 $slope];
+        $env = [0 0 0] [xrand(0.001, 0.999) 1 0] [1 0 $slope];
         for $t in $onsets, $dur in $durs do (
             if $dur > 2 then (
                 $nt = $t / $duration;
@@ -71,15 +79,15 @@ Stutter = (
 ## Function: TremChord
 ## ----------------------
 TremChord = (
-    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $ampmod, $peak -> (
+    $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $peak -> (
         init $eqbpf = [0 0 0] [32 0.125 -0.25] [261 1 -0.25] [830 0.707 -0.25] [4186 0.05 0.25] [26579 0.0 0.25];
         $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
-            $fq = $mc.mc2f() * exp2(xrandom(0, 3) * $sign);
-            $eq = samplebpf($eqbpf, $fq);
-            $env = [0 xrand(0.05, 0.35) ** 1.35 * $eq 0] [1 0 -0.25];
+            $fq = mc2f($mc) * exp2(xrandom(-1, 4));
+            $eq = samplebpf($eqbpf, $fq) * 0.25;
+            $env = [0 xrand(0.05, 0.35) ** 2 * $eq 0] [1 0 -0.25];
             if $sign == 1 then ($env = revbpf($env) );
             cycle(
                 @frequency $fq
@@ -96,11 +104,19 @@ TremChord = (
         $envmix = samplebpf(
             [0 0 0] [$peak 1/3 0.125] [1 1 -0.25], $nt
         );
+        $maxchordsize = round(
+            samplebpf(
+                [0 0.5 0] [$peak 1 0.25] [1 1 0], $nt
+            ) * length($chord) 
+        );
+        $chord = left($chord, $maxchordsize);
         $chordsize = length($chord);
-        $chordsize = xrandom($chordsize / 2, $chordsize);
+        $chordsize = max(
+            5, round($chordsize * xrand(0.5, 1)) 
+        );
         $chord = xscramble($chord).left($chordsize);
         for $mc in $chord do (
-            $oct = xrandom(-6, -9) * xchoose(1 -1);
+            $oct = xrandom(6, 9) * xchoose(1 -1);
             $b = ezsol(
                 @names family('woodwinds') 
                 @pitch $mc
@@ -110,17 +126,18 @@ TremChord = (
                 @useseed 1
             );
             $mod = xchoose(rect saw cycle tri)(
-                @frequency $mc.mc2f() * exp2($oct) * xchoose(-1 1) 
+                @frequency mc2f($mc) * exp2($oct) * xchoose(-1 1) 
                 @duration $duration
                 @phase xrand() 
             );
             $env1 = [0 1 0] [$dip xrand(0.1, 0.5) -0.25] [1 1 0.125];
             $env2 = [0 1 0] [0.001 1 0.25] [1 0 -0.125];
             $env = (1 - $envmix) * $env1 + $env2 * $envmix;
-            $b.$ampmod(
-                @m $mod
-                @minlevel $minlevel - 6
-                @maxlevel $maxlevel - 6
+            AmpMod(
+                @car $b
+                @mod $mod
+                @minlevel $minlevel - 3
+                @maxlevel $maxlevel - 3
             ).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 1/3) 
@@ -165,8 +182,14 @@ PercGap = (
 ## Function: Arpeggi
 ## ----------------------
 Arpeggi = (
-    $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -^ $bardur -> (
+    $onset = 0, $duration = 1000, $chord = null, $nt = null, $minlevel = -60, $maxlevel = -10 -^ $bardur, $peak -> (
         $unit = $bardur * xchoose(1/16 1/24 1/20);
+        $maxchordsize = round(
+            samplebpf(
+                [0 0.7 0] [$peak 1 0.125] [1 1 0], $nt
+            ) * length($chord) 
+        );
+        $chord = left($chord, $maxchordsize);
         $chord = xscramble($chord).left(xrandom(3, 7));
         $chordsize = length($chord);
         $numnotes = max(1, $duration / $unit);
@@ -265,7 +288,7 @@ Granulate = (
                         @duration $graindur
                         @phase xrand() 
                     ).process(
-                        gain(xrand(0.05, 0.125)) 
+                        gain(xrand(0.05, 0.125) * 0.5) 
                     ) 
                 );
                 $grain.transcribe(
@@ -284,7 +307,11 @@ Granulate = (
 ## Function: Melody
 ## ----------------------
 Melody = (
-    $onset, $duration, $chord, $minlevel = -60, $maxlevel = -10 -> (
+    $onset, $duration, $chord, $minlevel = -60, $maxlevel = -10, $nt = 0 -> (
+        $maxchordsize = round(
+            length($chord) * samplebpf([0 0.6 0] [1 1 0.125], $nt) 
+        );
+        $chord = left($chord, $maxchordsize);
         Thump(
             @onset $onset
             @duration $duration
@@ -352,13 +379,13 @@ PianoRoll = (
                 @duration $duration * 1.5
                 @velocity $vel
                 @useseed 1
+            ).process(
+                gain([0 0.33 0] [1 0 0.7]) 
             );
             $b.transcribe(
-                @onset $t
-                @pan mc2pan($mc, 0.1) 
-                @gain [0 1 0] [1 0 0.7] 
+                @onset $t @pan mc2pan($mc, 0.1) 
             );
-            if rand() > 0.707 then (Freeze(@onset $t @buffer $b));
+            if xrand() > 0.707 then (Freeze(@onset $t @buffer $b));
             $t += $incr
         ) 
     ) 
@@ -399,7 +426,7 @@ Freeze = (
 ## Function: GetHarmony
 ## ----------------------
 GetHarmony = (
-    $st = 1.0, $steps = 3/2 2/3 8/9 4/3 3/4 10/9, $chords = [1 6/5 3/2 9/8] [1 5/4 3/2 7/4] [1 6/5 3/2 4/3] [1 5/4 3/2 7/4] [1 5/4 3/2 15/8] [1 5/4 3/2 7/4] -> (
+    $st = 1.0, $steps = 32/21 2/3 8/9 21/16 3/4 10/9, $chords = [1 6/5 3/2 9/8] [1 5/4 3/2 7/4] [1 6/5 3/2 4/3] [1 5/4 3/2 7/4] [1 5/4 3/2 15/8] [1 5/4 3/2 7/4] -> (
         init $r = $st;
         init $i = 1;
         init $steps = $steps;
@@ -493,7 +520,6 @@ $minlevelbpf = [0 -24 0] [$peak $minlevelend $clipslope] [1 $minlevelend 0];
 $maxlevelbpf = [0 -18 0] [$peak $maxlevelend $clipslope] [1 $maxlevelend 0];
 while $t < $totdur do (
     $nt = $t / $totdur;
-    ## probabilistically choose between objects
     $minlevel = samplebpf($minlevelbpf, $nt);
     $maxlevel = samplebpf($maxlevelbpf, $nt);
     $weights = samplebpf($weightsbpf, $nt);
@@ -504,16 +530,13 @@ while $t < $totdur do (
     $object = xchoose(
         @choices $objects @weights $weights
     );
-    ## sample global breakpoint functions
     $gap = samplebpf($gapbpf, $nt);
     $numunits = samplebpf($numunitsbpf, $nt);
     $maxunits = samplebpf($maxunitsbpf, $nt).round().int();
     $chordsize = samplebpf($chordsizebpf, $nt).round().int();
-    ## determine max event duration
     $subunits = right(left($units, $numunits), -$maxunits);
     $maxdur = $bardur * xchoose($subunits);
     $maxdur = max(50, min($maxdur, $totdur - $t));
-    ## choose chord slice
     addmarker($t);
     if UpdateHarmony(@delta $maxdur @threshold $harmonicpulse) == 1 then (
         $cycle = GetHarmony();
@@ -521,10 +544,9 @@ while $t < $totdur do (
         $index = $cycle.getkey('index') 
     );
     $chord = $fullchord.pcquant($pcs).left($chordsize);
-    ## invoke chosen object (Melody or TremChord)
     $reps = 1;
     if $object == Melody && $nt > 0.3 then $reps = 2;
-    for $rep in 1...$reps do ($object(
+    for $rep in 1...$reps do $object(
         @onset $t
         @duration $maxdur
         @chord $chord
@@ -532,7 +554,7 @@ while $t < $totdur do (
         @nt $nt
         @minlevel $minlevel
         @maxlevel $maxlevel
-    ) );
+    );
     ## advance time and occasionally insert a gap
     $markers _= [
         ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
@@ -558,9 +580,9 @@ $markers _= [
 $finalchord = null;
 while $finalchord == null do (
     $cycle = GetHarmony();
-    if $cycle.getkey('index') == 1 then (
-        $pcs = $cycle.getkey('ratios').r2pc($pcroot);
-        $finalchord = $fullchord.pcquant($pcs) 
+    if getkey($cycle, 'index') == 1 then (
+        $pcs = r2pc(getkey($cycle, 'ratios'), $pcroot);
+        $finalchord = pcquant($fullchord, $pcs) 
     ) 
 );
 ## ----------------------
@@ -570,17 +592,17 @@ render(
     @play 1 @process normalize(-3) 
 );
 $metadata = (
-    ## 
+    ## --- 
     ['root' $root] 
-    ## 
+    ## --- 
     ['tempo' $tempo] 
-    ## 
+    ## --- 
     ['peak' $peak * $totdur] 
-    ## 
+    ## --- 
     ['totdur' $totdur] 
-    ## 
+    ## --- 
     ['markers' $markers] 
-    ## 
+    ## --- 
     ['final_chord' $finalchord] 
 );
 ezexport(@data $metadata)
