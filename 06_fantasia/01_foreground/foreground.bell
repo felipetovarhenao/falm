@@ -7,12 +7,12 @@ $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
 $harmonicpulse = $bardur * (3/4) * 1.125;
 $root = f#3;
-$pcroot = $root.mc2pc();
+$pcroot = mc2pc($root);
 $t = 0;
 $totalbars = 200;
 $peak = 0.7;
 $totdur = $totalbars * ($bardur * 3/8);
-$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
+$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'flz-to-ord' 'ord-to-flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
 $fullchord = r2mc(1...23, $root).sort();
 $maxunitsize = 14;
 $units = rev(
@@ -81,7 +81,6 @@ Stutter = (
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $peak -> (
         init $eqbpf = [0 0 0] [32 0.125 -0.25] [261 1 -0.25] [830 0.707 -0.25] [4186 0.05 0.25] [26579 0.0 0.25];
-        $vel = xrand(50, 127);
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
@@ -116,12 +115,16 @@ TremChord = (
         );
         $chord = xscramble($chord).left($chordsize);
         for $mc in $chord do (
+            $vel = xrand(30, 127);
+            if $vel > 70 then ($subtypes = diff(
+                $types, 'air-and-ord' 'air-to-ord' 'ord-to-air' 
+            ));
             $oct = xrandom(6, 9) * xchoose(1 -1);
             $b = ezsol(
                 @names family('woodwinds') 
                 @pitch $mc
                 @duration $duration + 50
-                @types $types
+                @types $subtypes
                 @velocity $vel
                 @useseed 1
             );

@@ -4,7 +4,14 @@ $b.transcribe($t);
 $t += read('./07_tile/tile.txt');
 $b = importaudio('./07_tile/tile.wav');
 $b.transcribe($t);
+$tail = 1000;
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process freeverb(
+        @roomsize 0.8
+        @wet 0.0125
+        @damp 1
+        @width 1
+        @tail $tail
+    ) fade(0, $tail) normalize(-3) 
 );
 ezexport()
