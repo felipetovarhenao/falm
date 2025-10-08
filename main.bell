@@ -22,6 +22,7 @@ for $folder $id in $folders with @unwrap 1 do (
     $path = './' + $folder + '/' + $file + '.wav';
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
+    addmarker($t @names $folder);
     $b.transcribe($t);
     $t += $bdur
 );
