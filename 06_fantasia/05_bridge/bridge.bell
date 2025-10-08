@@ -159,8 +159,8 @@ for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtim
     $pizz = ezsol(
         @pitch $chord:1 - 1200
         @velocity 127
-        @duration $rampdur * 2
-        @names 'bass' 
+        @duration min($rampdur * 3, 3000) 
+        @names 'bass' 'cello' 
         @types 'pizz' 
         @useseed 1
     );
@@ -183,7 +183,7 @@ $br = $b.setkey('offset', $totdur);
 $br.process(normalize(-3)).transcribe($shift);
 $bassdur = 2000;
 cycle(
-    @frequency $chord:1.mc2f() / 2 @duration $bassdur
+    @frequency mc2f($chord:1) / 2 @duration $bassdur
 ).transcribe(
     @onset $shift - $bassdur
     @gain [0 0 0] [1 0.125 2/3.] 

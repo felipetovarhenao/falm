@@ -13,7 +13,7 @@ $totalbars = 200;
 $peak = 0.7;
 $totdur = $totalbars * ($bardur * 3/8);
 $types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'flz-to-ord' 'ord-to-flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
-$fullchord = r2mc(1...23, $root).sort();
+$fullchord = sort(r2mc(1...23, $root));
 $maxunitsize = 14;
 $units = rev(
     sort((1 1 1...$maxunitsize) / 16) 
@@ -116,9 +116,10 @@ TremChord = (
         $chord = xscramble($chord).left($chordsize);
         for $mc in $chord do (
             $vel = xrand(30, 127);
-            if $vel > 70 then ($subtypes = diff(
+            $subtypes = $types;
+            if $vel > 70 then $subtypes = diff(
                 $types, 'air-and-ord' 'air-to-ord' 'ord-to-air' 
-            ));
+            );
             $oct = xrandom(6, 9) * xchoose(1 -1);
             $b = ezsol(
                 @names family('woodwinds') 

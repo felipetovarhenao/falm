@@ -27,14 +27,12 @@ $base1.process(normalize(-3)).transcribe($t);
 $t += $split;
 $b = importaudio('../03_leadup/leadup.wav');
 $leadupmeta = read('../03_leadup/leadup.txt');
-$b.transcribe(
-    $t - $leadupmeta.'duration' @gain 0.707
-);
+$b.transcribe($t - $leadupmeta.'duration' );
 importaudio('../05_bridge/bridge.wav').transcribe($t);
 $t += read('../05_bridge/bridge.txt');
 $tail = $base2.process(
     mix(
-        importaudio('../02_percussion/percussion.wav') @gains 0.707 1
+        importaudio('../02_percussion/percussion.wav') @gains 0.5 1
     ) arctan() normalize(-3) 
 ).setkey('duration', $totdur - $split);
 $segs = $tail.splitbuf(@split $unit);
@@ -71,7 +69,9 @@ for $seg $segid in $segs do (
         $shift = 0;
         $lastonset = $t;
         for $c in 1...$numcopies do (
-            $copy.setkey('duration', max(25, $copydur)).process(normalize(-18 @rms 1) arctan() normalize(-9)).transcribe(@onset $t + $shift);
+            $copy.setkey('duration', max(25, $copydur)).process(
+                normalize(-18 @rms 1) arctan() normalize(-9)
+            ).transcribe(@onset $t + $shift);
             $shift += $copydur
         ) 
     ) else (
