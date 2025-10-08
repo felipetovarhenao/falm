@@ -11,8 +11,8 @@ BassDrum = (
             @types 'perc' 'hit-on-body' 
             @duration $unit
             @velocity 127
-            @useseed 1
             @resample 0
+            @useseed 1
         ).process(normalize(@level -28 @rms 1));
         for $i in 1...$numattacks do (
             $pan = mc2pan($pitch, 0.25);
@@ -58,7 +58,7 @@ Freeze = (
     ) 
 );
 $postfx = normalize(-3);
-$sequence = read('../riff/sequence.txt');
+$sequence = read('../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $ids = 2...length($sections);
@@ -156,4 +156,4 @@ for $id in $ids do (
         ) 
     ) 
 );
-if $preview == 1 then (render(@play 1 @process $postfx) )
+if $preview == 1 then render(@play 1 @process $postfx)

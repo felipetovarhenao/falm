@@ -24,7 +24,7 @@ RandomOctave = (
     ) 
 );
 setseed(10);
-$sequence = read('../sequence.txt');
+$sequence = read('../../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $ids = 3...length($sections);
 $firstsection = minimum($ids);
@@ -100,7 +100,7 @@ if $combine == 1 then (
         @play 1 @process $postfx (
             if $preview == 1 then (
                 ## ---
-                mix(importaudio('../strings/strings_' + $id + '.wav')) 
+                mix(importaudio('../01_strings/strings_' + $id + '.wav')) 
                 ## ---
                 normalize(-3) 
             ) 

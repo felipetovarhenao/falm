@@ -1,10 +1,9 @@
-$sequence = read('../riff/sequence.txt');
+$sequence = read('../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $ids = 3...length($sections);
 $minid = minimum($ids);
 $maxid = maximum($ids);
-## $ids = 8;
 $preview = length($ids) == 1;
 $groupsizebpf = [0 1 0] [1 4 0.125];
 $maxnotesbpf = [0 12 0] [1 8 0];
@@ -21,13 +20,6 @@ $postfx = (
     fade(0, 5) 
     ## ---
     reverse() 
-    ## ---
-    ## freeverb(
-    ##     @roomsize 0.9
-    ##     @wet 0.0125
-    ##     @damp 1
-    ##     @width 1
-    ## ) 
     ## ---
     normalize(-9) 
 );
@@ -90,26 +82,6 @@ for $id in $ids do (
         $t += $unit / min(6, $overlap + 1) 
     );
     $totdur = $t;
-    ## for $note in $notes do (
-    ##     $pitch = getkey($note, 'pitch');
-    ##     $env = [0 1 0] [1 0.1 -xrand(1/4, 4/5)];
-    ##     if xrand() > 0.5 then ($env = revbpf($env));
-    ##     $pan = abs(
-    ##         xrand() - (0 1) 
-    ##     );
-    ##     ezsol(
-    ##         @pitch $pitch + xrandom(0, 2) * 1200
-    ##         @names family('woodwinds') 'acc' 
-    ##         @types 'ord' 'flz' 
-    ##         @velocity 0
-    ##         @duration $totdur
-    ##         @useseed 1
-    ##     ).transcribe(
-    ##         @onset 0
-    ##         @pan $pan
-    ##         @gain $env
-    ##     ) 
-    ## );
     if $preview == 0 then (
         render(@reset 1 @process $postfx);
         ezexport(@data $totdur @id $id) 

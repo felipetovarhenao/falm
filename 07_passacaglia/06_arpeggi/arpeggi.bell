@@ -1,4 +1,4 @@
-$sequence = read('../riff/sequence.txt');
+$sequence = read('../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $root = $sequence.'root';
 $unit = $sequence.'unit';

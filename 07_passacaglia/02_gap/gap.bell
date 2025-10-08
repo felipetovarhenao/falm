@@ -1,5 +1,5 @@
 setseed(9);
-$sequence = read('../riff/sequence.txt');
+$sequence = read('../00_sequence/sequence.txt');
 $root = $sequence.'root';
 $id = 8;
 $section = $sequence.'sections':($id - 1);

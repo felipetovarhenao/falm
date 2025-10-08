@@ -1,4 +1,4 @@
-$sequence = read('../sequence.txt');
+$sequence = read('../../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $ids = 5...length($sections);

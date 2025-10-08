@@ -1,19 +1,20 @@
-$data = read('./sequence.txt');
+$data = read('../00_sequence/sequence.txt');
 $sections = $data.'sections';
 $numsections = length($sections);
-$layers = 'strings' 'perc' 'sines' 'bass' 'brass' 'downbeat';
+$layers = 'strings' 'perc' 'downbeat' 'bass' 'sines' 'brass';
 $t = 0;
 for $i in 1...$numsections do (
     $id = tosymbol($i);
     $t = 0;
-    for $layer in $layers do (
-        $file = './' + $layer + '/' + $layer + '_' + $id + '.wav';
+    for $layer $layerid in $layers do (
+        $digit = '0' + tosymbol($layerid) + '_';
+        $file = './' + $digit + $layer + '/' + $layer + '_' + $id + '.wav';
         if exists($file) == 1 then (
             $b = importaudio($file);
             $b.transcribe($t) 
         ) 
     );
-    $t += read('./strings/strings_' + $id + '.txt');
+    $t += read('./01_strings/strings_' + $id + '.txt');
     render(
         @reset 1 @process normalize(-3) 
     );

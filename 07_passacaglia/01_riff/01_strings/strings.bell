@@ -25,14 +25,13 @@ Stutter = (
         ) 
     ) 
 );
-$data = read('../sequence.txt');
+$data = read('../../00_sequence/sequence.txt');
 $sections = $data.'sections';
 $numreps = 4;
 $globaloffsets = dx2x(for $section in $sections collect getkey($section, 'total_duration') * $numreps);
 $globalduration = $globaloffsets:-1;
 $t = 0;
 $sectionids = 1...length($sections);
-## $sectionids = 6;
 $combine = length($sectionids) == 1;
 $stutterbpf = [0 0 0] [1 0.2 -0.1];
 $stutterdivsbpf = [0 3 0] [1 12 0.25];
@@ -68,7 +67,8 @@ for $sectionid in $sectionids do (
                     @velocity $velocity
                     @names $name
                     @types $types
-                ).process(
+                );
+                $buffer = $buffer.process(
                     normalize(-14 @rms 1) 
                     ## --
                     trim(@threshold 0.1 @end 0) 

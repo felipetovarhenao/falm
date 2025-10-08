@@ -1,10 +1,9 @@
-$sequence = read('../sequence.txt');
+$sequence = read('../../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $ids = 4...length($sections);
 $minid = minimum($ids);
 $maxid = maximum($ids);
 $numnotesbpf = [0 0 0] [1 1 0];
-## $ids = 7;
 for $id in $ids do (
     $gnt = scale($id, $minid, $maxid, 0, 1);
     $section = $sections:$id;
@@ -26,9 +25,6 @@ for $id in $ids do (
         ) 
     );
     $t = 0;
-    ## importaudio(
-    ##     '../strings/strings_' + tosymbol($id) + '.wav' 
-    ## ).transcribe($t);
     for $rep in 1...4 do (
         for $chord $chordid in $chords do (
             $timestep = getkey($chord, 'timestep');

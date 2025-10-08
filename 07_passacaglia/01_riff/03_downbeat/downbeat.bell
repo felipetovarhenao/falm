@@ -1,17 +1,18 @@
-$sequence = read('../sequence.txt');
+$sequence = read('../../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $root = $sequence.'root';
 $ids = 2...length($sections);
 ## $ids = 7;
 for $id in $ids do (
     $section = $sections:$id;
-    $pcs = getkey($section, 'pitch_classes').print();
+    $pcs = getkey($section, 'pitch_classes');
     $mc = pcquant(r2mc(5, $root), $pcs) - 1200;
     $b = bass(
         @pitch $mc
         @duration null
         @velocity 127
         @type 'pizz' 
+        @useseed 1
     ).analyze(effectiveduration(@thresholdratio 0.001));
     cycle(
         @frequency mc2f($mc) / 2 @duration $b.getkey('effectiveduration') 

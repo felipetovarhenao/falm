@@ -63,7 +63,9 @@ for $seed $chordsize in $seeds collect (
             $vel = xrand(10, 115);
             $mc1 = $mcpair:1;
             $mc2 = $mcpair:2;
-            $diff = c2r(pitchdiff($mc1, $mc2));
+            $diff = c2r(
+                minabs(pitchdiff($mc1, $mc2), 300)
+            );
             $env = [0 1 0] [1 1/$diff $slope];
             $durmul = integrate( @llll $env):(-1 2);
             $instrument = xchoose(pitchfilter(

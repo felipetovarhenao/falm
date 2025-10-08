@@ -2,8 +2,9 @@ $folders = 'doppel' 'run' 'arpeggi' 'blast' 'strum' 'bell' 'gap' 'riff';
 $t = 0;
 for $i in 1...8 do (
     $id = tosymbol($i);
-    for $folder in $folders do (
-        $basefile = './' + $folder + '/' + $folder + '_' + $id ;
+    for $folder $folderid in $folders do (
+        $prefix = '0' + tosymbol(8 - $folderid + 1) + '_';
+        $basefile = './' + $prefix + $folder + '/' + $folder + '_' + $id ;
         $sndfile = $basefile + '.wav';
         $txtfile = $basefile + '.txt';
         if exists($sndfile) == 1 && exists($txtfile) == 1 then (
@@ -19,7 +20,7 @@ for $i in 1...8 do (
         ) 
     ) 
 );
-importaudio('./dissolve/dissolve.wav').transcribe($t);
+importaudio('./09_dissolve/dissolve.wav').transcribe($t);
 render(
     @play 1 @process normalize(-3) join(envelope(@duration 2000)) 
 );

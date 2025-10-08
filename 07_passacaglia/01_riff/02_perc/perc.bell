@@ -1,5 +1,5 @@
 setseed(1);
-$data = read('../sequence.txt');
+$data = read('../../00_sequence/sequence.txt');
 $sections = $data.'sections';
 $unit = $data.'unit';
 $mix = 0;
@@ -7,7 +7,7 @@ $dummy = envelope(0);
 for $id in 2...length($sections) do (
     $chords = ($sections:$id).getkey('chords');
     $base = importaudio(
-        '../strings/strings_' + tosymbol($id) + '.wav' 
+        '../01_strings/strings_' + tosymbol($id) + '.wav' 
     );
     $dummy.transcribe();
     $t = 0;

@@ -1,13 +1,13 @@
 setseed(80);
-$sequence = read('../riff/sequence.txt');
+$sequence = read('../00_sequence/sequence.txt');
 $sections = $sequence.'sections';
 $unit = $sequence.'unit';
 $id = length($sections);
 $b = importaudio(
-    '../riff/riff_' + tosymbol($id) + '.wav' 
+    '../01_riff/riff_' + tosymbol($id) + '.wav' 
 );
 $meta = read(
-    '../riff/riff_' + tosymbol($id) + '.txt' 
+    '../01_riff/riff_' + tosymbol($id) + '.txt' 
 );
 $reps = 8;
 $markers = arithmser(0, $meta, $unit);
