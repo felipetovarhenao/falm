@@ -71,7 +71,7 @@ for $seg $segid in $segs do (
         $shift = 0;
         $lastonset = $t;
         for $c in 1...$numcopies do (
-            $copy.setkey('duration', max(25, $copydur)).transcribe(@onset $t + $shift);
+            $copy.setkey('duration', max(25, $copydur)).process(normalize(-18 @rms 1) arctan() normalize(-9)).transcribe(@onset $t + $shift);
             $shift += $copydur
         ) 
     ) else (
