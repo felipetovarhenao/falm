@@ -64,7 +64,7 @@ for $dur in $durs do (
                 @duration max(1000, $dur) 
                 @velocity 127
                 @names 'flute' 'clar' 'sax' family('brass') family('strings') family('plucked') 
-                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'legno-batt' 'perc' 'hit-on-body' 'air' 'air-and-ord' 'air-to-ord' 
+                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'perc' 'hit-on-body' 'air' 'air-and-ord' 'air-to-ord' 
                 @useseed 1
             ) 
         );

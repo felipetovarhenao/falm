@@ -247,7 +247,7 @@ KeyClicks = (
                             ezsol(
                                 @pitch $mc + xrandom(0, 2) * 1200
                                 @names family('strings') 
-                                @types 'pizz' 'pizz-secco' 'legno-batt' 
+                                @types 'pizz' 'pizz-secco' 
                                 @velocity 0
                                 @duration $dur * 4
                                 @useseed 1
