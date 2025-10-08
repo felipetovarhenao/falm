@@ -5,7 +5,7 @@ $folders = (
     ## ---
     '03_scherzo' 
     ## ---
-    ['04_andante' 'post'] 
+    '04_andante' 
     ## ---
     '05_nocturno' 
     ## ---
@@ -16,10 +16,8 @@ $folders = (
     '08_epilogo' 
 );
 $t = 0;
-for $folder $id in $folders with @unwrap 1 do (
-    $file = $folder:2 ||| 'main';
-    $folder = $folder:1;
-    $path = './' + $folder + '/' + $file + '.wav';
+for $folder $id in $folders do (
+    $path = './' + $folder + '/' + 'main' + '.wav';
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
     addmarker($t @names $folder);
