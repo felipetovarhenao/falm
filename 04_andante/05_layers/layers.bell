@@ -7,7 +7,7 @@ $mcs = r2mc(1...32, $mcroot).pcquant($pcs).xscramble();
 initurn(
     @size length($mcs) @useseed 1
 );
-$markers = read('../pulse/pulse.txt');
+$markers = read('../01_pulse/pulse.txt').'sections';
 $climaxst = $markers:2;
 $climaxend = $markers:3;
 $totdur = ($climaxend - $climaxst);

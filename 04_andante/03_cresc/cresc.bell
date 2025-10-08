@@ -1,4 +1,4 @@
-$metadata =read('../pulse/pulse.txt');
+$metadata = read('../01_pulse/pulse.txt');
 $beat = $metadata.'beat';
 $beatnum = int(round($metadata.'sections':2 / $beat));
 $event = $metadata.'chords':$beatnum;

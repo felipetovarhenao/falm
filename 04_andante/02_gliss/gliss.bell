@@ -1,5 +1,5 @@
 setseed(1010);
-$metadata = read('../pulse/pulse.txt');
+$metadata = read('../01_pulse/pulse.txt');
 $beat = $metadata.'beat';
 $sections = $metadata.'sections';
 $events = $metadata.'chords';
