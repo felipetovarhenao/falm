@@ -2,9 +2,10 @@ $t = 0;
 $names = (
     'glitch' 'polyrhythm' 
 );
-$files = for $n in $names collect [
+$files = for $n $nid in $names collect [
     rev(
-        $folder = './' + $n;
+        $prefix = '0' + tosymbol($nid) + '_';
+        $folder = './' + $prefix + $n;
         $files = sort(readfolder($folder));
         $files = for $file in $files collect (
             $parsed = parsepath($file);
@@ -19,14 +20,14 @@ $files = $files.sort(
     ($a, $b -> length($a::1) < length($b::1)) 
 );
 $files = $files.trans(@iterationmode 1).rev().flat();
-for $file $fileid in $files do (
+for $file in $files do (
     $b = importaudio($file + '.wav');
     $b.transcribe($t);
     $timestep = read($file + '.txt');
     $t += $timestep
 );
-importaudio('./loops/loops.wav').transcribe($t);
-$timestep = read('./loops/loops.txt');
+importaudio('./03_loops/loops.wav').transcribe($t);
+$timestep = read('./03_loops/loops.txt');
 $t += $timestep;
 $bassdur = min(4500, $timestep);
 $basspeak = 0.95;
@@ -39,13 +40,13 @@ cycle(
     @pan mc2pan(c3) 
     @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
-importaudio('./trail/trail.wav').transcribe($t);
-$t += read('./trail/trail.txt');
-importaudio('./scratch/scratch.wav').transcribe($t);
-$t += read('./scratch/scratch.txt');
-importaudio('./climax/climax.wav').transcribe($t @gain 0.707);
-$t += read('./climax/climax.txt');
-importaudio('./bursts/bursts.wav').transcribe($t @gain 0.5);
+importaudio('./04_trail/trail.wav').transcribe($t);
+$t += read('./04_trail/trail.txt');
+importaudio('./07_scratch/scratch.wav').transcribe($t);
+$t += read('./07_scratch/scratch.txt');
+importaudio('./06_climax/climax.wav').transcribe($t @gain 0.707);
+$t += read('./06_climax/climax.txt');
+importaudio('./08_bursts/bursts.wav').transcribe($t @gain 0.5);
 render(
     @play 1
     @fade 0
@@ -54,6 +55,7 @@ render(
         normalize(-3) 
         ## ---
         ## resample(1/c2r(-200)) 
+        
     ) 
 );
 ezexport()

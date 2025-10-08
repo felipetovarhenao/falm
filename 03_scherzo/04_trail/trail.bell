@@ -1,9 +1,9 @@
 setseed(1000 + 1234);
 $t = 0;
-$b = importaudio('../loops/loops.wav');
+$b = importaudio('../03_loops/loops.wav');
 $bardur = 2150.;
 $dur = 1/8 * $bardur;
-$end = read('../loops/loops.txt');
+$end = read('../03_loops/loops.txt');
 $N = 12;
 for $i in 1...($N + 1) do (
     $mc = g7;
