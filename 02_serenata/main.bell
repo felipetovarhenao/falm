@@ -1,20 +1,20 @@
 $t = 0 ;
-importaudio('./intro/intro.wav').transcribe($t);
-$t += read('./intro/intro.txt').maximum();
-importaudio('./bisb/bisb.wav').transcribe(
-    $t - read('./bisb/bisb.txt') @gain 0.707
+importaudio('./01_intro/intro.wav').transcribe($t);
+$t += read('./01_intro/intro.txt').maximum();
+importaudio('./02_transient/transient.wav').transcribe(
+    $t - read('./02_transient/transient.txt') @gain 0.707
 );
-importaudio('./arpeggi/arpeggi.wav').transcribe($t);
-$t += read('./arpeggi/arpeggi.txt');
-importaudio('./swell/swell.wav').transcribe(
-    @onset $t - read('./swell/swell.txt') + 500 @gain 0.5
+importaudio('./03_arpeggi/arpeggi.wav').transcribe($t);
+$t += read('./03_arpeggi/arpeggi.txt');
+importaudio('./04_swell/swell.wav').transcribe(
+    @onset $t - read('./04_swell/swell.txt') + 500 @gain 0.5
 );
-importaudio('./nesting/nesting.wav').transcribe($t);
-$meta = read('./nesting/nesting.txt');
+importaudio('./05_nesting/nesting.wav').transcribe($t);
+$meta = read('./05_nesting/nesting.txt');
 $peak = $meta.'peak';
 $t += $peak;
-$b = importaudio('./cresc/cresc.wav');
-$b.transcribe($t - read('./cresc/cresc.txt'));
+$b = importaudio('./06_cresc/cresc.wav');
+$b.transcribe($t - read('./06_cresc/cresc.txt'));
 $b.process(
     reverse() freeverb(
         @roomsize 0.9
@@ -30,6 +30,7 @@ harp(
     @pitch c6 
     @type 'bisb' 
     @duration null
+    @useseed 1
 ).transcribe(
     @onset $t + maximum($meta.'markers') - $peak
     @pan xrand() 
@@ -37,7 +38,7 @@ harp(
 );
 render(
     @play 1 @process (
-        normalize(0) multiply(1.3) arctan() normalize(-3) 
+        normalize(0) arctan() normalize(-3) 
     ) 
 );
 ezexport()
