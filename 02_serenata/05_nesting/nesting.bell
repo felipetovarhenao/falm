@@ -109,45 +109,48 @@ Consume = (
         $t = $onset;
         $peak = Peak;
         $chordiszebpf = [0 0 0] [$peak 1 0.125] [1 1 0];
-        $legatobpf = [0 1 0] [$peak 2 0.125] [1 3 1/3];
-        $envslopebpf = [0 0 0] [$peak -0.5 -0.125] [1 -0.5 0];
-        $sinegatebpf = [0 0 0] [$peak 1/3 0.125] [1 2/3 0];
+        $legatobpf = [0 1 0] [$peak 3 0.125] [1 4 1/3];
+        $sinelegatobpf = [0 1 0] [$peak 2 0.125] [1 2.5 1/3];
+        $envslopebpf = [0 0 0] [$peak -0.33 0] [1 -0.5 0];
+        $sinegatebpf = [0 0 0] [$peak 2/3 0.125] [1 3/4 0];
         $panspreadbpf = [0 0.1 0] [1 1 1/3.];
+        $maxvelmixbpf = [0 0 0] [1 1 0.125];
         $children = $event.getkey('children');
         $level = $event.getkey('level') ||| 0;
         if $maxlevel == -1 || $level < $maxlevel then (
             for $child in $children do (
+                $nt = max(0, min(1, $t / $maxonset));
                 $mcs = $child.getkey('pitch');
                 $vel = $child.getkey('velocity');
                 $duration = $child.getkey('duration');
                 $names = $child.getkey('names');
                 $types = $child.getkey('types');
-                $gainmul = sqrt(scale($vel, 0, 127, 0.125, 1) / exp2($level));
-                $nt = max(0, min(1, $t / $maxonset));
+                $gainmul = sqrt(scale($vel, 0, 127, 0.25, 1) / (1.0707 ** $maxlevel));
+                $maxvelmix = samplebpf($maxvelmixbpf, $nt);
+                $vel = (1 - $maxvelmix) * $vel + 127 * $maxvelmix;
                 $chordsize = max(
                     1, ceil(samplebpf($chordiszebpf, $nt) * length($mcs)) 
                 );
                 $legato = samplebpf($legatobpf, $nt);
+                $sinelegato = samplebpf($sinelegatobpf, $nt);
                 $envslope = samplebpf($envslopebpf, $nt);
                 $sinegate = samplebpf($sinegatebpf, $nt);
                 $panspread = samplebpf($panspreadbpf, $nt);
                 $sinegate = xrand() < samplebpf($sinegatebpf, $nt);
                 $submcs = left($mcs, $chordsize);
-                $balance = 1.066 ** (
-                    -1 * (length($submcs) - 1) 
-                );
+                $balance = 1.0707 ** (1 - length($submcs));
                 for $mc $mci in $submcs do (
                     $panval = mc2pan($mc, $panspread);
                     if $sinegate == 1 then (
                         sinewave(
                             @pitch RandomOctave($mc) 
                             @velocity $vel
-                            @duration $duration * $legato
+                            @duration $duration * $sinelegato
                             @phase xrand() 
                             @envelope [0 $gainmul 0] [1 0 $envslope] 
                         ).ApplyTremolo().transcribe(
                             @onset $t
-                            @gain 0.1 * $balance
+                            @gain 0.125 * $balance * exp2(xrand(-0.5, 0.5)) 
                             @pan $panval xrand() 
                         ) 
                     );
@@ -158,7 +161,9 @@ Consume = (
                         @types $types:$mci
                         @velocity $vel
                         @useseed 1
-                    ).process(normalize(-3)).transcribe(
+                    ).process(
+                        normalize(@level -12 @rms 1) arctan() normalize(-3) 
+                    ).transcribe(
                         @onset $t
                         @pan $panval
                         @gain [0 $gainmul * $balance 0] [1 0 $envslope] 
@@ -186,7 +191,7 @@ GetMaxLevel = (
 );
 setseed(900);
 Root = c2;
-Harmony = r2pc(1 10/9 5/4 3/2 5/3 15/8, mc2pc(Root));
+Harmony = r2pc(1 9/8 5/4 3/2 5/3 13/7, mc2pc(Root));
 $period = 5500;
 $maxdepth = 30;
 $events = [
@@ -201,8 +206,6 @@ $events = [
     ] 
 ];
 for $i in 1...$maxdepth do ($events = $events.map(Nestify @maxdepth -3));
-## write($events, './events.txt');
-## null
 $t = 0;
 $reps = 16;
 $depth = GetMaxLevel($events);
@@ -210,6 +213,8 @@ print('Recursion depth:' $depth);
 $levels = 1...($depth - 1) ($depth :* $reps);
 $peaksize = length($levels);
 $levels _= rev(1...max(1, $depth - 1));
+## $levels = 4 7;
+## $peaksize = length($levels);
 $gap = 300;
 Peak = float($peaksize / length($levels));
 $totdur = float($period * length($levels)) + $gap;
