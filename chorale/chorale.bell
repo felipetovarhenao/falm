@@ -1,0 +1,45 @@
+setseed(0);
+$totdur = 45000;
+$mcs = r2mc(1...32, f#2).pcquant(r2pc(1 9/8 5/4 21/16 3/2 5/3 15/8, 6));
+$st = 0;
+$ids = xscramble(1...length($mcs));
+for $id in $ids do (
+    $t = $st;
+    while $t < $totdur do (
+        $b = ezsol(
+            @pitch $mcs:$id
+            @duration null
+            @names 'acc' 
+            @types xscramble(
+                'back' 'reg' 'ord' 'stacc' 'dim' 'sfz' 'cresc' 'cresc-to-dim' 
+            ).left(3) 
+            @velocity xrandom(127) 
+            @useseed 1
+        );
+        if xrand() > 0.5 then ($b = $b.process(reverse()));
+        if xrand() > 0.5 then (
+            $neighbor = xchoose(
+                $mcs:[$id + (-1 1)] 
+            );
+            $rat = 1/c2r($neighbor - $mcs:$id);
+            $gliss = [0 1 0] [xrand(0.1, 0.66) $rat xrand(0.85, 0.97)] [1 $rat 0];
+            $b = $b.process(resample($gliss)) 
+        );
+        $b = $b.analyze(envmaxtime());
+        $peak = $b.getkey('envmaxtime');
+        $b.transcribe(
+            @onset $t @pan abs(xrand() - (0 1)) 
+        );
+        $t += $peak
+    );
+    $st += xrand($totdur / length($mcs)) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.98
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport()
