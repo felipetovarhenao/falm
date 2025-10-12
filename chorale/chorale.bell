@@ -1,36 +1,53 @@
-setseed(0);
+RandBpf = (
+    -> (
+        $x = 0;
+        $env = while $x < 1 collect (
+            $y = abs(xrand(0.33) - xchoose(0 1));
+            $pt = [$x $y xrand(-0.25, 0.25)];
+            $x += xrand(0.25) ** 2;
+            $pt
+        );
+        $env [1 0 0] 
+    ) 
+);
+setseed(1);
 $totdur = 90000;
-$mcroot = f#2;
+$mcroot = fq2;
 $pcroot = mc2pc($mcroot);
-$mcs = r2mc(1...32, $mcroot).pcquant(r2pc(1 9/8 5/4 21/16 3/2 5/3 13/7 15/8, $pcroot));
+$mcs = r2mc(1...32, $mcroot).pcquant(r2pc(1 8/7 9/8 5/4 21/16 3/2 5/3 15/8, $pcroot));
 $st = 0;
-$ids = xscramble(1...length($mcs));
+$ids = argsort(abs($mcs - d5));
 for $id in $ids do (
     $t = $st;
     while $t < $totdur do (
         $b = ezsol(
             @pitch $mcs:$id
             @duration null
-            @names 'acc' 
+            @names xchoose('acc' if $id == 1 then 'bass') 
             @types xscramble(
                 'back' 'reg' 'ord' 'stacc' 'dim' 'sfz' 'cresc' 'cresc-to-dim' 
-            ).left(2) 
+            ) 
             @velocity xrandom(127) 
             @useseed 1
         );
-        if xrand() > 0.5 then ($b = $b.process(reverse()));
-        if xrand() > 0.5 then (
+        if xrand() > 0.75 then (
+            $skipsize = xchoose(1 2 @weights 8 1);
             $neighbor = xchoose(
-                $mcs:[$id + (-1 1)] 
+                $mcs:[$id + (-1 1) * $skipsize] 
             );
             $rat = 1/c2r($neighbor - $mcs:$id);
-            $gliss = [0 1 0] [xrand(0.05, 2/3.) $rat xrand(0.75, 0.99)] [1 $rat 0];
+            $gliss = [0 1 0] [xrand(0.05, 2/3.) $rat xrand(0.85, 0.99)] [1 $rat 0];
             $b = $b.process(resample($gliss)) 
         );
+        if xrand() > 0.75 then ($b = $b.process(reverse()));
+        $env = null;
+        if xrand() > 0.75 then ($env = RandBpf());
         $b = $b.analyze(envmaxtime());
         $peak = $b.getkey('envmaxtime');
         $b.transcribe(
-            @onset $t @pan abs(xrand() - (0 1)) 
+            @onset $t
+            @pan abs(xrand() - (0 1)) 
+            @gain $env
         );
         $t += $peak
     );
