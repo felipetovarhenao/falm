@@ -11,7 +11,7 @@ RandBpf = (
     ) 
 );
 setseed(1);
-$totdur = 12000;
+$totdur = 90000;
 $mcroot = fq2;
 $pcroot = mc2pc($mcroot);
 $mcs = r2mc(1...48, $mcroot).pcquant(r2pc(1 8/7 9/8 5/4 21/16 3/2 5/3 15/8, $pcroot));
