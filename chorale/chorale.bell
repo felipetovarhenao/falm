@@ -16,10 +16,12 @@ $mcroot = fq2;
 $pcroot = mc2pc($mcroot);
 $mcs = r2mc(1...64, $mcroot).pcquant(r2pc(1 9/8 6/5 4/3 21/16 3/2 12/7 5/3 7/4, $pcroot));
 $st = 0;
-$ids = argsort(abs($mcs - d5));
-$stbpf = [0 0 0] [1 0.8 -0.25];
+$ids = argsort(
+    abs(mc2pc($mcs) - $pcroot) 
+);
+$stbpf = [0 0 0] [1 1 -0.33];
 for $id $ii in $ids do (
-    $iin = scale($ii, 1, length($ids), 0, 1);
+    $iin = scale($ii, 1, length($ids) + 1, 0, 1);
     $st = samplebpf($stbpf, $iin) * $totdur;
     $t = $st;
     while $t < $totdur do (
