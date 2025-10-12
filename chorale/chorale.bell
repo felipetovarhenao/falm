@@ -4,17 +4,17 @@ RandBpf = (
         $env = while $x < 1 collect (
             $y = abs(xrand(0.33) - xchoose(0 1));
             $pt = [$x $y xrand(-0.25, 0.25)];
-            $x += xrand(0.25) ** 2;
+            $x += xrand(0.001, 0.25) ** 2;
             $pt
         );
         $env [1 0 0] 
     ) 
 );
 setseed(1);
-$totdur = 90000;
+$totdur = 12000;
 $mcroot = fq2;
 $pcroot = mc2pc($mcroot);
-$mcs = r2mc(1...32, $mcroot).pcquant(r2pc(1 8/7 9/8 5/4 21/16 3/2 5/3 15/8, $pcroot));
+$mcs = r2mc(1...48, $mcroot).pcquant(r2pc(1 8/7 9/8 5/4 21/16 3/2 5/3 15/8, $pcroot));
 $st = 0;
 $ids = argsort(abs($mcs - d5));
 for $id in $ids do (
