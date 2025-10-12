@@ -11,22 +11,25 @@ RandBpf = (
     ) 
 );
 setseed(1);
-$totdur = 90000;
+$totdur = 120000;
 $mcroot = fq2;
 $pcroot = mc2pc($mcroot);
-$mcs = r2mc(1...48, $mcroot).pcquant(r2pc(1 8/7 9/8 5/4 21/16 3/2 5/3 15/8, $pcroot));
+$mcs = r2mc(1...48, $mcroot).pcquant(r2pc(1 6/5 4/3 21/16 3/2 12/7 5/3 7/4, $pcroot));
 $st = 0;
 $ids = argsort(abs($mcs - d5));
-for $id in $ids do (
+$stbpf = [0 0 0] [1 0.8 -0.25];
+for $id $ii in $ids do (
+    $iin = scale($ii, 1, length($ids), 0, 1);
+    $st = samplebpf($stbpf, $iin) * $totdur;
     $t = $st;
     while $t < $totdur do (
         $b = ezsol(
             @pitch $mcs:$id
             @duration null
-            @names xchoose('acc' if $id == 1 then 'bass') 
-            @types xscramble(
-                'back' 'reg' 'ord' 'stacc' 'dim' 'sfz' 'cresc' 'cresc-to-dim' 
+            @names xchoose(
+                'acc' if $id == 1 then 'bass' 
             ) 
+            @types 'back' 'reg' 'ord' 'stacc' 'dim' 'sfz' 'cresc' 'cresc-to-dim' 
             @velocity xrandom(127) 
             @useseed 1
         );
