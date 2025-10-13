@@ -1,0 +1,67 @@
+Nearest = (
+    $list, $target -> (
+        $mindiff = 1000000;
+        $bestidx = -1;
+        for $elem $idx in $list do (
+            $diff = abs(
+                pitchdiff(r2mc($elem), r2pc($target)) 
+            );
+            if $diff < $mindiff then (
+                $bestidx = $idx;
+                $mindiff = $diff
+            ) 
+        );
+        $bestidx
+    ) 
+);
+HarmonicInterpolation = (
+    $chord1, $chord2 -> (
+        $remove = diff($chord1, $chord2);
+        $add = diff($chord2, $chord1);
+        $tmp = $chord1;
+        $steps = [sort($chord1)];
+        for $target in $add do (
+            $bestidx = Nearest(
+                @list $tmp
+                @target $target
+                @mode 1
+            );
+            $bestmc = $tmp:$bestidx;
+            if intersection($bestmc, $remove) != null then (
+                $tmp = diff($tmp, $bestmc);
+                $tmp = sort($tmp $target);
+                $remove = diff($remove, $bestmc);
+                $add = diff($add, $target);
+                $steps _= [sort($tmp)] 
+            ) 
+        );
+        $add = for $a in $add collect [$a 1];
+        $remove = for $rem in $remove collect [$rem 0];
+        for $change in $remove $add with @unwrap 1 do (
+            $item = $change:1;
+            $mode = $change:2;
+            $tmp = if $mode == 0 then diff($tmp, $item) else $tmp $item;
+            $steps _= [sort($tmp)] 
+        );
+        $steps
+    ) 
+);
+$chords = [1 5/4 3/2 5/3] [1 4/3 3/2 9/8 15/8] [9/8 7/5 5/3 15/14] [9/8 21/16 5/4 15/8] [1 5/4 3/2];
+$steps = for $link in group($chords, 2, 1) with @unwrap 1 collect (HarmonicInterpolation($link::1, $link::2).left(-1));
+$steps _= $chords:-1;
+$t = 0;
+for $chord in $steps with @unwrap 1 do (
+    $pcs = r2pc($chord);
+    $mcs = r2mc(1...32, c2).pcquant($pcs);
+    for $mc in $mcs.xscramble() do (
+        pno(@pitch $mc @duration 3000).transcribe(
+            @onset $t
+            @pan xrand() 
+            @gain [0 1 0] [1 0 0.8] 
+        );
+        $t += xrand(200) 
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) 
+)
