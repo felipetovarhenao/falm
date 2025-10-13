@@ -3,20 +3,33 @@ $t = 0;
 for $chord in $prog with @unwrap 1 do (
     $pcs = r2pc($chord);
     $mcs = r2mc(1...32, c3).pcquant($pcs);
-    for $mc in $mcs.xscramble().left(25) do (
+    for $mci in (1...length($mcs)).xscramble().left(25) do (
+        $mc = $mcs:$mci;
         $b = ezsol(
             @pitch $mc
-            @duration 1000
+            @duration null
             @velocity xrand(127) 
             @names 'acc' 
             @types 'back' 'reg' 'ord' 'stacc' 'dim' 'sfz' 'cresc' 'cresc-to-dim' 
+        );
+        if xrand() > 0.5 then ($b = $b.process(reverse()));
+        if xrand() > 0.5 then (
+            $neighbor = xchoose(
+                $mcs:[$mci + (-1 1)] 
+            );
+            $diff = $neighbor - $mc;
+            if abs($diff) < 500 then (
+                $rat = 1/c2r($diff);
+                $gliss = [0 1 0] [xrand(0.1, 0.66) $rat xrand(0.85, 0.97)] [1 $rat 0];
+                $b = $b.process(resample($gliss)) 
+            ) 
         );
         $b.transcribe(
             @onset $t
             @pan xrand() 
             @gain [0 1 0] [1 0 0.8] 
         );
-        $t += xrand(100) 
+        $t += xrand(300) 
     ) 
 );
 render(
@@ -26,4 +39,5 @@ render(
         @damp 1
         @width 1
     ) normalize(-3) 
-)
+);
+ezexport()
