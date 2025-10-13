@@ -1,0 +1,81 @@
+setseed(3);
+$harmony = read('../../00_harmony/harmony.txt');
+$mcroot = $harmony.'mcroot';
+$pcs = $harmony.'pcs';
+$base = pcquant(
+    @mc r2mc(1...64, $mcroot) @pcs $pcs
+);
+$totdur = 25000;
+$t = $totdur * (1/3);
+$onsets = arithmser(0, 1, null, length($base)).scale(0, 1, 0, $t, -0.35);
+$ids = argsort(
+    abs($base - mean($base)) 
+);
+$overlapbpf = [0 1 0] [1 8 0.25];
+$vel2types = (
+    $vel -> (
+        $types = 'ord' 'cresc' 'cresc-to-dim';
+        if $vel > 90 then (
+            $types _= 'reg' 'stacc' 'sfz' 
+        );
+        if $vel > 45 then ($types _= 'dim');
+        if $vel > 22 then ($types _= 'back');
+        $types
+    ) 
+);
+for $id in $ids, $st in $onsets do (
+    $mc = $base:$id;
+    $t = $st;
+    while $t < $totdur do (
+        $nt = $t / $totdur;
+        $vel = samplebpf([0 0 0] [1 127 0.125], $nt);
+        $overlap = samplebpf($overlapbpf, $nt);
+        $b = ezsol(
+            @pitch $mc
+            @names (if $id == 1 then 'bass' else 'acc') 
+            @types $vel2types($vel) 
+            @duration null
+            @velocity $vel * xrand(0.5, 1) 
+            @useseed 1
+        ).analyze(effectiveduration(@thresholdratio 0.0025));
+        $b = $b.setkey('duration', $b.getkey('effectiveduration'));
+        $b = $b.process(
+            gain(
+                [0 1 0] [0.66 1 0] [1 0 0.125] 
+            ) 
+        );
+        if xrand() > 0.5 then ($b = $b.process(reverse()));
+        $pan = for $x in 0...xrandom(
+            round($b.getkey('duration') / 500) 
+        ) collect [$x - 1 xrand() xrand(-0.125, 0.125)];
+        $b.transcribe(
+            @onset $t @pan $pan
+        );
+        $t += $b.getkey('duration') / $overlap
+    );
+    if $id == 1 then (
+        $cresc = bass(
+            @pitch $mc
+            @type 'sfz' 
+            @duration $totdur
+            @velocity 127
+            @useseed 1
+        ).process(reverse() normalize(-3));
+        $cresc.transcribe(
+            @onset $totdur - $cresc.getkey('duration') 
+            @pan 0 1 0.5
+            @gain [0 0 0] [1 1 0.125] 
+        );
+        bass(
+            @pitch $mc
+            @duration null
+            @type 'stacc' 
+            @velocity 127
+            @useseed 1
+        ).process(normalize(-3)).transcribe(@onset $totdur @pan 0.5) 
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport(['totdur' $totdur])

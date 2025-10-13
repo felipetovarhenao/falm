@@ -1,0 +1,8 @@
+$mcroot = r2mc(7/5, d2);
+$pcroot = mc2pc($mcroot);
+$ratios = 1 9/8 8/7 16/13 64/49 3/2 256/169 27/16 121/64;
+write(
+    @data ['mcroot' $mcroot] ['pcroot' $pcroot] ['ratios' $ratios] ['pcs' r2pc($ratios, $pcroot)] 
+    ## ---
+    @path './harmony.txt' 
+)

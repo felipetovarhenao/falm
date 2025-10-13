@@ -1,0 +1,118 @@
+setseed(0);
+$harmony = read('../00_harmony/harmony.txt');
+$mcroot = $harmony.'mcroot';
+$pcs = $harmony.'pcs';
+Trill = (
+    $mcs = null, $onset = 0, $duration = 2000 -> (
+        $mcs = randomseq(
+            @llll $mcs
+            @length xrandom(1, 4) 
+            @steps -1 1
+            @useseed 1
+        );
+        $mindur = min($duration, xrand(50, 100));
+        $maxdur = xrand(0.25, 1) * ($duration / length($mcs));
+        $incrbpf = float($mindur $maxdur);
+        if xrand() > 0.5 then ($incrbpf = rev($incrbpf) );
+        if xrand() > 0.5 then ($incrbpf _= $incrbpf:1);
+        $xpts = arithmser(0, 1, null, length($incrbpf)).scale(0, 1, 0, 1, xrand(-1/3., 1/3));
+        $incrbpf = for $x $xi in $xpts collect [$x $incrbpf:$xi xrand(-0.125, 0.125)];
+        $t = 0;
+        $pan = xrand(-1, 1) * 0.5;
+        while $t < $duration do (
+            $nt = min(1, max(0, $t / $duration));
+            $mc = $mcs:1;
+            $mcs = rot($mcs, 1);
+            $incr = samplebpf($incrbpf, $nt);
+            pno(
+                @pitch $mc
+                @duration max(100, $incr * 4) 
+                @velocity xrand(127) 
+                @useseed 1
+            ).transcribe(
+                @onset $t + $onset
+                @pan fold(mc2pan($mc, 0.1) + $pan) 
+                @gain [0 1 0] [1 0 0.75] 
+            );
+            $t += $incr
+        );
+        $duration
+    ) 
+);
+Blurb = (
+    $mcs = null, $onset = 0, $duration = 2000 -> (
+        $len = xrandom(5, 10);
+        $seq = randomseq(
+            @llll $mcs
+            @length $len
+            @steps -2...2
+            @useseed 1
+        );
+        $numattacks = xrandom(1, $len);
+        $addrs = int(
+            round(arithmser(1, $len + 1, null, $numattacks + 1)) 
+        );
+        $ranges = trans(
+            [left($addrs, -1)] [right($addrs, 1) - 1] 
+        );
+        $chords = for $range in $ranges collect [
+            sort(thin($seq:$range)) 
+        ];
+        $durs = timeramp(
+            @duration $duration
+            @length length($chords) 
+            @slope xrand(-1, 1) * 1/2
+        );
+        $numchords = length($chords);
+        $t = 0;
+        $pan = xrand(-1, 1) * 0.5;
+        for $chord $chordid in $chords, $dur in $durs with @unwrap 1 do (
+            for $mc in $chord do (
+                pno(
+                    @pitch $mc
+                    @velocity xrandom(0, 127) 
+                    @duration if $chordid < $numchords then max(500, 4 * $dur) 
+                    @useseed 1
+                ).transcribe(
+                    @onset $t + $onset
+                    @pan fold($pan + mc2pan($mc, 0.1) ) 
+                    @gain [0 1 0] [1 0 0.75] 
+                ) 
+            );
+            $t += $dur
+        );
+        $duration
+    ) 
+);
+$spectrum = pcquant(r2mc(1...32, $mcroot), $pcs);
+$t = 0;
+$peak = read('../01_background/01_input/input.txt').'totdur';
+$stretch = read('../01_background/background.txt').'stretch';
+$totdur = $stretch * $peak;
+while $t < $totdur do (
+    $obj = xchoose(Trill Blurb @weights 1 4);
+    $t += $obj(
+        @mcs $spectrum
+        @onset $t
+        @duration xrand(500, 5000) 
+    );
+    if xrand() > 0.8 then ($t += xrand(250, 4500)) 
+);
+render(
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.9
+            @wet 0.125
+            @damp 1
+            @width 1
+            @tail 0
+        ) 
+        ## ---
+        fade(0, 1000) 
+        ## ---
+        normalize(-6) 
+        ## ---
+        mix(importaudio('../01_background/background.wav')) normalize(-3) 
+    ) 
+);
+ezexport()
