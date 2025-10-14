@@ -1,7 +1,41 @@
-setseed(12);
+setseed(40);
 $harmony = read('../00_harmony/harmony.txt');
 $mcroot = $harmony.'mcroot';
 $pcs = $harmony.'pcs';
+Granulate = (
+    $buffer = null, $onset = 0 -> (
+        $t = 0;
+        $bufdur = getkey($buffer, 'duration');
+        $totdur = min(
+            5000, $bufdur * exp2(xrand(-0.5, 0.5)) 
+        );
+        $offsetbpf = [0 0 0] [1 1 xrand(-0.125, 0.125)];
+        while $t < $totdur do (
+            $nt = min(1, max(0, $t / $totdur));
+            $graindur = xrand(90, 200);
+            $incr = $graindur / exp2(xrand(-2, 2));
+            $maxoffset = ($bufdur - $graindur);
+            $offset = $maxoffset * samplebpf($offsetbpf, $nt);
+            $offset = min(
+                $maxoffset, max(
+                    0, $offset + exp2(xrand(-0.5, 0.5)) * $incr
+                ) 
+            );
+            $grain = $buffer.setkey('duration', $graindur).setkey('offset', $offset);
+            $envslope = xrand(-0.33, 0.33);
+            $env = xchoose(
+                [[0 0 0] [1 1 $envslope]] [[0 1 0] [1 0 $envslope]] [hanning()] 
+            )::1;
+            transcribe(
+                @buffer $grain
+                @onset $t + $onset + exp2(xrand(-0.5, 0.5)) * $incr
+                @pan xrand() 
+                @gain $env
+            );
+            $t += $incr
+        ) 
+    ) 
+);
 Freeze = (
     $buffer = null, $onset = 0 -> (
         $t = 0;
@@ -25,7 +59,7 @@ Freeze = (
         );
         $rampenv = [0 xrand(0.707) ** 2 0] [1 1 xrand(-0.25, 0.25)];
         $mc = getkey($buffer, 'pitch');
-        $det = xrandom(0, 1);
+        $det = xchoose(0 1 2 @weights 4 2 1);
         while $t < $totdur do (
             $win = xchoose(
                 [$rampenv] [revbpf($rampenv)] [hanning()] 
@@ -42,7 +76,7 @@ Freeze = (
                     @onset $truonset
                     @pan $trupan
                     @gain $win
-                    @detune xrandom(-1, 2) * 1200 * $det
+                    @detune xrandom(-$det, $det) * 1200
                 ) 
             ) else (
                 sinewave(
@@ -99,7 +133,8 @@ Bell = (
             $offset -= $wave.getkey('duration') 
         );
         for $v in 1...$V do (
-            $wave.transcribe(
+            transcribe(
+                @buffer $wave
                 @onset $onset + $offset
                 @pan fold(
                     mc2pan($mc, 1) + xrand(-1, 1) * 0.1
@@ -112,19 +147,26 @@ Bell = (
 );
 ## 
 Transcribe = (
-    $buffer = null, $onset = 0, $pan = null, $gain = null -> (
-        if xrand() > 0.66 then (Bell(@buffer $buffer @onset $onset));
-        if xrand() < 0.85 then (
-            ## ----
-            transcribe(
+    $buffer = null, $onset = 0, $pan = null, $gain = null, $nt = 0 -> (
+        $bellthresh = samplebpf([0 0.25 0] [1 0.75 0.125], $nt);
+        $fxthresh = samplebpf([0 0.15 0] [1 0.5 0.125], $nt);
+        $buffer = clipnorm(
+            @buffer $buffer
+            @minlevel -90
+            @maxlevel -18
+        );
+        if xrand() < $bellthresh then (Bell(@buffer $buffer @onset $onset));
+        if xrand() < $fxthresh then (
+            $fx = xchoose(Freeze Stretch Granulate);
+            $fx(
                 @buffer $buffer
                 @onset $onset
                 @pan $pan
                 @gain $gain
             ) 
         ) else (
-            $fx = xchoose(Freeze Stretch);
-            $fx(
+            ## ----
+            transcribe(
                 @buffer $buffer
                 @onset $onset
                 @pan $pan
@@ -150,7 +192,7 @@ GenBuffer = (
 );
 Trill = (
     $mcs = null, $onset = 0, $duration = 2000, $nt = 0 -> (
-        $vel = samplebpf([0 0 0] [1 127 0.125], $nt);
+        $vel = samplebpf([0 0 0] [1 127 -0.125], $nt);
         $mcs = randomseq(
             @llll $mcs
             @length xrandom(1, 4) 
@@ -180,6 +222,7 @@ Trill = (
                 @onset $start
                 @pan fold(mc2pan($mc, 0.1) + $pan) 
                 @gain [0 1 0] [1 0 0.75] 
+                @nt $nt
             );
             $t += $incr
         );
@@ -188,7 +231,7 @@ Trill = (
 );
 Blurb = (
     $mcs = null, $onset = 0, $duration = 2000, $nt = 0 -> (
-        $vel = samplebpf([0 0 0] [1 127 0.125], $nt);
+        $vel = samplebpf([0 0 0] [1 127 -0.125], $nt);
         $len = xrandom(5, 10);
         $seq = randomseq(
             @llll $mcs
@@ -224,6 +267,7 @@ Blurb = (
                     @onset $t + $onset
                     @pan fold($pan + mc2pan($mc, 0.1) ) 
                     @gain [0 1 0] [1 0 0.75] 
+                    @nt $nt
                 ) 
             );
             $t += $dur
@@ -231,47 +275,37 @@ Blurb = (
         $duration
     ) 
 );
-$spectrum = pcquant(r2mc(1...32, $mcroot), $pcs);
+$spectrum = pcquant(r2mc(1...48, $mcroot), $pcs);
+$spectrum = $spectrum:[
+    argsort(abs($spectrum - d5)) 
+];
 $t = 0;
 $peak = read('../01_background/01_input/input.txt').'totdur';
 $stretch = read('../01_background/background.txt').'stretch';
 $totdur = $stretch * $peak;
 $gapthreshbpf = [0 1 0] [1 0.01 -0.125];
-$gapbpf = [0 4000 0] [1 250 -0.125];
-$mcfilterbpf = [0 0.5 0] [1 1 0.125];
+$gapbpf = [0 3000 0] [1 250 -0.125];
+$mcfilterbpf = [0 0.33 0] [1 1 -0.125];
+$overlapbpf = [0 1 0] [1 2 0.25];
 while $t < $totdur do (
     $nt = min(1, max(0, $t / $totdur));
     $mcfilter = round(samplebpf($mcfilterbpf, $nt) * length($spectrum));
     $gapthresh = samplebpf($gapthreshbpf, $nt);
+    $overlap = samplebpf($overlapbpf, $nt);
     $gap = samplebpf($gapbpf, $nt);
     $obj = xchoose(Trill Blurb @weights 1 4);
-    $t += $obj(
-        @mcs left($spectrum, $mcfilter) 
+    $timestep = $obj(
+        @mcs sort(left($spectrum, $mcfilter)) 
         @onset $t
         @duration xrand(500, 5000) 
         @nt $nt
     );
+    $t += $timestep / $overlap;
     if xrand() < $gapthresh then (
-        $t += $gap * exp2(xrand(-0.5, 0.5)) 
+        $t += $gap * exp2(xrand(-1, 0)) 
     ) 
 );
 render(
-    @play 1 @process (
-        ## ---
-        freeverb(
-            @roomsize 0.98
-            @wet 0.0125
-            @damp 1
-            @width 1
-            @tail 0
-        ) 
-        ## ---
-        fade(0, 1000) 
-        ## ---
-        normalize(-3) 
-        ## ---
-        ## mix(importaudio('../01_background/background.wav')) normalize(-3) 
-        
-    ) 
+    @play 1 @process normalize(-3) 
 );
 ezexport()
