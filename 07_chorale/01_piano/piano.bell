@@ -1,4 +1,4 @@
-setseed(2);
+setseed(10);
 $harmony = read('../00_harmony/harmony.txt');
 $mcroot = $harmony.'mcroot';
 $pcs = $harmony.'pcs';
@@ -37,7 +37,10 @@ Granulate = (
     ) 
 );
 Freeze = (
-    $buffer = null, $onset = 0 -> (
+    $buffer = null, $onset = 0, $nt -> (
+        $maxdet = round(
+            samplebpf([0 0 0] [1 2 0.5], $nt) 
+        );
         $t = 0;
         $bufdur = getkey($buffer, 'duration');
         $graindur = min($bufdur, xrand(100, 500));
@@ -60,7 +63,7 @@ Freeze = (
         );
         $rampenv = [0 xrand(0.707) ** 2 0] [1 1 xrand(-0.25, 0.25)];
         $mc = getkey($buffer, 'pitch');
-        $det = xchoose(0 2 @weights 0.9 0.1);
+        $det = xrandom(0, $maxdet);
         while $t < $totdur do (
             $win = xchoose(
                 [$rampenv] [revbpf($rampenv)] [hanning()] 
@@ -114,7 +117,10 @@ RandEnvelope = (
     ) 
 );
 Stutter = (
-    $buffer = null, $onset = 0 -> (
+    $buffer = null, $onset = 0, $nt -> (
+        $maxdevs = round(
+            samplebpf([0 0 0] [1 2 0.5], $nt) 
+        );
         $bufdur = $buffer.getkey('duration');
         $totdur = min(2000, $bufdur * exp2(-0.5, 0.5));
         $maxsegs = round($totdur / 90);
@@ -124,7 +130,7 @@ Stutter = (
             @slope xrand(-0.25, 0.25) 
         );
         $env = [0 1 0] [1 0 xrand(-0.5, 0.5)];
-        $dev = xrandom(0, 2);
+        $dev = xrandom(0, $maxdevs);
         $t = 0;
         for $dur in $durs do (
             $buffer.setkey('duration', max(50, $dur)).transcribe(
