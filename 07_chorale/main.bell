@@ -15,4 +15,5 @@ render(
             @fadeoutcurve 0.25
         ) normalize(-3) 
     ) 
-)
+);
+ezexport()
