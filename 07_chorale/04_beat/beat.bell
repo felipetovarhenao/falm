@@ -2,7 +2,7 @@ setseed(50);
 $harm = read('../00_harmony/harmony.txt');
 $root = $harm.'mcroot';
 $peak = read('../01_background/01_input/input.txt').'totdur' * read('../01_background/background.txt').'stretch';
-$b = importaudio('../main.wav');
+$b = importaudio('../03_premerge/premerge.wav');
 $b = $b.setkey('offset', $peak);
 $bpm = 85;
 $bardur = 240000 / $bpm;

@@ -4,7 +4,12 @@ $peak = $meta.'peak';
 $b = importaudio('./03_premerge/premerge.wav');
 $b.setkey('duration', $peak).transcribe($t);
 $t += $peak;
-importaudio('./04_beat/beat.wav').transcribe($t + $meta.'offset');
+importaudio('./04_beat/beat.wav').transcribe(
+    @onset $t + $meta.'offset' @gain 0.9
+);
 $t += $meta.'totdur';
 $b.setkey('offset', $meta.'resume').transcribe($t);
-render(@play 1)
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport()
