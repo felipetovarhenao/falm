@@ -1,0 +1,5 @@
+importaudio('./01_background/background.wav').transcribe();
+importaudio('./01_piano/piano.wav').transcribe();
+render(
+    @play 1 @process normalize(-3) 
+)

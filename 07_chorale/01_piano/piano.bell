@@ -8,7 +8,9 @@ Freeze = (
         $release = getkey(analyze($buffer, envmaxtime()), 'envmaxtime') + 90;
         $readst = getkey($buffer, 'offset') + $release;
         $bufdur = max(1, getkey($buffer, 'duration') - $release);
-        $totdur = $bufdur * exp2(xrand(2));
+        $totdur = min(
+            8000, $bufdur * exp2(xrand(2)) 
+        );
         $readend = $readst + $bufdur * xrand(0.9) ** 2;
         $readbpf = [0 $readst 0] [1 $readend xrand(-0.25, 0.25)];
         $graindur = xrand(100, 500);
@@ -22,12 +24,12 @@ Freeze = (
             @gain [0 1 0] [1 0 0.9] 
         );
         $rampenv = [0 xrand(0.707) ** 2 0] [1 1 xrand(-0.25, 0.25)];
-        $win = xchoose(
-            [$rampenv] [revbpf($rampenv)] [hanning()] 
-        )::1;
         $mc = getkey($buffer, 'pitch');
         $det = xrandom(0, 1);
         while $t < $totdur do (
+            $win = xchoose(
+                [$rampenv] [revbpf($rampenv)] [hanning()] 
+            )::1;
             $nt = min(1, max(0, $t / $totdur));
             $read = samplebpf($readbpf, $nt);
             $pan = samplebpf($panbpf, $nt);
@@ -38,9 +40,9 @@ Freeze = (
             if xrand() < 0.98 then (
                 $buffer.setkey('offset', $read).setkey('duration', $graindur).process(gain($gain)).transcribe(
                     @onset $truonset
-                    @pan $pan
+                    @pan $trupan
                     @gain $win
-                    @detune xrandom(-1, 1) * 1200 * $det
+                    @detune xrandom(-1, 2) * 1200 * $det
                 ) 
             ) else (
                 sinewave(
@@ -234,10 +236,10 @@ $t = 0;
 $peak = read('../01_background/01_input/input.txt').'totdur';
 $stretch = read('../01_background/background.txt').'stretch';
 $totdur = $stretch * $peak;
-$gapthreshbpf = [0 1 0] [$peak 0.01 -0.125] [1 1 0.125];
-$gapbpf = [0 4000 0] [$peak 250 -0.125] [1 4000 0.125];
-$mcfilterbpf = [0 0.5 0] [$peak 1 0.125] [1 1 0.125];
-while $t < 120000 ||| $totdur do (
+$gapthreshbpf = [0 1 0] [1 0.01 -0.125];
+$gapbpf = [0 4000 0] [1 250 -0.125];
+$mcfilterbpf = [0 0.5 0] [1 1 0.125];
+while $t < $totdur do (
     $nt = min(1, max(0, $t / $totdur));
     $mcfilter = round(samplebpf($mcfilterbpf, $nt) * length($spectrum));
     $gapthresh = samplebpf($gapthreshbpf, $nt);
@@ -255,6 +257,7 @@ while $t < 120000 ||| $totdur do (
 );
 render(
     @play 1 @process (
+        ## ---
         freeverb(
             @roomsize 0.98
             @wet 0.0125
@@ -267,7 +270,8 @@ render(
         ## ---
         normalize(-3) 
         ## ---
-        mix(importaudio('../01_background/background.wav')) normalize(-3) 
+        ## mix(importaudio('../01_background/background.wav')) normalize(-3) 
+        
     ) 
 );
 ezexport()
