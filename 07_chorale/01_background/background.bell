@@ -6,21 +6,24 @@ render(
         ## 
         arctan() 
         ## ---
+        trim(
+            @threshold 0.01
+            @start 0
+            @end 1
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout 500
+            @fadeoutcurve 0.125
+            @fadeouttype 2
+        ) 
+        ## ---
         rubberband(
             @stretching $stretch
             @smoothing 1
             @stretchmode 0
         ) 
-        ## ## ----
-        ## freeverb(
-        ##     @roomsize 0.97
-        ##     @wet 0.015
-        ##     @damp 1
-        ##     @width 1
-        ##     @tail 0
-        ## ) 
-        ## ## ---
-        ## fade(0, 3000) 
         ## ---
         normalize(-3) 
     ) 
