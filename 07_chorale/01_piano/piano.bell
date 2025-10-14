@@ -286,7 +286,7 @@ $totdur = $stretch * $peak;
 $gapthreshbpf = [0 1 0] [1 0.01 -0.125];
 $gapbpf = [0 3000 0] [1 250 -0.125];
 $mcfilterbpf = [0 0.33 0] [1 1 -0.125];
-$overlapbpf = [0 1 0] [1 3 0.25];
+$overlapbpf = [0 1 0] [1 2 0.25];
 while $t < $totdur do (
     $nt = min(1, max(0, $t / $totdur));
     $mcfilter = round(samplebpf($mcfilterbpf, $nt) * length($spectrum));
