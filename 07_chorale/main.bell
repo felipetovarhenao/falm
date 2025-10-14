@@ -1,19 +1,10 @@
-importaudio('./01_background/background.wav').process(trim(@threshold 0.01 @start 0)).transcribe();
-importaudio('./01_piano/piano.wav').process(trim(@threshold 0.01 @start 0)).transcribe();
-render(
-    @play 1 @process (
-        freeverb(
-            @roomsize 0.97
-            @wet 0.015
-            @damp 1
-            @width 1
-            @tail 0
-        ) fade(
-            @fadein 0
-            @fadeout 2000
-            @fadeouttype 2
-            @fadeoutcurve 0.25
-        ) normalize(-3) 
-    ) 
-);
-ezexport()
+$t = 0;
+$meta = read('./04_beat/beat.txt');
+$peak = $meta.'peak';
+$b = importaudio('./03_premerge/premerge.wav');
+$b.setkey('duration', $peak).transcribe($t);
+$t += $peak;
+importaudio('./04_beat/beat.wav').transcribe($t + $meta.'offset');
+$t += $meta.'totdur';
+$b.setkey('offset', $meta.'resume').transcribe($t);
+render(@play 1)

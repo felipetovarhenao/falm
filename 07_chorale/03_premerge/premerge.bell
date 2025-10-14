@@ -1,0 +1,19 @@
+importaudio('../01_background/background.wav').process(trim(@threshold 0.01 @start 0)).transcribe();
+importaudio('../02_piano/piano.wav').process(trim(@threshold 0.01 @start 0)).transcribe();
+render(
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.97
+            @wet 0.015
+            @damp 1
+            @width 1
+            @tail 0
+        ) fade(
+            @fadein 0
+            @fadeout 2000
+            @fadeouttype 2
+            @fadeoutcurve 0.25
+        ) normalize(-3) 
+    ) 
+);
+ezexport()
