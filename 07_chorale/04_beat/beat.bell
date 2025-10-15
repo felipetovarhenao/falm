@@ -25,7 +25,11 @@ $pattern = for $unit in $rhythm collect [
     ## ---
     ['reverse' xchoose(0 1)] 
     ## ---
-    ['pan' xrand() ] 
+    ['pan' xrand()] 
+    ## ---
+    ['type' xchoose(
+        'sfz' 'pizz' 'stacc' 
+    )] 
 ];
 $midpt = 1/3.;
 $legatobpf = [0 2 0] [$midpt 0.225 -0.125] [1 3 0.125];
@@ -38,6 +42,7 @@ while $t < $totdur do (
     $pattern = rot($pattern, -1);
     $unit = getkey($params, 'unit');
     $slope = getkey($params, 'slope');
+    $type = getkey($params, 'type');
     $rev = getkey($params, 'reverse');
     $pan = getkey($params, 'pan');
     $offset = samplebpf($readbpf, $nt);
@@ -47,8 +52,8 @@ while $t < $totdur do (
         @pitch $root
         @duration $unit * $legato
         @velocity $bassvel
-        @names 'bass' 'cello' 
-        @types 'sfz' 
+        @names 'bass' 
+        @types $type
         @useseed 1
     );
     $sine = sinewave(
