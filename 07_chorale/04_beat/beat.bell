@@ -1,4 +1,4 @@
-setseed(10);
+setseed(8);
 $harm = read('../00_harmony/harmony.txt');
 $root = $harm.'mcroot';
 $meta = read('../01_background/background.txt');
