@@ -1,0 +1,33 @@
+$harm = read('../00_harmony/harmony.txt');
+$mcroot = $harm.'mcroot';
+$pcs = $harm.'pcs';
+$mcs = pcquant(r2mc(1...32, $mcroot), $pcs);
+$maxpeak = 0;
+$bufs = for $mc $mci in $mcs collect (
+    $b = ezsol(
+        @pitch $mc
+        @duration null
+        @names if $mci == 1 then 'bass' else 'acc' 'sax' 
+        @types if $mci == 1 then 'cresc' else 'cresc' 
+        @useseed 1
+        @velocity 127
+    ).analyze(envmaxtime());
+    $maxpeak = max($maxpeak , $b.getkey('envmaxtime'));
+    $b
+);
+for $b in $bufs do (
+    $peak = $b.getkey('envmaxtime');
+    $t = $maxpeak - $peak;
+    $gain = [0 0 0] [
+        $peak / $b.getkey('duration') 1 xrand(-1, 1) * 0.125
+    ] [1 1 0];
+    $b.transcribe(
+        @onset $t
+        @pan xrand() xrand() 
+        @gain $gain
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport($maxpeak)
