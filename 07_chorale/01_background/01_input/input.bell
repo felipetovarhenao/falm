@@ -1,4 +1,4 @@
-setseed(3);
+setseed(12);
 $harmony = read('../../00_harmony/harmony.txt');
 $mcroot = $harmony.'mcroot';
 $pcs = $harmony.'pcs';
