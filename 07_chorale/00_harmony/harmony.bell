@@ -1,9 +1,51 @@
+LatticeToTuning = (
+    $lattice -> (
+        $monzos = cartesianprod($lattice);
+        $limits = primeser(
+            @min 2 @maxcount length($lattice) 
+        );
+        $ratios = flat([$limits] ** $monzos);
+        $ratios = sort(
+            thin(octreduce($ratios)) 
+        );
+        $ratios
+    ) 
+);
+$lattice = (
+    ## ——— 2 limit———
+    [0] 
+    ## ——— 3 limit———
+    [-1...3] 
+    ## ——— 5 limit———
+    [0] 
+    ## ——— 7 limit———
+    [-1] 
+    ## ———11 limit———
+    [-1] 
+    ## ———13 limit———
+    [-1 -2] 
+    ## ———17 limit———
+    [-1] 
+);
+$ratios = LatticeToTuning($lattice);
 $mcroot = r2mc(7/5, d2);
 $pcroot = mc2pc($mcroot);
-$ratios = 1 9/8 8/7 16/13 64/49 3/2 256/169 27/16 121/64;
 $pcs = r2pc($ratios, $pcroot);
+$deviations = for $r in $ratios collect (
+    $pc = r2pc($r);
+    $dev1 = $pc % 1;
+    $dev2 = 1 - $dev1;
+    $sign = '+';
+    $dev = if abs($dev1) < $dev2 then $dev1 else (
+        $sign = '-';
+        $dev2
+    );
+    $sign + tosymbol(
+        int(round($dev * 100)) 
+    ) + '¢' 
+);
 write(
-    @data ['mcroot' $mcroot] ['pcroot' $pcroot] ['ratios' $ratios] ['pcs' $pcs] 
+    @data ['mcroot' $mcroot] ['pcroot' $pcroot] ['ratios' $ratios] ['pcs' $pcs] ['cent_deviations' $deviations] 
     ## ---
     @path './harmony.txt' 
 )
