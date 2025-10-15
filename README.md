@@ -2,7 +2,7 @@
 
 ### Track listing
 
-1. Preludio (_in memoriam Malugo_). in 1/1
+1. Preludio | _Elegia_ (_in memoriam Malugo_). in 1/1
 2. Serenata. in 4/3
 3. Scherzo. in 15/8
 4. Andante. in 5/4
