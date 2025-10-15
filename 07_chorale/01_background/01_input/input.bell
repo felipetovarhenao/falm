@@ -73,7 +73,9 @@ for $id in $ids, $st in $onsets do (
         ).process(normalize(-3)).transcribe(@onset $totdur @pan 0.5) 
     ) 
 );
-render(
+$b = render(
     @play 1 @process normalize(-3) 
 );
-ezexport(['totdur' $totdur])
+ezexport(
+    ['peak' $totdur] ['totdur' getkey($b, 'duration')] 
+)
