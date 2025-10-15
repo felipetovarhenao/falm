@@ -1,3 +1,15 @@
+TimeCode = (
+    $ms -> (
+        $s = $ms / 1000;
+        $m = int(floor($s / 60));
+        $s = int(round($s % 60));
+        $m = tosymbol($m);
+        if symlen($m) == 1 then ($m = '0' + $m);
+        $s = tosymbol($s);
+        if symlen($s) == 1 then ($s = '0' + $s);
+        $m + ':' + $s
+    ) 
+);
 $folders = (
     '01_preludio' 
     ## ---
@@ -24,7 +36,7 @@ for $folder $id in $folders do (
     $b = importaudio($path);
     $bdur = $b.getkey('duration');
     $stats _= [
-        ['track' $folder] ['marker' $t] ['duration' $bdur]
+        ['name' $folder] ['marker' TimeCode($t)] ['duration' TimeCode($bdur)] 
     ];
     addmarker($t @names $folder);
     $b.transcribe($t);
@@ -33,4 +45,6 @@ for $folder $id in $folders do (
 render(
     @play 1 @process normalize(-3) 
 );
-ezexport($stats)
+ezexport(
+    ['total_length' TimeCode($t)] ['tracks' $stats]
+)
