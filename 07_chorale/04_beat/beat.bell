@@ -32,7 +32,7 @@ $pattern = for $unit in $rhythm collect [
     )] 
 ];
 $midpt = 1/3.;
-$legatobpf = [0 2 0] [$midpt 0.225 -0.125] [1 3 0.125];
+$legatobpf = [0 2 0] [$midpt 0.25 -0.125] [1 3 0.125];
 $bassvelbpf = [0 0 0] [$midpt 127 -0.125] [1 0 0.125];
 while $t < $totdur do (
     $nt = min(1, max(0, $t / $totdur));
