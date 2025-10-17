@@ -1,16 +1,3 @@
-LatticeToTuning = (
-    $lattice -> (
-        $monzos = cartesianprod($lattice);
-        $limits = primeser(
-            @min 2 @maxcount length($lattice) 
-        );
-        $ratios = flat([$limits] ** $monzos);
-        $ratios = sort(
-            thin(octreduce($ratios)) 
-        );
-        $ratios
-    ) 
-);
 $lattice = (
     ## ——— 2 limit———
     [0] 
@@ -27,7 +14,7 @@ $lattice = (
     ## ———17 limit———
     [-1] 
 );
-$ratios = LatticeToTuning($lattice);
+$ratios = gentuning($lattice);
 $mcroot = r2mc(7/5, d2);
 $pcroot = mc2pc($mcroot);
 $pcs = r2pc($ratios, $pcroot);
