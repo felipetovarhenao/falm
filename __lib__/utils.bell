@@ -641,4 +641,26 @@ gainboost = (
         $boost = if $g1 > 0 then $g2 / $g1 else 1;
         $boost
     ) 
+);
+#(
+```bell
+gentuning(
+    @lattice ## required
+) -> llll
+```
+
+Generate a just-intonation tuning from a lattice.
+)#
+gentuning = (
+    $lattice -> (
+        $monzos = cartesianprod($lattice);
+        $limits = primeser(
+            @min 2 @maxcount length($lattice) 
+        );
+        $ratios = flat([$limits] ** $monzos);
+        $ratios = sort(
+            thin(octreduce($ratios)) 
+        );
+        $ratios
+    ) 
 )
