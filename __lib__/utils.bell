@@ -664,15 +664,41 @@ gentuning = (
         $ratios
     ) 
 );
-interpolatechords = (
-    $chord1, $chord2 -> (
-        $remove = diff($chord1, $chord2);
-        $add = diff($chord2, $chord1);
-        $tmp = $chord1;
-        $steps = [sort($chord1)];
+#(
+```bell
+interpolateratios(
+    @ratios1 null
+    @ratios2 null
+) -> llll
+
+Utility for pitch class-based parsimonious voice-leading interpolation between two chords expressed as JI ratios.
+```
+)#
+interpolateratios = (
+    $ratios1, $ratios2 -> (
+        $nearestratio = (
+            $ratios, $target -> (
+                $mindiff = 1000000;
+                $bestidx = -1;
+                for $rat $idx in $ratios do (
+                    $diff = abs(
+                        pitchdiff(r2mc($rat), r2pc($target)) 
+                    );
+                    if $diff < $mindiff then (
+                        $bestidx = $idx;
+                        $mindiff = $diff
+                    ) 
+                );
+                $bestidx
+            ) 
+        );
+        $remove = diff($ratios1, $ratios2);
+        $add = diff($ratios2, $ratios1);
+        $tmp = $ratios1;
+        $steps = [sort($ratios1)];
         for $target in $add do (
-            $bestidx = Nearest(
-                @list $tmp
+            $bestidx = $nearestratio(
+                @ratios $tmp
                 @target $target
                 @mode 1
             );
@@ -687,7 +713,10 @@ interpolatechords = (
         );
         $add = for $a in $add collect [$a 1];
         $remove = for $rem in $remove collect [$rem 0];
-        for $change in $remove $add with @unwrap 1 do (
+        $changes = flat(
+            trans([$remove] [$add]), 1
+        );
+        for $change in $changes with @unwrap 1 do (
             $item = $change:1;
             $mode = $change:2;
             $tmp = if $mode == 0 then diff($tmp, $item) else $tmp $item;
@@ -695,4 +724,4 @@ interpolatechords = (
         );
         $steps
     ) 
-);
+)
