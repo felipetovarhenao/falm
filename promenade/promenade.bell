@@ -366,7 +366,7 @@ render(
     @play 1 @process freeverb(
         @roomsize 0.9
         @damp 1
-        @dry 0.0125
+        @wet 0.0125
     ) normalize(-3) 
 );
 ezexport()
