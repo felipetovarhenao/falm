@@ -247,6 +247,7 @@ Thump = (
             @velocity xrandom(127) 
             @names 'bass' 'cello' 
             @types 'pizz' 'pizz-secco' 'bartok' 'legno-bat' 'stacc' 
+            @useseed 1
         ).Normalize().Transcribe(
             @onset $onset
             @pan xrand() 
@@ -348,7 +349,6 @@ for $ratios in $prog with @unwrap 1 do (
         $pcs = r2pc($ratios, $pcroot);
         $chord = r2mc(1...32, $mcroot).pcquant($pcs);
         $dur = xchoose(1000 500 1500);
-        $dur *= 1;
         xchoose($objs)(
             @chord $chord
             @onset $t
@@ -364,12 +364,11 @@ while $t < $totdur do (
     $dur = (1500 1000 500):($i % 3 + 1);
     $dur *= 1;
     Thump($chord, $t, $dur);
-    $i += 1;
     $t += $dur
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.9
+        @roomsize 0.85
         @damp 1
         @wet 0.0125
     ) normalize(-3) 
