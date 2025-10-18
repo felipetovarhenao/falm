@@ -11,21 +11,21 @@ TimeCode = (
     ) 
 );
 $folders = (
-    ## '01_preludio' 
-    ## ## ---
-    ## '02_serenata' 
-    ## ## ---
-    ## '03_scherzo' 
-    ## ## ---
-    ## '04_andante' 
-    ## ## ---
-    '05_nocturno' 
+    '01_preludio' 
+    ## ---
+    '02_serenata' 
+    ## ---
+    '03_scherzo' 
+    ## ---
+    '04_andante' 
+    ## ---
+    '08_fantasia' 
     ## ---
     '06_intermezzo' 
     ## ---
     '07_chorale' 
     ## ---
-    '08_fantasia' 
+    '05_nocturno' 
     ## ---
     '09_passacaglia' 
     ## ---
