@@ -670,7 +670,6 @@ interpolateratios(
     @ratios1 null
     @ratios2 null
 ) -> llll
-
 Utility for pitch class-based parsimonious voice-leading interpolation between two chords expressed as JI ratios.
 ```
 )#
@@ -679,47 +678,47 @@ interpolateratios = (
         $nearestratio = (
             $ratios, $target -> (
                 $mindiff = 1000000;
-                $bestidx = -1;
+                $nearestidx = -1;
                 for $rat $idx in $ratios do (
                     $diff = abs(
                         pitchdiff(r2mc($rat), r2pc($target)) 
                     );
                     if $diff < $mindiff then (
-                        $bestidx = $idx;
+                        $nearestidx = $idx;
                         $mindiff = $diff
                     ) 
                 );
-                $bestidx
+                $nearestidx
             ) 
         );
-        $remove = diff($ratios1, $ratios2);
-        $add = diff($ratios2, $ratios1);
+        $toremove = diff($ratios1, $ratios2);
+        $toadd = diff($ratios2, $ratios1);
         $tmp = $ratios1;
         $steps = [sort($ratios1)];
-        for $target in $add do (
-            $bestidx = $nearestratio(
-                @ratios $tmp
-                @target $target
-                @mode 1
-            );
-            $bestmc = $tmp:$bestidx;
-            if intersection($bestmc, $remove) != null then (
-                $tmp = diff($tmp, $bestmc);
+        ## Track which removals have been paired
+        $unremoved = $toremove;
+        $unadded = $toadd;
+        ## First pass: pair additions with nearest removals (common tone substitution)
+        for $target in $toadd do (
+            $nearestidx = $nearestratio($tmp, $target);
+            $nearestrat = $tmp:$nearestidx;
+            if intersection($unremoved, $nearestrat) != null then (
+                $tmp = diff($tmp, $nearestrat);
                 $tmp = sort($tmp $target);
-                $remove = diff($remove, $bestmc);
-                $add = diff($add, $target);
+                $unremoved = diff($unremoved, $nearestrat);
+                $unadded = diff($unadded, $target);
                 $steps _= [sort($tmp)] 
             ) 
         );
-        $add = for $a in $add collect [$a 1];
-        $remove = for $rem in $remove collect [$rem 0];
-        $changes = flat(
-            trans([$remove] [$add]), 1
+        ## Second pass: handle remaining unpaired changes
+        ## Remove unpaired removals
+        for $rem in $unremoved do (
+            $tmp = diff($tmp, $rem);
+            $steps _= [sort($tmp)] 
         );
-        for $change in $changes with @unwrap 1 do (
-            $item = $change:1;
-            $mode = $change:2;
-            $tmp = if $mode == 0 then diff($tmp, $item) else $tmp $item;
+        ## Add unpaired additions
+        for $a in $unadded do (
+            $tmp = $tmp $a;
             $steps _= [sort($tmp)] 
         );
         $steps
