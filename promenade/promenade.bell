@@ -1,0 +1,372 @@
+setseed(0);
+Normalize = (
+    $b -> $b.process(
+        normalize(-19 @rms 1) arctan() normalize(-3) 
+    ) 
+);
+Stretch = (
+    $buffer = null, $onset = 0 -> (
+        $stretch = exp2(xrand(3));
+        $maxstretch = (4000 / getkey($buffer, 'duration'));
+        $buffer = process(
+            @buffer $buffer @operations rubberband(
+                @stretching max(1.1, min($maxstretch, $stretch)) 
+                @smoothing 1
+                @stretchmode 0
+            ) 
+        );
+        transcribe(
+            @buffer $buffer
+            @onset $onset
+            @pan xrand() xrand() 
+            @gain [0 1 0] [1 0 xrand(-0.25, 0.25)] 
+        ) 
+    ) 
+);
+Freeze = (
+    $buffer, $onset = 0, $duration = null -> (
+        $bufdur = $buffer.getkey('duration');
+        $duration = $duration ||| ($bufdur * xrand(-1, 1).exp2());
+        $readst = $buffer.getkey('offset');
+        $readend = $bufdur + $readst;
+        $graindur = min($bufdur, xrand(90, 200));
+        $readbpf = [0 $readst 0.] [1 max($readst, $readend - $graindur) 0];
+        $gainbpf = [0 1 0] [1 0 -xrand(1/10, 3/4)];
+        if xrand() > 0.6 then (
+            $gainbpf = revbpf($gainbpf);
+            if xrand() > 0.5 then ($onset -= $duration) 
+        );
+        $t = 0;
+        $win = hanning();
+        $pan = xrand();
+        while $t < $duration do (
+            $nt = $t / $duration;
+            $grainoffset = samplebpf($readbpf, $nt);
+            $gain = samplebpf($gainbpf, $nt);
+            $grain = $buffer.setkey('offset', $grainoffset).setkey('duration', $graindur);
+            $grain.transcribe(
+                @onset $t + $onset + xrand(-10, 10) 
+                @gain $win * $gain
+                @pan $pan
+            );
+            $t += $graindur * xrand(0.125, 1/3) 
+        ) 
+    ) 
+);
+Stutter = (
+    $buffer, $onset = 0 -> (
+        $duration = $buffer.getkey('duration');
+        $maxreps = max(
+            1, int(round($duration / 35)) 
+        );
+        $numreps = xrandom(2, $maxreps);
+        $onsets = arithmser(0, 1, null, $numreps);
+        $onsets = scale($onsets, 0, 1, 0, $duration, xrand(1/20, 1/2) * xchoose(-1 1));
+        $durs = x2dx($onsets $duration);
+        $pan = xrand();
+        $readbpf = [0 0 0] [1 1 0];
+        $speed = xrand(0.125) ** 2;
+        $slope = xrand(1/5, 2/3) * xchoose(-1 1);
+        $env = [0 0 0] [xrand(0.001, 0.999) 1 0] [1 0 $slope];
+        for $t in $onsets, $dur in $durs do (
+            if $dur > 2 then (
+                $nt = $t / $duration;
+                $offset = samplebpf($readbpf, $nt) * $speed * ($duration - $dur);
+                $seg = $buffer.setkey('offset', $offset).setkey('duration', $dur);
+                $seg.transcribe(
+                    @onset $t + $onset
+                    @pan $pan
+                    @gain $env
+                ) 
+            ) 
+        ) 
+    ) 
+);
+Granulate = (
+    $buffer, $onset = 0 -> (
+        $pitch = $buffer.getkey('pitch');
+        $shift = 0;
+        $bufdur = $buffer.getkey('duration');
+        $texturedur = min(
+            $bufdur * xrand(0, 3.5).exp2(), 2500
+        );
+        $graingainbpf = [0 1 0] [1 0 -xrand(1/12, 1/2)];
+        $grainstoffset = 0;
+        if xrand() > 0.6 then (
+            $graingainbpf = revbpf($graingainbpf);
+            w if xrand() > 0.5 && $onset > $texturedur then ($grainstoffset = -$texturedur) 
+        );
+        $graindurmul = xrand().exp2();
+        $sinegate = scale(xrand() ** 2, 0, 1, 0.1, 0.9);
+        $speedbpf = [0 1 0] [
+            1 xrand(1).exp2() xrand(-1, 1) 
+        ];
+        if xrand() > 0.5 then ($speedbpf = revbpf($speedbpf));
+        while $shift < $texturedur do (
+            $gnt = $shift / $texturedur;
+            $graingain = samplebpf($graingainbpf, $gnt);
+            $speed = samplebpf($speedbpf, $gnt);
+            $graindur = xrand(50, 200) * $graindurmul;
+            if $graingain > 0 then (
+                $grainoffset = xrand(0, $bufdur - $graindur);
+                if xrand() > $sinegate then (
+                    $grain = $buffer.setkey('offset', $grainoffset).setkey('duration', $graindur) 
+                ) else (
+                    $grain = cycle(
+                        @frequency mc2f($pitch) * xchoose(1/2 1...8) 
+                        @duration $graindur
+                        @phase xrand() 
+                    ).process(
+                        gain(xrand(0.05, 0.125) * 0.025) 
+                    ) 
+                );
+                $grain.transcribe(
+                    @onset $shift + $onset + $grainstoffset
+                    @gain [0 0 0] [
+                        xrand(0.001, 0.9) ** 2.0 xrand(0.1, 0.707) * $graingain 0
+                    ] [1 0 -0.125] 
+                    @pan xrand() 
+                ) 
+            );
+            $shift += $graindur * xrand(0.1, 0.5) * $speed
+        ) 
+    ) 
+);
+RandEnvelope = (
+    $buffer = null, $onset = 0, $pan = null, $gain = null -> (
+        $x = 0;
+        $minstep = sqrt(90 / getkey($buffer, 'duration'));
+        $env = while $x < 1 collect (
+            $y = abs(xrand(0.33) - xchoose(0 1));
+            $pt = [$x $y xrand(-0.25, 0.25)];
+            $x += xrand($minstep, 0.5) ** 2;
+            $pt
+        );
+        $gain = $env [1 0 0];
+        transcribe(
+            @buffer process($buffer, gain($gain)) 
+            @onset $onset
+            @pan $pan
+        ) 
+    ) 
+);
+Transcribe = (
+    $buffer, $onset = 0, $pan = null, $gain = null -> (
+        if xrand() > 0.8 then (
+            $fn = xchoose(Granulate Stutter RandEnvelope Freeze Stretch);
+            $fn(
+                @buffer $buffer @onset $onset
+            ) 
+        ) else transcribe(
+            @buffer $buffer
+            @onset $onset
+            @pan $pan
+            @gain $gain
+        ) 
+    ) 
+);
+Chirp = (
+    $chord = null, $onset = 0, $duration = 1000 -> (
+        $mcs = $chord.sort().right(-12);
+        $mcs = randomseq(
+            @llll $mcs
+            @length xrandom(2, 6) 
+            @steps (-2 1) * xchoose(-1 1) 
+            @useseed 1
+        );
+        $t = 0;
+        $rampdur = $duration * xrand(0.125, 0.707) ** 2;
+        $durs = timeramp(
+            @duration $rampdur
+            @length length($mcs) 
+            @slope xrand(-0.25, 0.25) 
+        );
+        $tail = $duration - $rampdur;
+        $durs:xchoose(1 -1) += $tail;
+        for $mc in $mcs, $dur in $durs do (
+            $b = ezsol(
+                @pitch $mc
+                @duration $dur + 50
+                @velocity xrand(127) 
+                @names 'acc' 'sax' 'clar' 
+                @types 'stacc' 'ord' 'stacc' 'sfz' 'back' 'reg' 
+                @useseed 1
+            ).Normalize();
+            if xrand() > 0.7 then (
+                $w = simplefm(
+                    @frequency mc2f($mc) * xrandom(3).exp2() 
+                    @duration $b.getkey('duration') * exp2(xrand(-0.5, 1)) 
+                    @harmonicity (xrandom(-2, 2) * 0.25).exp2() 
+                    @modindex [0 xrand(2) 0] [1 0 -xrand(1/8, 1/2)] 
+                ).process(
+                    gain(
+                        [0 0.5 * $b.getkey('rms') 0] [1 0 -xrand(1/3, 7/8)] 
+                    ) 
+                );
+                $b = $b.process(mix($w)) 
+            );
+            $b.Transcribe(
+                @onset $onset + $t
+                @pan mc2pan($mc, 0.5) 
+                @gain [0 1 0] [1 0 0.8] 
+            );
+            $t += $dur
+        ) 
+    ) 
+);
+Thump = (
+    $chord = null, $onset = 0, $duration = 1000 -> (
+        $mc = $chord.left(2).xchoose();
+        sinewave(
+            @pitch $mc
+            @duration $duration
+            @velocity 30 + xrandom(-7, 7) 
+        ).transcribe(
+            @onset $onset
+            @pan xrand() 
+            @gain 0.25
+        );
+        if xrand() > 0.8 then (
+            ezsol(
+                @resample 0
+                @pitch xrand(36, 88) * 100
+                @duration $duration
+                @velocity 127
+                @names family('plucked') family('strings') 
+                @types 'perc' 'hit-on-body' 'tap' 
+                @useseed 1
+            ).Transcribe(
+                @onset $onset
+                @pan xrand() 
+                @gain [0 1 0] [1 0 0.5] 
+            ) 
+        );
+        ezsol(
+            @pitch $mc
+            @duration $duration * 3
+            @velocity xrandom(127) 
+            @names 'bass' 'cello' 
+            @types 'pizz' 'pizz-secco' 'bartok' 
+        ).Normalize().Transcribe(
+            @onset $onset
+            @pan xrand() 
+            @gain [0 1 0] [1 0 -0.5] 
+        ) 
+    ) 
+);
+Chord = (
+    $chord = null, $onset = 0, $duration = 1000 -> (
+        $mcs = $chord.right(2).xscramble().left(xrandom(5, 12));
+        $durs = timeramp(
+            @duration $duration
+            @length length($mcs) 
+            @slope xrand(-0.25, 0.25) 
+        );
+        $t = 0;
+        for $mc in $mcs, $dur in $durs do (
+            $b = ezsol(
+                @pitch $mc
+                @duration $duration
+                @velocity xrand(127) 
+                @gain 0.125
+                @names family('plucked') 'acc' family('strings') 
+                @types 'pizz' 'stacc' 'sfz' 'harm' 'back' 'keys' 
+                @useseed 1
+            ).Normalize();
+            if xrand() > 0.5 then (
+                $w = simplefm(
+                    @frequency mc2f($mc) * xrandom(3).exp2() 
+                    @duration $b.getkey('duration') * xrand(-1, 1).exp2() 
+                    @harmonicity (xrandom(-2, 2) * 0.25).exp2() 
+                    @modindex [0 xrand(2) 0] [1 0 -xrand(1/8, 1/2)] 
+                ).process(
+                    gain(
+                        [0 0.5 * $b.getkey('rms') 0] [1 0 -xrand(1/8, 7/8)] 
+                    ) 
+                );
+                $b = $b.process(mix($w)) 
+            );
+            $b.Transcribe(
+                @onset $t + $onset
+                @pan xrand() 
+                @gain [0 1 0] [1 0 -xrand(-0.5, 0.5)] 
+            );
+            $t += xrand(20) 
+        ) 
+    ) 
+);
+Arpeggio = (
+    $chord = null, $onset = 0, $duration = 1000 -> (
+        $mcs = $chord.right(3).xscramble().left(xrandom(2, 10));
+        $durs = timeramp(
+            @duration $duration
+            @slope xrand(-0.5, 0.5) 
+            @length length($mcs) 
+        );
+        $t = 0;
+        for $mc in $mcs, $dur in $durs do (
+            $group = xchoose(
+                [
+                    [family('plucked')] [
+                        'harm' 'harm-in-wood' 'ord' 
+                    ] 
+                ] [[
+                    'flute' 'sax' 'clar' 'stacc' 
+                ] ['keys']] 
+            )::1;
+            xchoose(pno ezsol @weights 1 2)(
+                @pitch $mc
+                @duration $dur * 4 + 500
+                @velocity xrand(127) 
+                @gain 0.125
+                @names $group::1
+                @types $group::2
+                @useseed 1
+            ).Normalize().Transcribe(
+                @onset $onset + $t
+                @pan xrand() 
+                @gain [0 1 0] [1 0 -xrand(0.8, 0.2)] 
+            );
+            $t += $dur
+        ) 
+    ) 
+);
+$mcroot = eb2;
+$pcroot = mc2pc($mcroot);
+$ratios1 = 1 6/5 7/6 4/3 11/8 7/5 21/16 3/2 7/4 16/9 9/8;
+$ratios2 = 1 9/8 8/7 16/13 4/3 16/11 3/2 256/169 27/16 32/17;
+$prog = interpolateratios($ratios1, $ratios2);
+$t = 0;
+$objs = Chirp Chord Arpeggio;
+for $ratios in $prog with @unwrap 1 do (
+    for $i in 1...8 do (
+        $pcs = r2pc($ratios, $pcroot);
+        $chord = r2mc(1...32, $mcroot).pcquant($pcs);
+        $dur = xchoose(1000 500 1500);
+        $dur *= 1;
+        xchoose($objs)(
+            @chord $chord
+            @onset $t
+            @duration $dur
+        );
+        $t += $dur
+    ) 
+);
+$totdur = $t;
+$t = 0;
+$i = 0;
+while $t < $totdur do (
+    $dur = (1500 1000 500):($i % 3 + 1);
+    $dur *= 1;
+    Thump($chord, $t, $dur);
+    $i += 1;
+    $t += $dur
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @damp 1
+        @dry 0.0125
+    ) normalize(-3) 
+);
+ezexport()
