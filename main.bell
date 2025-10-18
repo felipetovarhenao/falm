@@ -21,13 +21,15 @@ $folders = (
     ## ---
     '05_nocturno' 
     ## ---
-    '06_fantasia' 
+    '06_intermezzo' 
     ## ---
     '07_chorale' 
     ## ---
-    '07_passacaglia' 
+    '08_fantasia' 
     ## ---
-    '08_epilogo' 
+    '09_passacaglia' 
+    ## ---
+    '10_epilogo' 
 );
 $t = 0;
 $stats = null;
@@ -46,5 +48,5 @@ render(
     @play 1 @process normalize(-3) 
 );
 ezexport(
-    ['total_length' TimeCode($t)] ['tracks' $stats]
+    ['total_length' TimeCode($t)] ['tracks' $stats] 
 )
