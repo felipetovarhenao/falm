@@ -345,9 +345,9 @@ $prog _= interpolateratios($ratios3, $ratios4).right(1);
 $t = 0;
 $objs = Chirp Chord Arpeggio;
 for $ratios in $prog with @unwrap 1 do (
+    $pcs = r2pc($ratios, $pcroot);
+    $chord = r2mc(1...32, $mcroot).pcquant($pcs);
     for $i in 1...4 do (
-        $pcs = r2pc($ratios, $pcroot);
-        $chord = r2mc(1...32, $mcroot).pcquant($pcs);
         $dur = xchoose(1000 500 1500);
         xchoose($objs)(
             @chord $chord
