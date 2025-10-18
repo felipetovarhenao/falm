@@ -663,4 +663,36 @@ gentuning = (
         );
         $ratios
     ) 
-)
+);
+interpolatechords = (
+    $chord1, $chord2 -> (
+        $remove = diff($chord1, $chord2);
+        $add = diff($chord2, $chord1);
+        $tmp = $chord1;
+        $steps = [sort($chord1)];
+        for $target in $add do (
+            $bestidx = Nearest(
+                @list $tmp
+                @target $target
+                @mode 1
+            );
+            $bestmc = $tmp:$bestidx;
+            if intersection($bestmc, $remove) != null then (
+                $tmp = diff($tmp, $bestmc);
+                $tmp = sort($tmp $target);
+                $remove = diff($remove, $bestmc);
+                $add = diff($add, $target);
+                $steps _= [sort($tmp)] 
+            ) 
+        );
+        $add = for $a in $add collect [$a 1];
+        $remove = for $rem in $remove collect [$rem 0];
+        for $change in $remove $add with @unwrap 1 do (
+            $item = $change:1;
+            $mode = $change:2;
+            $tmp = if $mode == 0 then diff($tmp, $item) else $tmp $item;
+            $steps _= [sort($tmp)] 
+        );
+        $steps
+    ) 
+);
