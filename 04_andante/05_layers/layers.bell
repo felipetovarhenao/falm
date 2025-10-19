@@ -22,7 +22,7 @@ while $t < $totdur do (
     $b = ezsol(
         @pitch $mc
         @names family('brass') family('woodwinds') family('strings') 
-        @types 'cresc-to-dim' 'stacc' 'cresc' if $nt > 0.3 then 'dim' 
+        @types 'cresc-to-dim' 'stacc' 'cresc' 
         @duration null
         @velocity 127
         @useseed 1
