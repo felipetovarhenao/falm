@@ -27,7 +27,7 @@ $b.process(
     $t + 300 @gain [0 1 0] [0.05 0.707 -0.35] [1 0 -0.125] 
 );
 harp(
-    @pitch c6 
+    @pitch r2mc(7/8, d6) 
     @type 'bisb' 
     @duration null
     @useseed 1

@@ -1,4 +1,6 @@
-$chord = r2mc(1...64, c3).pcquant(r2pc(1 5/4 3/2 5/3 9/8));
+$mcroot = r2mc(7/8, d3);
+$pcroot = mc2pc($mcroot);
+$chord = r2mc(1...64, $mcroot).pcquant(r2pc(1 5/4 3/2 5/3 9/8, $pcroot));
 $tail = 2000;
 $durs = for $mc in $chord collect (
     $b = harp(

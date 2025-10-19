@@ -1,7 +1,7 @@
 setseed(509);
 $totdur = 65000;
 $t = 0;
-$root = c4;
+$root = r2mc(7/8, d4);
 $minvelbpf = [0 0 0] [1 100 1/3];
 $gapbpf = [0 2500 0] [1 0 0.35];
 $gapthreshbpf = [0 0.125 0] [1 0 0.25];

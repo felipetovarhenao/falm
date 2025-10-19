@@ -1,5 +1,7 @@
 setseed(797);
-$chord = r2mc(1...24, c2).rev().pcquant(r2pc(1 5/4 21/16 3/2 5/3));
+$mcroot = r2mc(7/8, d2);
+$pcroot = mc2pc($mcroot);
+$chord = r2mc(1...24, $mcroot).rev().pcquant(r2pc(1 5/4 21/16 3/2 5/3, $pcroot));
 $totdur = 35000;
 $incrbpf = [0 150 0] [0.9 40 0.25] [1 350 0.125];
 $incrjitbpf = [0 1 0] [1 0 -0.125];
@@ -67,9 +69,9 @@ while ($t < $totdur) || (
     $t += $incr * $incrjit
 );
 render(
-    @play 1 @process freeverb(
+    @play 1 @process normalize(-3) freeverb(
         @roomsize 0.9
-        @wet 0.0125
+        @wet 0.005
         @damp 1
         @width 1
     ) normalize(-3) 
