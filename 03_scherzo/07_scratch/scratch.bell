@@ -1,23 +1,29 @@
+if CrushedCresc == null then BP_FN_ERROR(@details 'You need you run script containing gesture/object definitions first.');
 setseed(100 + 1234);
 $t = 0;
 $bassdur = 2150.;
 $basspeak = 0.7;
-for $i in 0...1 do (CrushedCresc($t, $bassdur * $basspeak) );
+for $i in 0...1 do (CrushedCresc($t, $bassdur * $basspeak));
+$mc = r2mc(2/3, Root);
 sinewave(
-    @pitch c2 
+    @pitch $mc
     @duration $bassdur
     @envelope [0 0 0] [$basspeak 0.5 0.125] [1 0 -0.125] 
-).process(fade()).transcribe($t @pan 0.8 0);
+).process(fade()).transcribe(@onset $t @pan 0.8 0.2);
 $t += $bassdur * $basspeak;
 ezsol(
-    @pitch c2 
+    @pitch $mc
     @types 'pizz' 
     @names 'bass' 
     @duration null
     @velocity 127
     @useseed 1
-).transcribe($t @pan 0.5);
+).transcribe(
+    @onset $t
+    @pan 0.5 0 1
+    @gain [0 1 0] [1 0 0.125] 
+);
 render(
-    @play 1 @process normalize(-3)
+    @play 1 @process normalize(-3) 
 );
 ezexport($t)

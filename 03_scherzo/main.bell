@@ -1,3 +1,4 @@
+if Root == null then BP_FN_ERROR(@details 'You need you run script containing gesture/object definitions first.');
 $t = 0;
 $names = (
     'glitch' 'polyrhythm' 
@@ -31,13 +32,14 @@ $timestep = read('./03_loops/loops.txt');
 $t += $timestep;
 $bassdur = min(4500, $timestep);
 $basspeak = 0.95;
+$bassmc = r2mc(Root, 2/3);
 cycle(
-    @frequency mc2f(c2) 
+    @frequency mc2f($bassmc) 
     @duration $bassdur
     @phase 0.012
 ).process(fade(5, 5)).transcribe(
     @onset $t - $bassdur * $basspeak
-    @pan mc2pan(c3) 
+    @pan mc2pan($bassmc) 
     @gain [0 0 0] [$basspeak 0.7 0.75] [1 0 -0.2] 
 );
 importaudio('./04_trail/trail.wav').transcribe($t);
@@ -51,13 +53,12 @@ render(
     @play 1
     @fade 0
     @process (
-        normalize(@level -22 @rms 1) 
+        normalize(@level -25 @rms 1) 
         ## ---
         arctan() 
         ## ----
         normalize(-3) 
         ## ---
-        ## resample(1/c2r(-200)) 
         
     ) 
 );

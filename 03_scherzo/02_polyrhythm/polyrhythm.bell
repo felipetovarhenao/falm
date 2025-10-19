@@ -10,7 +10,7 @@ for $seed $id in $seeds do (
     );
     setseed($seed);
     $chord = pcquant(
-        r2mc((4...32), c2), r2pc(1 5/4 9/8 15/8 3/2 5/3 7/5) 
+        r2mc((4...32), r2mc(2/3, Root)), r2pc(1 5/4 9/8 15/8 3/2 5/3 7/5, PcRoot) 
     );
     $totdur = nearest(1/4 1/2 3/4 5/8 7/8 1 5/4, $totdur / $bardur) * $bardur;
     $delay = xrand(5);
@@ -49,7 +49,12 @@ for $seed $id in $seeds do (
     render(
         @reset 1
         @fade 0
-        @process ezverb() 
+        @process freeverb(
+            @roomsize 0.85
+            @wet 0.0125
+            @damp 1
+            @width 1
+        ) 
     );
     ezexport($totdur @id $id) 
 )
