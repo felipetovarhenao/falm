@@ -1,9 +1,9 @@
 setseed(101);
-$metadata = read('./strings.txt');
+$metadata = read('../00_strings/strings.txt');
 $totdur = $metadata.getkey('totdur');
 $events = $metadata.getkey('events');
 $han = hanning();
-$waves = cycle tri rect saw;
+$waves = cycle tri rect saw ezsol;
 $wetbpf = null;
 $legatobpf = [0 0 0] [1 1 0.5];
 $maxpatsizebpf = [0 1 0] [1 20 0.125];
@@ -54,8 +54,11 @@ for $e in $events do (
             $phase = xrand();
             $b = xchoose($waves.left($numwaves))(
                 @frequency max($minfq, $fq * $oct) 
+                @pitch r2mc(max($minfq, $fq * $oct)) 
                 @duration $incr * $legato
                 @phase $phase
+                @names 'acc' 
+                @types 'sfz' 'ord' 'reg' 
                 @duty $phase
             );
             if xrand() > 0.7 then (
