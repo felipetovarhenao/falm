@@ -1,5 +1,5 @@
 setseed(1);
-$mcroot = r2mc(5/4, d2);
+$mcroot = r2mc(6/5, d2);
 $pcroot = mc2pc($mcroot);
 $tuning = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
 $pcs = r2pc($tuning, $pcroot);
