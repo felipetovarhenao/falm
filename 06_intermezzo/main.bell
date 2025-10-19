@@ -152,7 +152,7 @@ Transcribe = (
         );
         $boost = gainboost(
             @buffer $buffer
-            @outmin dbtoa(-12) 
+            @outmin dbtoa(-18) 
             @outmax dbtoa(-3) 
             @slope 0
         );
