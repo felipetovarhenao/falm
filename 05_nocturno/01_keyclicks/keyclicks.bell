@@ -6,10 +6,15 @@ for $file in $files with @unwrap 1 do (
     $basepath = './' + '0' + tosymbol($id) + '_' + $name + '/' + $name;
     $snd = importaudio($basepath + '.wav');
     $txt = read($basepath + '.txt');
-    $snd.transcribe($t);
+    if $id != 3 then (
+        $snd = $snd.process(
+            normalize(@level -26 @rms 1) arctan() normalize(-3) 
+        ) 
+    );
     if $name == 'cresc' then (
         importaudio('./05_transient/transient.wav').transcribe($t - read('./05_transient/transient.txt')) 
     );
+    $snd.transcribe($t);
     $t += $txt
 );
 render(
