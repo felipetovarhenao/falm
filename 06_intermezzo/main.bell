@@ -339,7 +339,7 @@ Arpeggio = (
         ) 
     ) 
 );
-$mcroot = r2mc(13/12, d2);
+$mcroot = r2mc(9/8, d2);
 $pcroot = mc2pc($mcroot);
 $harmony = (
     ## ---
@@ -359,11 +359,14 @@ $prog = for $transition $id in group($harmony, 2, 1) with @unwrap 1 collect (
 );
 $t = 0;
 $objs = Chirp Chord Arpeggio;
+$bpm = 60;
+$bardur = 240000 / $bpm;
+$units = (1/4 1/8 3/8) * $bardur;
 for $ratios in $prog with @unwrap 1 do (
     $pcs = r2pc($ratios, $pcroot);
     $chord = r2mc(1...32, $mcroot).pcquant($pcs);
     for $i in 1...4 do (
-        $dur = xchoose(1000 500 1500);
+        $dur = xchoose($units);
         xchoose($objs)(
             @chord $chord
             @onset $t
@@ -375,8 +378,9 @@ for $ratios in $prog with @unwrap 1 do (
 $totdur = $t;
 $t = 0;
 $i = 0;
+$units = (3/8 1/4 1/8) * $bardur;
 while $t < $totdur do (
-    $dur = (1500 1000 500):($i % 3 + 1);
+    $dur = $units:($i % 3 + 1);
     $dur *= 1;
     Thump($chord, $t, $dur);
     $t += $dur
