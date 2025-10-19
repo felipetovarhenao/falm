@@ -15,7 +15,7 @@ $lattice = (
     [-1] 
 );
 $ratios = gentuning($lattice);
-$mcroot = r2mc(7/5, d2);
+$mcroot = r2mc(11/8, d2);
 $pcroot = mc2pc($mcroot);
 $pcs = r2pc($ratios, $pcroot);
 $deviations = for $r in $ratios collect (
