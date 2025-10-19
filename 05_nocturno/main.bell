@@ -12,6 +12,12 @@ $t += read('./03_sparkles/sparkles.txt');
 importaudio('./05_granular/granular.wav').transcribe($t);
 $t += read('./05_granular/granular.txt');
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process (
+        normalize(@level -24 @rms 1) 
+        ## ---
+        arctan() 
+        ## ---
+        normalize(-3) 
+    ) 
 );
 ezexport()
