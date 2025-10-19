@@ -31,6 +31,18 @@ sawwave(@pitch $root @duration $maxdur).transcribe(
     @gain [0 0.125 0] [1 0 -0.5] 
 );
 $b = render(
-    @play 1 @process normalize(-3) reverse() 
+    @play 1 @process (
+        normalize(-3) 
+        ## ---
+        trim(@threshold 0.00125 @start 0) 
+        ##  ---
+        fade(
+            @fadein 0
+            @fadeout 2000
+            @fadeouttype 2
+        ) 
+        ## ---
+        reverse() 
+    ) 
 );
 ezexport($b.getkey('duration'))
