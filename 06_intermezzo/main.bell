@@ -1,9 +1,4 @@
 setseed(1);
-Normalize = (
-    $b -> $b.process(
-        normalize(-19 @rms 1) arctan() normalize(-3) 
-    ) 
-);
 Stretch = (
     $buffer = null, $onset = 0 -> (
         $stretch = exp2(xrand(3));
@@ -152,6 +147,16 @@ RandEnvelope = (
 );
 Transcribe = (
     $buffer, $onset = 0, $pan = null, $gain = null -> (
+        $buffer = $buffer.process(
+            normalize(-24 @rms 1) arctan() 
+        );
+        $boost = gainboost(
+            @buffer $buffer
+            @outmin dbtoa(-12) 
+            @outmax dbtoa(-3) 
+            @slope 0
+        );
+        $buffer = $buffer.process(gain($boost));
         if xrand() > 0.8 then (
             $fn = xchoose(Granulate Stutter RandEnvelope Freeze Stretch);
             $fn(
@@ -189,9 +194,9 @@ Chirp = (
                 @duration $dur + 50
                 @velocity xrand(127) 
                 @names 'acc' 'sax' 'clar' 
-                @types 'stacc' 'ord' 'stacc' 'sfz' 'back' 'reg' 
+                @types 'stacc' 'ord' 'sfz' 'back' 'reg' 
                 @useseed 1
-            ).Normalize();
+            );
             if xrand() > 0.7 then (
                 $w = simplefm(
                     @frequency mc2f($mc) * xrandom(3).exp2() 
@@ -248,7 +253,7 @@ Thump = (
             @names 'bass' 'cello' 
             @types 'pizz' 'pizz-secco' 'bartok' 'legno-bat' 'stacc' 
             @useseed 1
-        ).Normalize().Transcribe(
+        ).Transcribe(
             @onset $onset
             @pan xrand() 
             @gain [0 1 0] [1 0 -0.5] 
@@ -273,7 +278,7 @@ Chord = (
                 @names family('plucked') 'acc' family('strings') 
                 @types 'pizz' 'stacc' 'sfz' 'harm' 'back' 'keys' 
                 @useseed 1
-            ).Normalize();
+            );
             if xrand() > 0.5 then (
                 $w = simplefm(
                     @frequency mc2f($mc) * xrandom(3).exp2() 
@@ -311,9 +316,11 @@ Arpeggio = (
                     [family('plucked')] [
                         'harm' 'harm-in-wood' 'ord' 
                     ] 
-                ] [[
-                    'flute' 'sax' 'clar' 'stacc' 
-                ] ['keys']] 
+                ] 
+                ## ---,
+                [[
+                    'flute' 'sax' 'clar' 
+                ] [ 'keys' ]] 
             )::1;
             xchoose(pno ezsol @weights 1 2)(
                 @pitch $mc
@@ -323,7 +330,7 @@ Arpeggio = (
                 @names $group::1
                 @types $group::2
                 @useseed 1
-            ).Normalize().Transcribe(
+            ).Transcribe(
                 @onset $onset + $t
                 @pan xrand() 
                 @gain [0 1 0] [1 0 -xrand(0.8, 0.2)] 
@@ -382,7 +389,7 @@ for $x in ['viola' 'harm-trem'] ['harp' 'harm'] with @unwrap 1 do (
         @velocity 127
         @types $x:2
         @useseed 1
-    ).Normalize().Transcribe(
+    ).Transcribe(
         @onset $t
         @pan xrand() 
         @gain [0 1 0] [1 0 -xrand(1/8, 2/3)] 
@@ -391,7 +398,7 @@ for $x in ['viola' 'harm-trem'] ['harp' 'harm'] with @unwrap 1 do (
 $tail = 2500;
 render(
     @play 1 @process freeverb(
-        @roomsize 0.85
+        @roomsize 0.75
         @damp 1
         @wet 0.0125
         @tail $tail
