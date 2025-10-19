@@ -62,13 +62,28 @@ for $beatnum in $beatnums do (
         $onset += xrand($delay) 
     ) 
 );
+$tail = 2000;
 render(
-    @play 1 @process normalize(-3) freeverb(
-        @roomsize 0.925
-        @wet [0 0.012 0] [1 0.05 0.8] 
-        @dry [0 1/3 0] [1 1 0.1] 
-        @damp 1
-        @width 1
+    @play 1 @process (
+        ## ---
+        normalize(-3) 
+        ## ---
+        freeverb(
+            @roomsize 0.925
+            @wet [0 0.012 0] [1 0.05 0.8] 
+            @dry [0 1/3 0] [1 1 0.1] 
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+        ) 
+        ## ---
+        normalize(-3) 
     ) 
 );
 ezexport()

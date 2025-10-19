@@ -1,3 +1,4 @@
+setseed(2);
 $metadata = read('../01_pulse/pulse.txt');
 $beat = $metadata.'beat';
 $beatnum = int(round($metadata.'sections':2 / $beat));
@@ -22,7 +23,7 @@ for $mc $mci in $chord.rev() do (
         @useseed 1
     ).transcribe(
         @onset $t
-        @pan mc2pan($mc, 0.25) 
+        @pan mc2pan($mc, 1.) 
         @gain $gain
     );
     $t += $incr
@@ -52,6 +53,7 @@ $b.process($bassop).transcribe(
     @pan xrand() xrand() 
     @gain 0.25
 );
+$tail = 2000;
 render(
     @play 1
     @panmode 1
@@ -64,7 +66,16 @@ render(
             @wet [0 0 0] [1 0.0125 0.5] 
             @damp 1
             @width 1
+            @tail $tail
         ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+        ) 
+        ## ---
+        normalize(-3) 
     ) 
 );
 ezexport($t)

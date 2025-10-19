@@ -1,5 +1,5 @@
 $t = 0;
-$mc = r2mc(64, f#2);
+$mc = r2mc(64, r2mc(5/4, d2));
 pno(
     @pitch $mc
     @duration null

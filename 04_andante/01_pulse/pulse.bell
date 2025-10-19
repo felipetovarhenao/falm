@@ -3,7 +3,7 @@ $bpm = 112;
 $unit = 1/16.;
 $beat = (240000/$bpm) * $unit;
 $t = 0;
-$mcroot = f#2;
+$mcroot = r2mc(5/4, d2);
 $pcroot = mc2pc($mcroot);
 $mindurthresh = 10;
 $minutes = 5;
@@ -113,7 +113,7 @@ GenSolBuf = (
 );
 $count = 0;
 $metadata = (
-    ['beat' $beat]
+    ['beat' $beat] 
     ## -----
     ['chords'] 
 );
@@ -165,7 +165,7 @@ while $t < $totdur do (
             ## ----------
             $b = sinewave(
                 @pitch $mc
-                @velocity scale($vel, 0, 127, 5, 80) 
+                @velocity scale($vel, 0, 127, 3, 70) 
                 @duration $streamsize * $beat + $mindurthresh
                 @phase xrand() 
             ) 
@@ -209,13 +209,26 @@ while $t < $totdur do (
     $count += $countstep;
     $t += $beat
 );
+$tail = 2000;
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.9
-        @wet 0.025
-        @damp 1
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process (
+        ## ---
+        freeverb(
+            @roomsize 0.9
+            @wet 0.025
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+        ) 
+        ## ---
+        normalize(-3) 
+    ) 
 );
 $metadata _= ['sections' (0 $climaxst $climaxend 1) * $totdur];
 ezexport($metadata)

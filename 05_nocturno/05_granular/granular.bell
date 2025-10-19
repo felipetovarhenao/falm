@@ -1,6 +1,4 @@
 setseed(23);
-$mcroot = b1;
-$pcroot = mc2pc($mcroot);
 $t = 0;
 $dryenv = [0 0 0];
 $harmony = read('../00_harmony/harmony.txt');
@@ -95,7 +93,7 @@ $tail = 4000;
 $b.process(
     gain($dryenv) freeverb(
         @roomsize 0.98
-        @wet [0 0.015 0] [1 0.025 0.25] 
+        @wet [0 0.01 0] [1 0.0125 0.25] 
         @dry 0
         @damp 1
         @width 1

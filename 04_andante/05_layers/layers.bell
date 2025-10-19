@@ -1,5 +1,5 @@
 setseed(1);
-$mcroot = f#2;
+$mcroot = r2mc(5/4, d2);
 $pcroot = mc2pc($mcroot);
 $tuning = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
 $pcs = r2pc($tuning, $pcroot);
@@ -22,7 +22,7 @@ while $t < $totdur do (
     $b = ezsol(
         @pitch $mc
         @names family('brass') family('woodwinds') family('strings') 
-        @types 'cresc-to-dim' 'stacc' 'cresc' 
+        @types 'cresc-to-dim' 'stacc' 'cresc' if $nt > 0.3 then 'dim' 
         @duration null
         @velocity 127
         @useseed 1
@@ -33,6 +33,7 @@ while $t < $totdur do (
     );
     $t += xrandom(1, 4) * $beat
 );
+$tail = 2000;
 render(
     @play 1 @process (
         freeverb(
@@ -40,6 +41,10 @@ render(
             @wet 0.05
             @damp 1
             @width 1
+        ) fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
         ) normalize(-3) 
     ) 
 );
