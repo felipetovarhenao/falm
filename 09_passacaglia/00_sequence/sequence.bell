@@ -11,7 +11,7 @@ for $name in family('strings') do $instruments _= instrument(
     @types 'pizz' 
     @join 0
 );
-$mcroot = ab1;
+$mcroot = r2mc(7/10, d2);
 $pcroot = mc2pc($mcroot);
 $sequence = ['root' $mcroot] ['unit' $unit] ['sections' null];
 $seeds = (
@@ -64,7 +64,7 @@ for $seed $chordsize in $seeds collect (
             $mc1 = $mcpair:1;
             $mc2 = $mcpair:2;
             $diff = c2r(
-                minabs(pitchdiff($mc1, $mc2), 300)
+                minabs(pitchdiff($mc1, $mc2), 300) 
             );
             $env = [0 1 0] [1 1/$diff $slope];
             $durmul = integrate( @llll $env):(-1 2);
