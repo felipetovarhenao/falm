@@ -171,7 +171,7 @@ for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtim
     for $dur in $timeramp do (
         $bm = $b.setkey(
             'offset',  (($totdur - $dur) + $headtime) 
-        ).process(mix($pizz)).setkey('duration', max(25 , $dur));
+        ).process(mix($pizz)).setkey('duration', max(50, $dur));
         $bm.process(
             gain([0 1 0] [1 0 -0.125]) 
         ).transcribe(
