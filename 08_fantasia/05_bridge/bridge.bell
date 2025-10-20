@@ -1,4 +1,4 @@
-setseed(909);
+setseed(303);
 Swirl = (
     $onset = 0, $duration = 1000, $chord = null, $length = null, $velocity = 127, $slope = 0.125 -> (
         $t = 0;
@@ -64,7 +64,7 @@ for $vel $id in (
         ) 
     ) 
 );
-$ampenv = [0 0.5 0] [0.25 0.005 -0.25] [1 1 0.8];
+$ampenv = [0 0.707 0] [0.25 0.125 -0.25] [1 1 0.8];
 $bassmc = $chord:1;
 $bassfq = $bassmc.mc2f() * 0.5;
 cycle(
@@ -88,7 +88,7 @@ for $mc $mci in ($bassmc $chord:2) - 1200, $start in 0 $totdur do (
         $process _= reverse();
         $offset -= $bass.getkey('duration') 
     );
-    $bass.process($process normalize(-3)).transcribe(
+    $bass.process($process).transcribe(
         @onset $start + $offset @pan xrand() 
     ) 
 );
@@ -126,7 +126,7 @@ for $o $oi in -2...0 do (
         @velocity 127
         @duration null
         @type xchoose('pizz' 'bartok') 
-    ).process(normalize(-3)).transcribe(
+    ).transcribe(
         @onset $t @pan xrand() 
     ) 
 );
@@ -160,27 +160,28 @@ for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtim
         @pitch $chord:1 - 1200
         @velocity 127
         @duration min($rampdur * 3, 3000) 
-        @names 'bass' 'cello' 
-        @types 'pizz' 
+        @names 'bass' 
+        @types 'bartok' 
         @useseed 1
-    );
-    $pizz.transcribe(
-        @onset $shift
-        @pan mc2pan($mc, 0.707) 
-        @gain [0 1 0] [1 0 -0.25] 
+    ).process(
+        gain(0.125) panning(
+            @position xrand(-1, 1) * 0.125 + 0.5 @numchannels 2
+        ) 
     );
     for $dur in $timeramp do (
         $bm = $b.setkey(
             'offset',  (($totdur - $dur) + $headtime) 
-        ).setkey('duration', max(25 , $dur));
+        ).process(mix($pizz)).setkey('duration', max(25 , $dur));
         $bm.process(
-            gain([0 1 0] [1 0 -0.125]) normalize(@level -12 @rms 1) 
-        ).transcribe(@onset $shift);
+            gain([0 1 0] [1 0 -0.125]) 
+        ).transcribe(
+            @onset $shift @pan xrand() 
+        );
         $shift += $dur
     ) 
 );
 $br = $b.setkey('offset', $totdur);
-$br.process(normalize(-3)).transcribe($shift);
+$br.transcribe($shift);
 $bassdur = 2000;
 cycle(
     @frequency mc2f($chord:1) / 2 @duration $bassdur
@@ -190,6 +191,6 @@ cycle(
     @pan 0 1 0.5
 );
 render(
-    @play 1 @process normalize(-3) 
+    @play 1 @process normalize(@level -18 @rms 1) arctan() normalize(-3) 
 );
 ezexport($shift)
