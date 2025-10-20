@@ -6,28 +6,24 @@ $bardur = 2150.;
 $dur = 1/8 * $bardur;
 $end = read('../03_loops/loops.txt');
 $N = 12;
-$V = 4;
 for $i in 1...($N + 1) do (
     $mc = Root + 1200 * 5;
     $dur2 = ($N + 1 - $i) * $dur;
     if $dur2 > 10 then (
-        for $v in 1...$V do (
+        for $v in 1...4 do (
             $resbpf = [0 1 0] [1 1/c2r(-50) xrand(2/3, 7/8)];
             $durfactor = integrate($resbpf):(-1 2);
-            $balance = 1.1 ** (1 - $V);
             ezsol(
-                @pitch Root + 1200 * 5
+                @pitch $mc
                 @velocity 127
                 @names family('strings') 'acc' 
-                @types 'nonvib' 'harm' 'reg' 'ord' 'ord-to-crushed' 'cresc' 
+                @types 'nonvib' 'harm' 'reg' 'ord' 'ord-to-crushed' 
                 @duration $dur2 / $durfactor
                 @useseed 1
-            ).process(
-                normalize(@level -28 @rms 1) arctan() resample($resbpf) 
-            ).transcribe(
+            ).process(resample($resbpf)).transcribe(
                 @onset $t
-                @pan mc2pan($mc, 0.125) xrand() 
-                @gain [0 0 0] [1 $balance 0.5] 
+                @pan mc2pan($mc) 
+                @gain [0 0 0] [1 1 0.5] 
             ) 
         );
         $t += $dur2
@@ -37,12 +33,10 @@ for $i in 1...($N + 1) do (
     );
     for $rep in 1...$i do (
         $incr = $dur / $subdiv;
-        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(45, $incr * 2)).process(
-            gain(
-                [0 1 0] [1 0 xrand(-1/2, 1/2)] 
-            ) normalize(@level -20 @rms 1) arctan() normalize(-3) 
-        ).transcribe(
-            @onset $t @pan xrand() 
+        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(45, $incr * 2)).transcribe(
+            @onset $t
+            @pan xrand() 
+            @gain [0 1 0] [1 0 xrand(-1/2, 1/2)] 
         );
         $t += $incr * ($rep < $i) 
     ) 
@@ -58,8 +52,8 @@ $bass.process(
 ).transcribe(@onset $t - $bassdur);
 addmarker($t);
 render(
-    @play 1 @process normalize(@level -20 @rms 1) arctan() freeverb(
-        @roomsize 0.80
+    @play 1 @process normalize(@level -18 @rms 1) arctan() normalize(-3) freeverb(
+        @roomsize 0.8
         @wet [0 0.005 0] [1 0 -0.125] 
         @damp 1
         @width 1
