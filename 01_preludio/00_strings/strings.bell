@@ -1,5 +1,5 @@
 ## seeds: 4 208
-setseed(208);
+setseed(2084);
 scoreconfig(
     @voicenames 'violin' 'viola' 'cello' 'bass' @clefs 'g' 'Alto' 'f' 'F8vb' 
 );
@@ -119,6 +119,7 @@ while $t < $totaldur do (
             @duration null
             @velocity $vel + xrand(-0.5, 0.5) * $velvar
             @type $type
+            @useseed 1
         );
         $boost = gainboost(
             @buffer $b.process(trim(@threshold 0.001)) 
