@@ -1,4 +1,4 @@
-importaudio('../01_background/background.wav').process(trim(@threshold 0.01 @start 0)).transcribe();
+importaudio('../01_background/background.wav').process(trim(@threshold 0.01 @start 0)).transcribe(@gain 0.85);
 importaudio('../02_piano/piano.wav').process(trim(@threshold 0.01 @start 0) ).transcribe();
 render(
     @play 1 @process (
