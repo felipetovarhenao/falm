@@ -251,7 +251,9 @@ Thump = (
             @duration $duration * 3
             @velocity xrandom(127) 
             @names 'bass' 'cello' 
-            @types 'pizz' 'pizz-secco' 'bartok' 'legno-bat' 'stacc' 
+            @types 'pizz' 'pizz-secco' 'legno-bat' 'stacc' (
+                if xrand() > 0.33 then 'bartok' 
+            ) 
             @useseed 1
         ).Transcribe(
             @onset $onset
