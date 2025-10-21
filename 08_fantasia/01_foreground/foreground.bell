@@ -102,8 +102,8 @@ TremChord = (
         for $sign in -1 1 do (
             $mc = xchoose($chord);
             $fq = mc2f($mc) * exp2(xrandom(-1, 4));
-            $eq = samplebpf($eqbpf, $fq) * 0.25;
-            $env = [0 xrand(0.05, 0.35) ** 2 * $eq 0] [1 0 -0.25];
+            $eq = samplebpf($eqbpf, $fq) * 0.3;
+            $env = [0 xrand(0.0707, 0.35) ** 2 * $eq 0] [1 0 -0.25];
             if $sign == 1 then ($env = revbpf($env) );
             cycle(
                 @frequency $fq
@@ -137,6 +137,9 @@ TremChord = (
             $subtypes = $types;
             if $vel > 50 then $subtypes = diff(
                 $types, 'air' 'air-and-ord' 'air-to-ord' 'ord-to-air' 
+            );
+            if $nt >= $peak then (
+                $subtypes = 'sfz' 'stacc' 'ord' 'ord-high' 'ord-micro' 
             );
             $oct = xrandom(6, 9) * xchoose(1 -1);
             $b = ezsol(

@@ -1,4 +1,4 @@
-setseed(2);
+setseed(7);
 $meta = read('../03_leadup/leadup.txt');
 $chord = $meta.'next_chord'.xscramble().left(12);
 $maxdur = 2000;
@@ -10,9 +10,9 @@ for $mc in $chord do (
         @pitch $mc + 1200
         @duration $dur
         @names 'flute' 'sax' 'clar' 'tuba' 'perc' family('strings') 
-        @types 'air' 'air-to-ord' 'blow' 'scrape-effect' 'harm-trem' 'harm' 
+        @types 'air' 'air-to-ord' 'blow' 'scrape-effect' 'harm-trem' 'harm' 'bow' 'edge' 
         @useseed 1
-    ).process(normalize(-3));
+    ).process(normalize(-14 @rms 1));
     if xrand() > 0.5 then ($b = $b.process(reverse()));
     if xrand() > 0.8 then (
         $wave = cycle(
@@ -30,11 +30,22 @@ for $mc in $chord do (
         @gain $env
     ) 
 );
+$bassmc = minimum($chord);
+ezsol(
+    @pitch $bassmc - 1200
+    @names 'bass' 
+    @types 'pizz' 
+    @velocity 70
+    @duration null
+    @useseed 1
+).process(normalize(-24 @rms 1) arctan()).transcribe(
+    @onset $t @pan xrand() xrand() 
+);
 addmarker($t);
 render(
     @play 1 @process freeverb(
         @roomsize 0.99
-        @wet 0.015
+        @wet 0.0125
         @damp 1
         @width 1
     ) normalize(-6) 

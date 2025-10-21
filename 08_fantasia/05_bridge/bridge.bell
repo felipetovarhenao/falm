@@ -146,9 +146,9 @@ $b = render(
         @tail $tail
     ) fade(0, $tail) normalize(-3) 
 );
+$shift = 0;
 $bl = $b.setkey('duration', $totdur);
 $bl.detach().process(normalize(-3)).transcribe();
-$shift = 0;
 $shift += $totdur;
 for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtime in arithmser(-5, 5, null, 4) do (
     $timeramp = timeramp(
@@ -156,15 +156,21 @@ for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtim
         @length 15
         @slope 0.22
     );
+    $pizzmc = $chord:1 - 1200;
+    $wave = sinewave(
+        @pitch $pizzmc
+        @duration $rampdur
+        @velocity 50
+    );
     $pizz = ezsol(
-        @pitch $chord:1 - 1200
+        @pitch $pizzmc - 1200
         @velocity 127
         @duration min($rampdur * 3, 3000) 
         @names 'bass' 
         @types 'bartok' 
         @useseed 1
     ).process(
-        gain(0.125) panning(
+        mix(@buffers $wave) gain(0.15) panning(
             @position xrand(-1, 1) * 0.125 + 0.5 @numchannels 2
         ) 
     );
