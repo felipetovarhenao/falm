@@ -12,7 +12,9 @@ $t = 0;
 $totalbars = 200;
 $peak = 0.7;
 $totdur = $totalbars * ($bardur * 3/8);
-$types = 'vib' 'ord' 'ord-micro' 'sfz' 'flz' 'flz-to-ord' 'ord-to-flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm';
+$types = thin(
+    'vib' 'ord' 'ord-high' 'ord-micro' 'sfz' 'flz' 'flz-to-ord' 'air' 'ord-to-flz' 'ord+mute' 'air-and-ord' 'air-to-ord' 'ord-to-air' 'harm' 
+);
 $fullchord = sort(r2mc(1...23, $root));
 $maxunitsize = 14;
 $units = rev(
@@ -26,6 +28,19 @@ $gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
 $chordsizebpf = [0 7 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
 $numunitsbpf = [0 1 0] [$peak length($units) 0.125] [1 length($units) 0];
+Normalize = (
+    $buffer, $minlevel = -12, $maxlevel = -6 -> (
+        $boost = gainboost(
+            @buffer $buffer
+            @inmin 0
+            @inmax 1
+            @outmin dbtoa($minlevel) 
+            @outmax dbtoa($maxlevel) 
+            @slope -0.0125
+        );
+        $buffer = $buffer.process(gain($boost)) 
+    ) 
+);
 ## ----------------------
 ## Helpers
 ## ----------------------
@@ -34,7 +49,7 @@ AmpMod = (
         $mod = process(
             @buffer $mod @operations scaling(-1, 1, 0, 1) rampsmooth(16, 16) 
         );
-        clipnorm(
+        Normalize(
             @buffer process(
                 @buffer $car @operations multiply($mod) 
             ) 
@@ -81,6 +96,8 @@ Stutter = (
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $peak -> (
         init $eqbpf = [0 0 0] [32 0.125 -0.25] [261 1 -0.25] [830 0.707 -0.25] [4186 0.05 0.25] [26579 0.0 0.25];
+        $panspread = samplebpf([0 1/3 0] [1 1 0.25], $nt);
+        if $nt >= $peak then ($types _= 'stacc');
         ## add oscillating cycles around chosen chord tones
         for $sign in -1 1 do (
             $mc = xchoose($chord);
@@ -94,7 +111,7 @@ TremChord = (
                 @phase xrand() 
             ).transcribe(
                 @onset $onset
-                @pan abs(mc2pan($mc, 0.25) - (0 1)) 
+                @pan abs(mc2pan($mc, $panspread) - (0 1)) 
                 @gain $env
             ) 
         );
@@ -114,11 +131,12 @@ TremChord = (
             5, round($chordsize * xrand(0.5, 1)) 
         );
         $chord = xscramble($chord).left($chordsize);
+        $bal = 1.0707 ** (1 - length($chord));
         for $mc in $chord do (
             $vel = xrand(30, 127);
             $subtypes = $types;
-            if $vel > 70 then $subtypes = diff(
-                $types, 'air-and-ord' 'air-to-ord' 'ord-to-air' 
+            if $vel > 50 then $subtypes = diff(
+                $types, 'air' 'air-and-ord' 'air-to-ord' 'ord-to-air' 
             );
             $oct = xrandom(6, 9) * xchoose(1 -1);
             $b = ezsol(
@@ -128,7 +146,7 @@ TremChord = (
                 @types $subtypes
                 @velocity $vel
                 @useseed 1
-            );
+            ).process(gain($bal));
             $mod = xchoose(rect saw cycle tri)(
                 @frequency mc2f($mc) * exp2($oct) * xchoose(-1 1) 
                 @duration $duration
@@ -144,7 +162,7 @@ TremChord = (
                 @maxlevel $maxlevel - 3
             ).transcribe(
                 @onset $onset
-                @pan mc2pan($mc, 1/3) 
+                @pan mc2pan($mc, $panspread) 
                 @gain $env
             ) 
         ) 
@@ -173,7 +191,7 @@ PercGap = (
                 @velocity xrandom(60, 127) 
                 @useseed 1
                 @duration $duration * 2
-            ).clipnorm(@minlevel $minlevel - 6 @maxlevel $maxlevel - 6).transcribe(
+            ).Normalize(@minlevel $minlevel - 6 @maxlevel $maxlevel - 6).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 
                 @gain [0 1 0] [1 0 0.7] 
@@ -218,7 +236,7 @@ Arpeggi = (
                 @types 'ord' 'sfz' 'stacc' 'ten' 'ord-micro' 'dim' 'ord-high' 'reg' 
                 @velocity 127
                 @useseed 1
-            ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
+            ).Normalize(@minlevel $minlevel @maxlevel $maxlevel);
             $b.transcribe(
                 @onset $onset
                 @gain [0 1 0] [1 0 0.5] 
@@ -245,7 +263,7 @@ Thump = (
             @names 'bass' 'cello' 
             @velocity xrandom(50) 
             @useseed 1
-        ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
+        ).Normalize(@minlevel $minlevel @maxlevel $maxlevel).transcribe(
             @onset $onset
             @gain [0 1 0] [1 0 0.8] 
             @pan mc2pan($mc, 0.125) 
@@ -354,7 +372,7 @@ Melody = (
                 @useseed 1
             ).process(
                 resample($res) fade(0, $legato) 
-            ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
+            ).Normalize(@minlevel $minlevel @maxlevel $maxlevel);
             if xrand() > 0.125 || $b.getkey('duration') < 70 then (
                 $b.transcribe(
                     @onset $t @pan mc2pan($mc1, 0.125) 
@@ -471,7 +489,7 @@ Pluck = (
                     @types 'harm' 'harm-in-wood' 'ord-high' 
                     @velocity xrand().scale(@outmax 127 @slope 0.2) 
                     @useseed 1
-                ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
+                ).Normalize(@minlevel $minlevel @maxlevel $maxlevel);
                 if xrand() > 0.95 then (Stutter($b, $onset)) else (
                     $b.transcribe(
                         @onset $onset
@@ -521,7 +539,7 @@ $weightsbpf = (
 $markers = null;
 $minlevelend = -16;
 $maxlevelend = -3;
-$clipslope = 0.25;
+$clipslope = 0.125;
 $minlevelbpf = [0 -24 0] [$peak $minlevelend $clipslope] [1 $minlevelend 0];
 $maxlevelbpf = [0 -18 0] [$peak $maxlevelend $clipslope] [1 $maxlevelend 0];
 while $t < $totdur do (
@@ -549,7 +567,10 @@ while $t < $totdur do (
         $pcs = $cycle.getkey('ratios').r2pc($pcroot);
         $index = $cycle.getkey('index') 
     );
-    $chord = $fullchord.pcquant($pcs).left($chordsize);
+    $chord = $fullchord:[
+        argsort(abs($fullchord - c5)) 
+    ];
+    $chord = $chord.pcquant($pcs).left($chordsize).sort();
     $reps = 1;
     if $object == Melody && $nt > 0.3 then $reps = 2;
     for $rep in 1...$reps do $object(
