@@ -1,7 +1,7 @@
 ## -------------------------
 ## Global setup and variables
 ## -------------------------
-setseed(778);
+setseed(824);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
 $bardur = $beatdur * 4;
@@ -472,16 +472,18 @@ Pluck = (
                     @velocity xrand().scale(@outmax 127 @slope 0.2) 
                     @useseed 1
                 ).clipnorm(@minlevel $minlevel @maxlevel $maxlevel);
-                $b.transcribe(
-                    @onset $onset
-                    @pan mc2pan($mc, 0.33) 
-                    @gain [0 1 0] [1 0 0.5] 
-                );
-                if xrand() > 0.9 then (Granulate(
-                    @onset $onset
-                    @buffer $b
-                    @pitch $mc
-                )) 
+                if xrand() > 0.95 then (Stutter($b, $onset)) else (
+                    $b.transcribe(
+                        @onset $onset
+                        @pan mc2pan($mc, 0.33) 
+                        @gain [0 1 0] [1 0 0.5] 
+                    );
+                    if xrand() > 0.9 then (Granulate(
+                        @onset $onset
+                        @buffer $b
+                        @pitch $mc
+                    )) 
+                ) 
             ) 
         ) 
     ) 
