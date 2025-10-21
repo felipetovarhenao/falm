@@ -1,6 +1,32 @@
-setseed(3);
+setseed(60);
 $cadence = read('../../00_harmony/harmony.txt').'cadence';
 $spectrum = getkey($cadence:1, 'mcs');
+$chord = xscramble(for $mc in $spectrum collect if $mc > g4 then $mc).left(5);
+$t = 0;
+for $mc in $chord do (
+    $group = xchoose(
+        [[
+            'names' 'harp' 'guitar' 
+        ] ['types' 'harm']] 
+        ## ---
+        [[
+            'names' 'flute' 'clar' 'sax' 
+        ] [
+            'types' 'keys' 'pizz'
+        ]] 
+    );
+    ezsol(
+        @pitch $mc
+        @names $group.getkey('names') 
+        @types $group.getkey('types') 
+        @velocity 0
+        @duration null
+        @useseed 1
+    ).transcribe(
+        @onset $t @pan xrand() 
+    );
+    $t += xrand(20) 
+);
 $t = 0;
 $t += Tremolo(
     @onset $t
@@ -21,6 +47,6 @@ render(
         @fadeout $tail
         @fadeoutcurve 0.8
         @fadeouttype 2
-    ) normalize(-19) 
+    ) normalize(-12) 
 );
 ezexport($t)
