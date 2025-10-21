@@ -58,16 +58,21 @@ for $dur in $durs do (
         $sinegain = samplebpf($sinegainbpf, $nt);
         $mc += pitchdiff($mc, $spectrum2) * $mix;
         $roll = samplebpf($rollbpf, $nt);
-        $b = Compress(
-            ezsol(
-                @pitch $mc
-                @duration max(1000, $dur) 
-                @velocity 127
-                @names 'flute' 'clar' 'sax' family('brass') family('strings') family('plucked') 
-                @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'perc' 'hit-on-body' 'air' 'air-and-ord' 'air-to-ord' 
-                @useseed 1
-            ) 
+        $b = ezsol(
+            @pitch $mc
+            @duration max(1000, $dur) 
+            @velocity 127
+            @names 'flute' 'clar' 'sax' family('brass') family('strings') family('plucked') 
+            @types 'keys' 'slap-pitch' 'slap-unpitch' 'exp-slap-pitch' 'bartok' 'pizz' 'tongue-ram' 'kiss' 'perc' 'hit-on-body' 'air' 'air-and-ord' 'air-to-ord' 
+            @useseed 1
         );
+        $instrument = $b.getkey('instrument');
+        $slope = -xrand(1/8, 1/2);
+        if intersection(
+            $instrument.'type', 'air-to-ord' 'air' 
+        ) != null then $slope *= -1;
+        print($instrument);
+        $b = Compress($b);
         $pan = mc2pan($mc, 0.707);
         $rms = $b.getkey('rms');
         if xrand() < $sineprob then (
@@ -92,7 +97,7 @@ for $dur in $durs do (
             @buffer $b
             @onset $onset
             @pan $pan
-            @gain [0 1 0] [1 0 -0.125] 
+            @gain [0 1 0] [1 0 $slope] 
         );
         $shift -= xrand($roll) 
     );
