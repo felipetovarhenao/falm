@@ -47,6 +47,6 @@ render(
         @fadeout $tail
         @fadeoutcurve 0.8
         @fadeouttype 2
-    ) normalize(-12) 
+    ) normalize(-5) 
 );
 ezexport($t)
