@@ -1,11 +1,11 @@
-$data = read('../06_premerge/premerge.txt');
+$data = read('../07_premerge/premerge.txt');
 $data2 = read('../01_foreground/foreground.txt');
 $bassfq = $data2.'final_chord'.minimum().mc2f();
 $gates = $data.'gates';
 if length($gates) % 2 == 1 then ($gates _= $gates:-1);
 $gates = group($gates, 2);
 $offset = $gates::(1 1 1);
-$b = importaudio('../06_premerge/premerge.wav').setkey('offset', $offset);
+$b = importaudio('../07_premerge/premerge.wav').setkey('offset', $offset);
 $c = importaudio('../04_glide/glide.wav');
 $t = 0;
 $minlevel = -12;

@@ -30,6 +30,8 @@ $leadupmeta = read('../03_leadup/leadup.txt');
 $b.transcribe(
     $t - $leadupmeta.'duration' @gain 0.33
 );
+$b = importaudio('../06_transient/transient.wav');
+$b.transcribe($t - read('../06_transient/transient.txt'));
 importaudio('../05_bridge/bridge.wav').transcribe($t);
 $t += read('../05_bridge/bridge.txt');
 $tail = $base2.process(
