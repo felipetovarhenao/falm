@@ -39,9 +39,10 @@ for $id in $ids do (
                     @names 'bass' 'cello' 
                     @types 'pizz' 'pizz-secco' 
                     @velocity $vel
+                    @useseed 1
                 ).transcribe(
                     @onset $t
-                    @pan mc2pan($pitch, 0.1) 
+                    @pan mc2pan($pitch, 0.3) 
                     @gain [0 1 0] [1 0 0.125] 
                 ) 
                 ## ---

@@ -18,7 +18,7 @@ $postfx = (
         @damp 1
     ) 
     ## ----
-    normalize(-6) 
+    normalize(-4) 
 );
 for $id in $ids do (
     setseed($id);

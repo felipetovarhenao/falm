@@ -72,6 +72,12 @@ for $sectionid in $sectionids do (
                     normalize(-14 @rms 1) 
                     ## --
                     trim(@threshold 0.1 @end 0) 
+                    ## ---
+                    biquad(
+                        @frequency mc2f($pitch) / 3
+                        @type 1
+                        @q 0.25
+                    ) 
                 );
                 $buffer = $buffer.setkey('duration', $duration).process(resample($gliss));
                 if $rep > 1 && xrand() < $stutter then Stutter(
