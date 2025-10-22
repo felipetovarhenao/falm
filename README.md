@@ -25,11 +25,11 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 
 ### Software
 
-- _Python~_ v3.12.4 [[download](https://www.python.org/downloads/release/python-3124/)]
-- _bellplay~_ v0.2.8-beta [[download](https://bellplay.net/)]
-- _Visual Studio Code_ [[download](https://code.visualstudio.com/)]
-  - _bellplay~ extension_ [[download](https://marketplace.visualstudio.com/items?itemName=tovarhenao.bellplay-plugin)]
-- _Ableton Live 12 (Standard/Suite)_ [[download](https://www.ableton.com/en/live/)]
+- _Python~_ v3.12.4 [[download](https://www.python.org/downloads/release/python-3124/)]: Used for setting up the working environment.
+- _bellplay~_ v0.2.8-beta [[download](https://bellplay.net/)]: Used for generating and modifying the actual music/audio output.
+- _Visual Studio Code_ [[download](https://code.visualstudio.com/)]: Used for editing the code.
+  - _bellplay~ extension_ [[download](https://marketplace.visualstudio.com/items?itemName=tovarhenao.bellplay-plugin)]: Improves the user experience for working on _bellplay~_ scripts.
+- _Ableton Live 12 (Standard/Suite)_ [[download](https://www.ableton.com/en/live/)]: Used by _bellplay~_ to generate piano samples.
 
 ### Data
 
