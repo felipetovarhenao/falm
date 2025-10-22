@@ -1,59 +1,57 @@
-$files = readfolder('/Users/felipetovarhenao/Google Drive/My Drive/FTH Drive/Sample libraries/Instruments/Maracas/');
+$file = '../__samples__/ES_Maracas, Latin, Shake, Short - Epidemic Sound.wav';
 $keymap = null;
 $velstep = 20;
-for $f in $files do (
-    $b = importaudio($f).analyze(onsets());
-    $split = $b.getkey('onsets');
-    $segs = $b.splitbuf(@split $split @mode 2);
-    $larms = null;
-    $centroids = null;
-    $segs = for $s in $segs collect (
-        $s = $s.analyze(
-            spectralcentroid() effectiveduration(
-                @samplerate $s.getkey('sr') @thresholdratio 0.01
-            ) larm() 
-        );
-        $larms _= $s.getkey('larm');
-        $centroids _= $s.getkey('spectralcentroid');
-        $s
+$b = importaudio($file).analyze(onsets());
+$split = $b.getkey('onsets');
+$segs = $b.splitbuf(@split $split @mode 2);
+$larms = null;
+$centroids = null;
+$segs = for $s in $segs collect (
+    $s = $s.analyze(
+        spectralcentroid() effectiveduration(
+            @samplerate $s.getkey('sr') @thresholdratio 0.01
+        ) larm() 
     );
-    $larmrange = minmax($larms):[1 3];
-    $mcrange = $centroids.f2mc().minmax():[1 3];
-    $segs = $segs.sortbykeys('spectralcentroid');
-    for $s $i in $segs do (
-        $id = tosymbol($i);
-        $path = '../__samples__/maracas/sample-' + $id + '.wav';
-        $path = $path.parsepath();
-        $path = $path.getkey('parent') + $path.getkey('name') + $path.getkey('extension');
-        $s.transcribe(
-            @gain [0 1 0] [1 0 0.25] 
-        );
-        render(@reset 1 @numchannels 1);
-        export($path);
-        $vel = int(
-            round(
-                $s.getkey('larm').scale(
-                    @inmin $larmrange:1
-                    @inmax $larmrange:2
-                    @outmin 1
-                    @outmax 127
-                ) / $velstep
-            ) * $velstep
-        ).min(127);
-        $mc = int(
-            round(
-                $s.getkey('spectralcentroid').f2mc().scale(
-                    @inmin $mcrange:1
-                    @inmax $mcrange:2
-                    @outmin c5 
-                    @outmax c6 
-                ) 
+    $larms _= $s.getkey('larm');
+    $centroids _= $s.getkey('spectralcentroid');
+    $s
+);
+$larmrange = minmax($larms):[1 3];
+$mcrange = $centroids.f2mc().minmax():[1 3];
+$segs = $segs.sortbykeys('spectralcentroid');
+for $s $i in $segs do (
+    $id = tosymbol($i);
+    $path = '../__samples__/maracas/sample-' + $id + '.wav';
+    $path = $path.parsepath();
+    $path = $path.getkey('parent') + $path.getkey('name') + $path.getkey('extension');
+    $s.transcribe(
+        @gain [0 1 0] [1 0 0.25] 
+    );
+    render(@reset 1 @numchannels 1);
+    export($path);
+    $vel = int(
+        round(
+            $s.getkey('larm').scale(
+                @inmin $larmrange:1
+                @inmax $larmrange:2
+                @outmin 1
+                @outmax 127
+            ) / $velstep
+        ) * $velstep
+    ).min(127);
+    $mc = int(
+        round(
+            $s.getkey('spectralcentroid').f2mc().scale(
+                @inmin $mcrange:1
+                @inmax $mcrange:2
+                @outmin c5 
+                @outmax c6 
             ) 
-        );
-        $mc = 6000;
-        if $keymap.$mc == null then ($keymap _= [$mc] );
-        if $keymap.$mc.$vel == null then ($keymap.$mc _= [$vel] );
-        $keymap.$mc.$vel _= $path
-    ) 
+        ) 
+    );
+    $mc = 6000;
+    if $keymap.$mc == null then ($keymap _= [$mc] );
+    if $keymap.$mc.$vel == null then ($keymap.$mc _= [$vel] );
+    $keymap.$mc.$vel _= $path
 );
 $keymap.write('../keymaps/maracas/ord.txt')
