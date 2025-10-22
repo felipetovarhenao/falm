@@ -13,6 +13,19 @@
 9. Passacaglia | _Rondo_. | 3/2 | Ab1 -> A
 10. Epilogo (_a Victoria_). | 1/1 | D2 -> D2
 
+| #   | Title                            |
+| --- | -------------------------------- |
+| 1.  | Élegie (_in memoriam Malugo_)    |
+| 2.  | Sérénade                         |
+| 3.  | Badinerie                        |
+| 4.  | Promenade                        |
+| 5.  | Chaconne                         |
+| 6.  | Valse                            |
+| 7.  | Rêverie                          |
+| 8.  | Nocturne                         |
+| 9.  | Rondò                            |
+| 10. | Épilogue (_a Victoria E. Henao_) |
+
 ## Requirements
 
 ### Software
