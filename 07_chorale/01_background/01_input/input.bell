@@ -76,6 +76,8 @@ for $id in $ids, $st in $onsets do (
 $b = render(
     @play 1 @process normalize(-3) 
 );
+$peak = $totdur;
+$totdur = getkey($b, 'duration');
 ezexport(
-    ['peak' $totdur] ['totdur' getkey($b, 'duration')] 
+    ['peak' $peak] ['totdur' $totdur] 
 )
