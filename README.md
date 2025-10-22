@@ -81,3 +81,15 @@ This step is important, as it ensures that _bellplay~_ automatically runs these 
 All scripts within `/__lib__` should be left unedited as they serve the backbone (mostly global functions and variables) of how the scripts in this repo work.
 
 ## How to generate _Fully Automated Luxury Music_
+
+## License
+
+All content in this repository—including code, scripts, and generated audio—is licensed under [**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+This means you are free to share and adapt this work, provided you:
+
+- Give appropriate credit
+- Do not use it for commercial purposes
+- Distribute any derivative works under the same license
+
+See the [LICENSE](LICENSE) file for full details.
