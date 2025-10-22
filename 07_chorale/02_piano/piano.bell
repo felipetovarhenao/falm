@@ -436,7 +436,7 @@ while $t < $totdur do (
     $durmul = samplebpf($durmulbpf, $nt);
     $ctrl = samplebpf($ctrlbpf, $nt);
     $obj = xchoose(
-        Trill Blurb Pattern Chord @weights (4 8 2 1) ** 1.25
+        @choices Trill Blurb Pattern Chord @weights (4 8 2 1) ** 1.25
     );
     $timestep = $obj(
         @mcs sort(left($spectrum, $mcfilter)) 
