@@ -1,5 +1,9 @@
 # _Fully Automated Luxury Music_
 
+## About
+
+**Fully Automated Luxury Music** is an open-source album entirely written and generated through stochastic algorithms. Rather than being performed, recorded, or manually edited, each piece is shaped by algorithmic processes that determine form, gesture, and timing.
+
 ### Track listing
 
 | #   | Title                            |
