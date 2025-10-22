@@ -1,4 +1,0 @@
-- Check for legno-batt samples
-- _fantasia_:
-  - Try vel-sensitive types in _foreground_.
-  - Try applying `freeverb` in premerge only:
