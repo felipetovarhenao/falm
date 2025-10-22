@@ -17,6 +17,8 @@
 
 ## Requirements
 
+In addition to some basic familiary with [_bell_ programming](https://felipe-tovar-henao.com/bell-tutorials) and [shell commands](https://www.tutorialspoint.com/unix/index.htm), the following resources are required:
+
 ### Software
 
 - _Python~_ v3.12.4 [[download](https://www.python.org/downloads/release/python-3124/)]
