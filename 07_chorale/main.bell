@@ -12,7 +12,7 @@ importaudio('./05_cresc/cresc.wav').transcribe(
 );
 $t += $meta.'totdur';
 $b.setkey('offset', $meta.'resume').transcribe($t);
-$gap = envelope(@duration 2500);
+$gap = envelope(@duration 3000);
 render(
     @play 1 @process normalize(-3) join($gap) 
 );
