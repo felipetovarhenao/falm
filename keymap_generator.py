@@ -1,3 +1,5 @@
+import sys
+from argparse import ArgumentParser
 import os
 import re
 import shutil
@@ -465,8 +467,19 @@ SOL-based sampler. Given a SOL keymap `@type`, returns a buffer with a {name} sa
 )"""
 
 
-indir = '/Users/felipetovarhenao/Documents/FullSOL2020/'
-keymap_dir = './keymaps/'
+parser = ArgumentParser(prog='keymap generator',
+                        usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} -i <path to FullSOL dataset>')
+parser.add_argument('path',
+                    action='store',
+                    help="Path to IRCAM's FullSOL directory.")
+
+args = parser.parse_args()
+
+indir = args.path
+
+BASE_DIR = os.path.dirname(__file__)
+keymap_dir = os.path.join(BASE_DIR, 'keymaps')
+
 instruments = []
 if os.path.exists(keymap_dir):
     shutil.rmtree(keymap_dir)
@@ -532,7 +545,7 @@ for instrument in instrument_dict.keys():
 
 BELL_CODE += ')'
 
-OUT_DIR = './__lib__/'
+OUT_DIR = os.path.join(BASE_DIR, '__lib__')
 
 if not os.path.exists(OUT_DIR):
     os.mkdir(OUT_DIR)
