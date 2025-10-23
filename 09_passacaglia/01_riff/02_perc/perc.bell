@@ -1,12 +1,12 @@
+setseed(1);
 $data = read('../../00_sequence/sequence.txt');
 $sections = $data.'sections';
 $unit = $data.'unit';
 $mix = 0;
 $dummy = envelope(0);
-$sectionsids = 2...length($sections);
-$sectionsids = 3;
-for $id in $sectionsids do (
-    setseed($id);
+$sectionids = 2...length($sections);
+$sectionids = 2;
+for $id in $sectionids do (
     $chords = ($sections:$id).getkey('chords');
     $base = importaudio(
         '../01_strings/strings_' + tosymbol($id) + '.wav' 
@@ -38,18 +38,18 @@ for $id in $sectionsids do (
                 @useseed 1
             ).clipnorm(
                 @minlevel -18
-                @maxlevel -10
+                @maxlevel -12
                 @rms 1
             );
             $onset = $t + $step;
             $substep = $unit / $numdivs;
             for $div in 0...($numdivs - 1) do (
-                $det = if $div > 0 then xchoose(r2c(1/2 5/8 3/4 1 5/4 3/2 2));
+                $det = if $div > 0 then xrand(-200, 200);
                 $b.setkey('duration', $substep).transcribe(
                     @onset $onset + $substep * $div
-                    @gain [0 1 0] [1 0 -0.5] 
-                    @detune $det
+                    @gain [0 1 0] [1 0 -xrand(1/4, 1/2)] 
                     @pan mc2pan($pitch, 0.2) 
+                    @detune $det
                 ) 
             ) 
         );
@@ -60,11 +60,10 @@ for $id in $sectionsids do (
             @play 1
             @reset 1
             @process (
-                onepole(@cutoff 80 @highpass 1) 
                 ## ---
                 freeverb(
                     @roomsize 0.75
-                    @wet 0.012
+                    @wet 0.0122
                     @damp 1
                     @width 1
                 ) 
