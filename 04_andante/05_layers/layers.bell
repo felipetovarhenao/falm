@@ -1,4 +1,4 @@
-setseed(1);
+setseed(17);
 $mcroot = r2mc(6/5, d2);
 $pcroot = mc2pc($mcroot);
 $tuning = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
@@ -6,6 +6,14 @@ $pcs = r2pc($tuning, $pcroot);
 $mcs = r2mc(1...32, $mcroot).pcquant($pcs).xscramble();
 initurn(
     @size length($mcs) @useseed 1
+);
+GetPeak = (
+    $b -> (
+        $env = $b.process(
+            absolute() rampsmooth(1024, 4096) onepole(@cutoff 10) 
+        ).analyze(envmaxtime());
+        $env.getkey('envmaxtime') 
+    ) 
 );
 $markers = read('../01_pulse/pulse.txt').'sections';
 $climaxst = $markers:2;
@@ -15,37 +23,65 @@ $t = 0;
 $bpm = 112;
 $unit = 1/16.;
 $beat = (240000/$bpm) * $unit;
+addmarker($totdur);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $id = urn() + 1;
     $mc = $mcs:($id);
+    $incr = xrandom(1, 4) * $beat;
+    $types = 'cresc' (if xrand() > 0.25 then 'stacc') (if $t + $incr < $totdur then 'cresc-to-dim') (if $t == 0 then 'dim');
     $b = ezsol(
         @pitch $mc
         @names family('brass') family('woodwinds') family('strings') 
-        @types 'cresc-to-dim' 'stacc' 'cresc' 
+        @types $types
         @duration null
         @velocity 127
         @useseed 1
-    ).analyze(effectiveduration(@thresholdratio 0.001));
+    ).analyze(effectiveduration(@thresholdratio 0.00125) envmaxtime());
     $b = $b.setkey('duration', $b.getkey('effectiveduration'));
-    $b.transcribe(
-        @onset $t @pan mc2pan($mc, 0.25) 
+    $delay = 0;
+    if $t + $b.getkey('duration') >= $totdur then (
+        $peak = GetPeak($b);
+        if $t + $peak >= $totdur then (
+            $delay += 50 + ($totdur - ($t + $peak)) 
+        ) 
     );
-    $t += xrandom(1, 4) * $beat
+    $b.process(dcfilter()).transcribe(
+        @onset $t + $delay @pan mc2pan($mc, 0.25) 
+    );
+    $t += $incr
+);
+$bass = bass(
+    @pitch $mcroot
+    @duration null
+    @velocity 127
+    @type 'cresc' 
+    @useseed 1
+).process(normalize(-9));
+$peak = GetPeak($bass);
+$bass.transcribe(
+    @onset ($totdur - $peak) + 50
+    @pan 0.5
+    @gain [0 0 0] [$peak / $bass.getkey('duration') 1 0.25] [1 0 -0.125] 
 );
 $tail = 2000;
 render(
     @play 1 @process (
+        ## ---
         freeverb(
             @roomsize 0.9
             @wet 0.05
             @damp 1
             @width 1
-        ) fade(
+        ) 
+        ## ---
+        fade(
             @fadein 0
             @fadeout $tail
             @fadeouttype 2
-        ) normalize(-3) 
+        ) 
+        ## ---
+        normalize(-3) 
     ) 
 );
 ezexport()
