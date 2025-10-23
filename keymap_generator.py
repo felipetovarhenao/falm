@@ -471,7 +471,8 @@ parser = ArgumentParser(prog='keymap generator',
                         usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} -i <path to FullSOL dataset>')
 parser.add_argument('path',
                     action='store',
-                    help="Path to IRCAM's FullSOL directory.")
+                    required=True,
+                    help="Path to IRCAM's FullSOL directory.",)
 
 args = parser.parse_args()
 
