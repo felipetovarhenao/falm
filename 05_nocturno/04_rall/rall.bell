@@ -70,7 +70,7 @@ for $dur in $durs do (
         $slope = -xrand(1/8, 1/2);
         if intersection(
             $instrument.'type', 'air-to-ord' 'air' 
-        ) != null then $slope *= -1;
+        ) != null then $slope = abs($slope) ** 0.707;
         $b = Compress($b);
         $pan = mc2pan($mc, 0.707);
         $rms = $b.getkey('rms');
