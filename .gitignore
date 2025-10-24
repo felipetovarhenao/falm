@@ -10,4 +10,4 @@
 !__lib__.bell
 sol.bell
 !.placeholder
-!__samples__/*.wav
+!src/__samples__/*.wav

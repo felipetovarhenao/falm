@@ -123,7 +123,7 @@ keymap = (
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
             $keymap = read(
-                '{PARENT_FOLDER}/__keymaps__/' + $path + '.txt' 
+                '{PARENT_FOLDER}/src/__keymaps__/' + $path + '.txt' 
             );
             if $keymap != null then KEYMAP_CACHE _= [$path $keymap] 
         );
@@ -478,7 +478,7 @@ args = parser.parse_args()
 indir = args.path
 
 BASE_DIR = os.path.dirname(__file__)
-keymap_dir = os.path.join(BASE_DIR, '__keymaps__')
+keymap_dir = os.path.join(BASE_DIR, 'src/__keymaps__')
 
 instruments = []
 if os.path.exists(keymap_dir):
@@ -545,7 +545,7 @@ for instrument in instrument_dict.keys():
 
 BELL_CODE += ')'
 
-OUT_DIR = os.path.join(BASE_DIR, '__lib__')
+OUT_DIR = os.path.join(BASE_DIR, 'src/__lib__')
 
 if not os.path.exists(OUT_DIR):
     os.mkdir(OUT_DIR)
