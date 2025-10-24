@@ -2,7 +2,9 @@
 
 ## About
 
-**Fully Automated Luxury Music** (**F.A.L.M**) is an open-source album entirely written and generated through stochastic music algorithms—probabilistic, rule-based processes designed to generate finely structured yet potentially infinite variants of a musical output. All scripts in this repository are written in the [_bell_](https://felipe-tovar-henao.com/bell-tutorials) programming language and meant to be run in [_bellplay~_](https://bellplay.net), an offline algorithmic audio software and framework I developed. The codebase is end-to-end (E2E), meaning you can generate all tracks from scratch by running the scripts in the proper order, without need or expectation of any manual editing. This album serves primarily as a proof of concept for open-source music—a relatively new and unexplored tradition—and as a reflection on recent developments in AI automation, what they mean for the future of artistic practice, and how human expression can remain central to algorithmic design. The title is a wink and nod to Aaron Bastani's book [_Fully Automated Luxury Communism: A Manifesto_](https://en.wikipedia.org/wiki/Fully_Automated_Luxury_Communism), which similarly offers an optimistic, though increasingly unlikely, vision of automation's positive impacts on society.
+**Fully Automated Luxury Music** (**F.A.L.M**) is an open-source, generative music album. The music is entirely generated through stochastic algorithms—probabilistic, rule-based processes designed to produce finely structured yet potentially infinite variants of a musical output. All generative scripts in this repository are written in the [_bell_](https://felipe-tovar-henao.com/bell-tutorials) programming language and meant to be run in [_bellplay~_](https://bellplay.net), an offline algorithmic audio software and framework I started developing in 2024. The codebase is end-to-end (E2E), meaning it generates and assembles the entire album from scratch by running the scripts in the proper order, without need or expectation of any manual editing—in other words, it's a fully reproducible and parameterized work.
+
+This album serves primarily as a proof of concept for _open-source music_—a rather recent and unexplored compositional practice (see, for instance, Pierre Cusa AKA _Pure Code_'s [_Ambient Garden Album_](https://github.com/pac-dev/AmbientGardenAlbum))—and as a reflection on recent developments in AI automation, what they mean for the future of artistic practice, and how human expression can remain central to algorithmic design. The title is a wink and nod to Aaron Bastani's book [_Fully Automated Luxury Communism: A Manifesto_](https://en.wikipedia.org/wiki/Fully_Automated_Luxury_Communism), which similarly offers an optimistic, though increasingly unlikely, vision of automation's positive impacts on society.
 
 ### Track listing
 
@@ -10,7 +12,7 @@
 | --- | -------------------------------- |
 | 1.  | Élegie (_in memoriam Malugo_)    |
 | 2.  | Sérénade                         |
-| 3.  | Badinerie                        |
+| 3.  | Caprice                          |
 | 4.  | Promenade                        |
 | 5.  | Chaconne                         |
 | 6.  | Valse                            |
