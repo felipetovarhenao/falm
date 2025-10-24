@@ -123,7 +123,7 @@ keymap = (
         $keymap = KEYMAP_CACHE.$path;
         if $keymap == null then (
             $keymap = read(
-                '{PARENT_FOLDER}/keymaps/' + $path + '.txt' 
+                '{PARENT_FOLDER}/__keymaps__/' + $path + '.txt' 
             );
             if $keymap != null then KEYMAP_CACHE _= [$path $keymap] 
         );
@@ -471,7 +471,6 @@ parser = ArgumentParser(prog='keymap generator',
                         usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} <path to FullSOL dataset>')
 parser.add_argument('path',
                     action='store',
-                    required=True,
                     help="Path to IRCAM's FullSOL directory.",)
 
 args = parser.parse_args()
@@ -479,7 +478,7 @@ args = parser.parse_args()
 indir = args.path
 
 BASE_DIR = os.path.dirname(__file__)
-keymap_dir = os.path.join(BASE_DIR, 'keymaps')
+keymap_dir = os.path.join(BASE_DIR, '__keymaps__')
 
 instruments = []
 if os.path.exists(keymap_dir):
