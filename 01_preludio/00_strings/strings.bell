@@ -104,9 +104,6 @@ while $t < $totaldur do (
         ['onset' $t] ['velocity' $vel] ['chord' $mcs] ['duration' $timestep] ['density' $chordsize] 
     ];
     $mcs = left($mcs, $chordsize);
-    $balance = sqrt(
-        1 / (length($mcs) * 3) 
-    );
     for $mc in $mcs, $pan in left($panvals, length($mcs)) with @scalarmode 0 do (
         $instruments = for $n in left($instrumentnames, $numnames) collect instrument(
             @name $n
@@ -114,6 +111,9 @@ while $t < $totaldur do (
             @join 0
         );
         $subinstruments = $instruments.pitchfilter($mc, 600).xscramble().left(xrandom(1, 4));
+        $balance = sqrt(
+            1 / (length($mcs) * length($subinstruments)) 
+        );
         for $instrument in $subinstruments do (
             $name = $instrument.getkey('name');
             $fn = $instrument.getkey('fn');
