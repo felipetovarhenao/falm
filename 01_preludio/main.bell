@@ -1,13 +1,13 @@
 $onset = 0;
-$metadata = read('./00_strings/strings.txt');
-importaudio('./00_strings/strings.wav').process(
-    normalize(3) arctan() normalize(-3)
+$metadata = read('./01_strings/strings.txt');
+importaudio('./01_strings/strings.wav').process(
+    normalize(3) arctan() normalize(-3) 
 ).transcribe(@onset $onset);
-importaudio('./01_runs/runs.wav').transcribe(@onset $onset @gain 0.25);
+importaudio('./02_runs/runs.wav').transcribe(@onset $onset @gain 0.25);
 $lastevent = $metadata.getkey('events'):-1;
 $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.3;
-importaudio('./02_tail/tail.wav').transcribe($onset);
-$onset += read('./02_tail/tail.txt') * 0.7;
+importaudio('./03_tail/tail.wav').transcribe($onset);
+$onset += read('./03_tail/tail.txt') * 0.7;
 render(
     @play 1 @process (
         ## ---

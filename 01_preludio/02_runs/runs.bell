@@ -1,5 +1,5 @@
 setseed(101);
-$metadata = read('../00_strings/strings.txt');
+$metadata = read('../01_strings/strings.txt');
 $totdur = $metadata.getkey('totdur');
 $events = $metadata.getkey('events');
 $han = hanning();
