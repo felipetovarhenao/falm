@@ -84,6 +84,10 @@ All scripts within `/__lib__` should be left unedited as they serve the backbone
 
 ## How to generate _Fully Automated Luxury Music_
 
+The codebase is organized in a tree-like, hierarchical structure whereby the album is divided into one folder for each track, in these in turn are further devided into subfolders containing the scripts that generate its constinuent parts. Each subfolder has a different organization. All nested folders' names have a suffix (e.g., `00_`, `01_`, ...) specifying the order in which they are meant to be run. Running them in the incorrect order may result in errors, since some scripts generate dependency files used by subsequent scripts. As such, the album is meant to be generated in a bottom-up, step-by-step process, and not in a one-shot. This is by design, as it allows for iterative tinkering and refining of smaller audio files or data that are gradually assembled into the full album.
+
+Once all audio tracks have been generated, they can be combined into a single one with the top-level [`main.bell`]('main.bell) script.
+
 ## License
 
 All content in this repository—including code, scripts, and generated audio—is licensed under [**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/).
