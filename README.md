@@ -61,11 +61,11 @@ In addition to the _FullSOL_-based keymaps, two additional keymaps need to be ge
 
 The first keymap is for Ableton Live's [_Grand Piano_](https://www.ableton.com/en/packs/grand-piano/), which is available in _Standard_ and _Suite_ licenses. To generate it, run the [`piano.bell`](/__lib__/piano.bell) script.
 
-> NOTE: You may need to may need to manually change the first line in [`piano.bell`](/__lib__/piano.bell) to match path to the Ableton's _Grand Piano_ directory in your computer. For instance, in MacOS it would look something like this:
+> NOTE: You may need to may need to manually change the first line in [`piano.bell`](/__lib__/piano.bell) to match path to the Ableton's _Grand Piano_ directory in your computer.
 
-    ```py
-    $files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
-    ```
+```py
+$files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
+```
 
 #### Maracas keymap
 
