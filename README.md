@@ -8,18 +8,18 @@ This album serves primarily as a proof of concept for _open-source music_—a ra
 
 ### Track listing
 
-| #   | Title                            |
-| --- | -------------------------------- |
-| 1.  | Élegie (_in memoriam Malugo_)    |
-| 2.  | Sérénade                         |
-| 3.  | Caprice                          |
-| 4.  | Promenade                        |
-| 5.  | Chaconne                         |
-| 6.  | Valse                            |
-| 7.  | Rêverie                          |
-| 8.  | Nocturne                         |
-| 9.  | Rondò                            |
-| 10. | Épilogue (_a Victoria E. Henao_) |
+| #   | Title                            | Source Code                          |
+| --- | -------------------------------- | ------------------------------------ |
+| 1.  | Élegie (_in memoriam Malugo_)    | [`01_preludio/`](/01_preludio)       |
+| 2.  | Sérénade                         | [`02_serenata/`](/02_serenata)       |
+| 3.  | Caprice                          | [`03_caprice/`](/03_caprice)         |
+| 4.  | Promenade                        | [`04_andante/`](/04_andante)         |
+| 5.  | Chaconne                         | [`08_fantasia/`](/08_fantasia)       |
+| 6.  | Valse                            | [`06_intermezzo/`](/06_intermezzo)   |
+| 7.  | Rêverie                          | [`07_chorale/`](/07_chorale)         |
+| 8.  | Nocturne                         | [`05_nocturno/`](/05_nocturno)       |
+| 9.  | Rondò                            | [`09_passacaglia/`](/09_passacaglia) |
+| 10. | Épilogue (_a Victoria E. Henao_) | [`10_epilogo/`](/10_epilogo)         |
 
 ## Requirements
 
