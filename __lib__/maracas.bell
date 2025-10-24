@@ -54,4 +54,4 @@ for $s $i in $segs do (
     if $keymap.$mc.$vel == null then ($keymap.$mc _= [$vel] );
     $keymap.$mc.$vel _= $path
 );
-$keymap.write('../keymaps/maracas/ord.txt')
+$keymap.write('../__keymaps__/maracas/ord.txt')
