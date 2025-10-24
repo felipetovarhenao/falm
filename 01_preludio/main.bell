@@ -1,6 +1,8 @@
 $onset = 0;
 $metadata = read('./00_strings/strings.txt');
-importaudio('./00_strings/strings.wav').transcribe(@onset $onset);
+importaudio('./00_strings/strings.wav').process(
+    normalize(3) arctan() normalize(-3)
+).transcribe(@onset $onset);
 importaudio('./01_runs/runs.wav').transcribe(@onset $onset @gain 0.25);
 $lastevent = $metadata.getkey('events'):-1;
 $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.3;
