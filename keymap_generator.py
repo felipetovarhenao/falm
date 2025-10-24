@@ -468,7 +468,7 @@ SOL-based sampler. Given a SOL keymap `@type`, returns a buffer with a {name} sa
 
 
 parser = ArgumentParser(prog='keymap generator',
-                        usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} -i <path to FullSOL dataset>')
+                        usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} <path to FullSOL dataset>')
 parser.add_argument('path',
                     action='store',
                     required=True,
