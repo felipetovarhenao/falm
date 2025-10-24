@@ -1,0 +1,40 @@
+setseed(1);
+$marker = read('../02_percussion/percussion.txt');
+$chord = $marker.getkey('chord');
+for $mc in $chord do (
+    $t = 0;
+    $b = ezsol(
+        @pitch $mc
+        @velocity xrandom(127) 
+        @duration null
+        @names family('strings') 
+        @types 'pizz' 'pizz-secco' 
+        @useseed 1
+    ).process(normalize(-3));
+    if xrand() > 0.6 then (
+        $wave = sinewave(
+            @pitch $mc + xrandom(1, 8).r2c() 
+            @duration $b.getkey('duration') * exp2(xrand(-1, 0)) 
+            @velocity $b.getkey('rms') ** 0.5 * 127
+        );
+        $b = $b.process(mix($wave)) 
+    );
+    $split = xrand(50, 200);
+    $segs = splitbuf(@buffer $b @split $split);
+    $head = xrandom(1, 5);
+    for $s in $segs.left($head).xscramble() $segs.right($head).xscramble() do (
+        $s.transcribe(
+            @onset $t @pan xrand() 
+        );
+        $t += $split
+    ) 
+);
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.96
+        @wet 0.05
+        @width 1
+        @damp 1
+    ) normalize(-3) 
+);
+ezexport($marker.getkey('onset'))

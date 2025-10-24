@@ -34,6 +34,8 @@ $b = importaudio('../06_transient/transient.wav');
 $b.transcribe($t - read('../06_transient/transient.txt'));
 importaudio('../05_bridge/bridge.wav').transcribe($t);
 $t += read('../05_bridge/bridge.txt');
+$b = importaudio('../07_stutter/stutter.wav');
+$b.transcribe($t);
 $tail = $base2.process(
     mix(
         importaudio('../02_percussion/percussion.wav') @gains 0.707 1

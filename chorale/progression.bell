@@ -46,7 +46,6 @@ HarmonicInterpolation = (
         $steps
     ) 
 );
-setseed(0);
 $chords = [1 5/4 3/2 5/3] [1 4/3 5/3 9/8] [3/2 9/8 15/8 21/16];
 $chords = for $r in octreduce(dr2r(8/5 :* 4)) collect octreduce($r * $chords);
 $steps = for $link in group($chords, 2, 1) with @unwrap 1 collect (HarmonicInterpolation($link::1, $link::2).left(-1));

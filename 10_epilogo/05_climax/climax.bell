@@ -1,4 +1,4 @@
-setseed(0);
+setseed(1);
 $harmony = read('../00_harmony/harmony.txt');
 $ratios = $harmony.'ratios';
 $mcroot = $harmony.'root';
@@ -39,6 +39,7 @@ for $type in 'mid' 'drawn' do (
         @type $type
         @velocity 127
         @duration null
+        @useseed 1
     ).analyze(envmaxtime() effectiveduration(@thresholdratio 0.01));
     $b.setkey('duration', $b.getkey('effectiveduration')).transcribe(
         @onset $t - $b.getkey('envmaxtime') + $delay

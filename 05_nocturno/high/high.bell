@@ -1,4 +1,4 @@
-setseed(0);
+setseed(1);
 $mcroot = b1;
 $pcroot = mc2pc($mcroot);
 $pcs = r2pc(1 9/8 8/7 5/4 7/5 11/8 3/2 5/3 13/7 15/8, $pcroot);
