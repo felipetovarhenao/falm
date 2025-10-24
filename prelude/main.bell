@@ -1,7 +1,0 @@
-$onset = 0;
-$b = importaudio('./transition.wav');
-$onset += read('./transition.txt');
-$b.transcribe();
-importaudio('./granular.wav').transcribe(5000);
-render(@play 1);
-ezexport($onset)
