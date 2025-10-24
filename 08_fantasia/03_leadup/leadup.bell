@@ -1,4 +1,4 @@
-setseed(3);
+setseed(4);
 $meta = read('../01_foreground/foreground.txt');
 $peak = read('../02_percussion/percussion.txt').getkey('onset');
 $root = $meta.'root';
@@ -31,7 +31,7 @@ for $m in $markers do (
     $nt = $onset / $totdur;
     $vel = samplebpf($velbpf , $nt);
     $group = xchoose($groups);
-    $chord = $m.getkey('chord').sort().left(3);
+    $chord = $m.getkey('chord').sort().left(5);
     $mc = xchoose($chord);
     $gain = $vel.scale(0, 127, 0.01, 1, -0.25);
     $maxlevel = $gain.atodb();
@@ -106,13 +106,9 @@ $bass = cycle(
 $tail = 4000;
 render(
     @play 1 @process (
-        dynamics(
-            @attack 500
-            @release 1000
-            @knee 0.5
-            @ratio 2
-            @thresh -24
-        ) 
+        normalize(@level -18 @rms 1) 
+        ## ---
+        arctan() 
         ## ---
         freeverb(
             @roomsize 0.8

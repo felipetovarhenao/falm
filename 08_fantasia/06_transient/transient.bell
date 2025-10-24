@@ -1,4 +1,4 @@
-setseed(7);
+setseed(15);
 $meta = read('../03_leadup/leadup.txt');
 $chord = $meta.'next_chord'.xscramble().left(12);
 $maxdur = 2000;
@@ -10,7 +10,7 @@ for $mc in $chord do (
         @pitch $mc + 1200
         @duration $dur
         @names 'flute' 'sax' 'clar' 'tuba' 'perc' family('strings') 
-        @types 'air' 'air-to-ord' 'blow' 'scrape-effect' 'harm-trem' 'harm' 'bow' 'edge' 
+        @types 'air' 'air-to-ord' 'blow' 'scrape-effect' 'harm-trem' 'harm' 'bow' 'edge' 'ord-to-crushed'
         @useseed 1
     ).process(normalize(-14 @rms 1));
     if xrand() > 0.5 then ($b = $b.process(reverse()));

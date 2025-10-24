@@ -28,7 +28,7 @@ $t += $split;
 $b = importaudio('../03_leadup/leadup.wav');
 $leadupmeta = read('../03_leadup/leadup.txt');
 $b.transcribe(
-    $t - $leadupmeta.'duration' @gain 0.33
+    @onset $t - $leadupmeta.'duration' @gain 0.33
 );
 $b = importaudio('../06_transient/transient.wav');
 $b.transcribe($t - read('../06_transient/transient.txt'));
