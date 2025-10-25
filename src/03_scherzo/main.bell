@@ -44,11 +44,11 @@ cycle(
 );
 importaudio('./04_trail/trail.wav').transcribe($t);
 $t += read('./04_trail/trail.txt');
-importaudio('./07_scratch/scratch.wav').transcribe($t);
-$t += read('./07_scratch/scratch.txt');
-importaudio('./06_climax/climax.wav').transcribe($t @gain 0.707);
-$t += read('./06_climax/climax.txt');
-importaudio('./08_bursts/bursts.wav').transcribe($t @gain 0.5);
+importaudio('./06_scratch/scratch.wav').transcribe($t);
+$t += read('./06_scratch/scratch.txt');
+importaudio('./05_climax/climax.wav').transcribe($t @gain 0.707);
+$t += read('./05_climax/climax.txt');
+importaudio('./07_bursts/bursts.wav').transcribe($t @gain 0.5);
 render(
     @play 1
     @fade 0
@@ -58,8 +58,6 @@ render(
         arctan() 
         ## ----
         normalize(-3) 
-        ## ---
-        
     ) 
 );
 ezexport()
