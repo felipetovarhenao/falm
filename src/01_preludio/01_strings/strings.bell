@@ -1,11 +1,7 @@
-## seeds: 4 208
+#( 
+    in memoriam Malugo
+)#
 setseed(208);
-scoreconfig(
-    @voicenames 'violin' 'viola' 'cello' 'bass' @clefs 'g' 'Alto' 'f' 'F8vb' 
-);
-$voicemap = (
-    ['violin' 1] ['viola' 2] ['cello' 3] ['bass' 4] 
-);
 $distsort = (
     $llll, $ref -> (
         $dist = abs($llll - $ref);
@@ -111,7 +107,6 @@ while $t < $totaldur do (
             @join 0
         );
         $instrument = $instruments.pitchfilter($mc, 600).xchoose();
-        $name = $instrument.getkey('name');
         $fn = $instrument.getkey('fn');
         $type = $instrument.getkey('types').xchoose();
         $b = $fn(
@@ -131,7 +126,6 @@ while $t < $totaldur do (
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
             @pan $pan
-            @voice $voicemap.$name ||| 1
         ) 
     );
     $t += $timestep
