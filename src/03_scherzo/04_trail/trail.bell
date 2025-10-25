@@ -61,7 +61,7 @@ $bass.process(
 ).transcribe(@onset $t - $bassdur);
 addmarker($t);
 render(
-    @play 1 @process normalize(@level -15 @rms 1) arctan() normalize(-3) freeverb(
+    @play 1 @process normalize(@level -18 @rms 1) arctan() normalize(-3) freeverb(
         @roomsize 0.8
         @wet [0 0.005 0] [1 0 -0.125] 
         @damp 1

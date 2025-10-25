@@ -53,7 +53,7 @@ render(
     @play 1
     @fade 0
     @process (
-        normalize(@level -24 @rms 1) 
+        normalize(@level -22 @rms 1) 
         ## ---
         arctan() 
         ## ----
