@@ -16,10 +16,10 @@ This album serves primarily as a proof of concept for _open-source music_—a ra
 | 2.  | Sérénade                         | [`02_serenata/`](src/02_serenata)       |
 | 3.  | Caprice                          | [`03_caprice/`](src/03_caprice)         |
 | 4.  | Promenade                        | [`04_andante/`](src/04_andante)         |
-| 5.  | Chaconne                         | [`08_fantasia/`](src/08_fantasia)       |
+| 5.  | Chaconne                         | [`05_fantasia/`](src/05_fantasia)       |
 | 6.  | Valse                            | [`06_intermezzo/`](src/06_intermezzo)   |
 | 7.  | Rêverie                          | [`07_chorale/`](src/07_chorale)         |
-| 8.  | Nocturne                         | [`05_nocturno/`](src/05_nocturno)       |
+| 8.  | Nocturne                         | [`08_nocturno/`](src/08_nocturno)       |
 | 9.  | Rondò                            | [`09_passacaglia/`](src/09_passacaglia) |
 | 10. | Épilogue (_a Victoria E. Henao_) | [`10_epilogo/`](src/10_epilogo)         |
 
