@@ -5,7 +5,6 @@ $unit = $data.'unit';
 $mix = 0;
 $dummy = envelope(0);
 $sectionids = 2...length($sections);
-$sectionids = 2;
 for $id in $sectionids do (
     $chords = ($sections:$id).getkey('chords');
     $base = importaudio(
