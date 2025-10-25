@@ -32,7 +32,7 @@ $timestep = read('./03_loops/loops.txt');
 $t += $timestep;
 $bassdur = min(4500, $timestep);
 $basspeak = 0.95;
-$bassmc = r2mc(Root, 2/3);
+$bassmc = r2mc(2/3, Root);
 cycle(
     @frequency mc2f($bassmc) 
     @duration $bassdur
