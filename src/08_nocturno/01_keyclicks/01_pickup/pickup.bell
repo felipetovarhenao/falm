@@ -1,0 +1,43 @@
+setseed(50);
+$harm = read('../../00_harmony/harmony.txt');
+$prog = $harm.'progression';
+$root = $harm.'root';
+$mcs = for $mc in $prog.getkey('mcs') collect if $mc > g4 then $mc;
+$mcs = xscramble($mcs).left(3);
+$duration = 2000;
+for $mc in $mcs do (
+    $dur = $duration * exp2(xrand(-0.5, 0));
+    $b = ezsol(
+        @pitch $mc
+        @names 'flute' 'sax' 'clar' 
+        @types 'air' 'air-to-ord' 
+        @velocity 127
+        @duration $dur
+        @useseed 1
+    );
+    $t = $duration - $b.getkey('duration');
+    $slope = xrand(1/4, 0.75);
+    $b.process(
+        reverse() gain(
+            [0 0 0] [1 1 $slope] 
+        ) 
+    ).transcribe(
+        @onset $t @pan [0 xrand() 0] [1 xrand() $slope] 
+    ) 
+);
+$peak = 0.9;
+$crescdur = $duration / 4;
+$bassdur = $crescdur / $peak;
+cycle(
+    @frequency mc2f($root) 
+    @duration $bassdur
+    @phase xrand() 
+).transcribe(
+    @onset $duration - $crescdur
+    @gain [0 0 0] [$peak 0.0125 0.25] [1 0 -0.125] 
+    @pan [0 xrand() 0] [1 xrand() 0.25] 
+);
+render(
+    @play 1 @process normalize(-3) 
+);
+ezexport($duration)

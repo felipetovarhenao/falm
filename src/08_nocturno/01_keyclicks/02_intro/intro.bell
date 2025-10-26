@@ -1,4 +1,4 @@
-$objects = read('../01_objects/objects.txt');
+$objects = read('../00_objects/objects.txt');
 setseed($objects.'seed');
 $objseq = $objects.'sequence';
 $t = 0;
