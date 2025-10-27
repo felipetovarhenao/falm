@@ -1,0 +1,121 @@
+granulatefx = (
+    $buffer = null, $onset = 0, $transpositions = 0 -> (
+        $bufdur = getkey($buffer, 'duration');
+        $totdur = $bufdur * exp2(xrand(-1, 1));
+        $t = 0;
+        $graindur = xrand(50, min($bufdur / 2, 1050));
+        $minoffset = getkey($buffer, 'offset');
+        $maxoffset = $minoffset + max(0, $bufdur - $graindur);
+        $readbpf = [0 $minoffset 0] [1 $maxoffset xrand() ** 2 * -0.5];
+        $overlap = xrand(0.5, 4);
+        $incr = $graindur / $overlap;
+        $detunings = $transpositions ||| 0;
+        while $t < $totdur do (
+            $nt = $t / $totdur;
+            $offset = samplebpf($readbpf, $nt);
+            $grain = setkey(
+                setkey($buffer, 'duration', $graindur), 'offset', min(
+                    $maxoffset, max($minoffset, $offset + xrand(-0.5, 0.5) * $incr) 
+                ) 
+            );
+            $peak = abs(xrand(0.125) ** 2 - xrandom(0, 1));
+            $env = [0 0 0] [
+                $peak xrand() ** 2 xrand(-0.25, 1) * 0.707
+            ] [1 0 xrand(-1, 0.25) * 0.707];
+            if xrand() > 0.5 then $grain = $grain.process(reverse());
+            $grain.transcribe(
+                @onset $t + $onset + $incr * xrand(-0.5, 0.5) 
+                @pan xrand() 
+                @gain $env
+                @keepduration 0
+                @detune xchoose($detunings) 
+            );
+            $t += $incr
+        ) 
+    ) 
+);
+setseed(1);
+$data = read('../01_strings/strings.txt');
+$totdur = getkey($data, 'totdur');
+$events = getkey($data, 'events');
+$chordsizebpf = [0 0 0] [1 0.5 0.25];
+$transpositions = r2c(1 1/2 2 3 4 6 1/4 8 5 12 10 7);
+$numtranspbpf = [0 1 0] [1 length($transpositions) -0.25];
+$waves = simplefm ezsol cycle tri rect saw;
+$numwavesbpf = [0 1 0] [1 length($waves) 0.125];
+$gainbpf = [0 0.5 0] [1 1 0.25];
+for $e in $events do (
+    $onset = $e.getkey('onset');
+    $nt = $onset / $totdur;
+    $gain = samplebpf($gainbpf, $nt);
+    $numwaves = round(samplebpf($numwavesbpf, $nt));
+    $duration = $e.getkey('duration');
+    $velocity = $e.getkey('velocity');
+    $chordsize = $e.getkey('density');
+    $chord = $e.getkey('chord').left($chordsize);
+    $chord = $chord.xscramble().left(
+        max(
+            1, round(length($chord) * samplebpf($chordsizebpf, $nt)) 
+        ) 
+    );
+    $numtransp = int(
+        round(samplebpf($numtranspbpf, $nt)) 
+    );
+    for $mc $mci in $chord do (
+        $envpeak = abs(xrand(0.25) ** 2 - xrandom(0, 1));
+        $fn = xchoose(left($waves, $numwaves));
+        $b = $fn(
+            @frequency mc2f($mc) 
+            @pitch $mc
+            @velocity $velocity
+            @names family('plucked') 
+            @types 'pizz' 'harm' 'ord' 
+            @useseed 1
+            @duration $duration * exp2(xrand(-2, 0)) 
+            @harmonicity xrandom(1, 3) 
+            @phase xrand() 
+            @modindex [0 xrand() ** 3 * 2 0] [1 0 -xrand(1/8, 5/6)] 
+        ).process(
+            gain(
+                [0 0 0] [$envpeak scale(xrand(), 0, 1, 0.5, 1, 0.125) * $gain xrand(0.125, 0.5)] [1 0 -xrand(0.125, 0.5)] 
+            ) if xrand() > 0.5 then reverse() 
+        );
+        $start = $onset + if $mci == 1 then 0 else exp2(xrand(-1, 1) * 0.5) * $duration;
+        $transp = for $tr in left($transpositions, $numtransp) collect (
+            $trmc = $mc + $tr;
+            if $trmc >= 3600 && $trmc < f2mc(15000) then $tr
+        );
+        granulatefx(
+            @buffer $b
+            @onset $start + $duration / 2
+            @transpositions $transp
+        ) 
+    ) 
+);
+$tail = 9000;
+render(
+    @play 1 @process (
+        ## ---
+        normalize(0) 
+        ## ---
+        arctan() 
+        ## ---
+        freeverb(
+            @roomsize 0.99
+            @wet [0 0.00125 0] [1 0.05 0.5] 
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+            @fadeoutcurve 0.25
+        ) 
+        ## ---
+        normalize(-3) 
+    ) 
+);
+ezexport()
