@@ -1,17 +1,12 @@
-BP_FN_ON_BEFORE = (
-    -> (
-        BP_FN_SANDBOX_CLEAR();
-        setseed(1);
-        scoreconfig();
-        BP_URN = null;
-        BP_VIEWER_DATA = null;
-        BP_DATABASE_BROWSER = null;
-        BP_DATABASE_TABLES = null;
-        BP_FN_DISPATCH('db', ['erase']);
-        BP_BUFFER_CACHE = null;
-        BP_PLAY_TOGGLE = 0;
+## Modify "on-before" function in bellplay~ to clear piano cache for each script run
+if ON_BEFORE_FN_COPY == null then (
+    ## keep copy of original function
+    ON_BEFORE_FN_COPY = BP_FN_ON_BEFORE;
+    ## Redefine function to automatically clear piano cache
+    BP_FN_ON_BEFORE = (-> (
+        ON_BEFORE_FN_COPY();
         NORMALIZED_PNO_SAMPLES = null
-    ) 
+    )) 
 );
 jispectrum = (
     $harmonics = 1...32, $ratios = 1 5/4 3/2 5/3, $root = d2 -> (
@@ -54,7 +49,6 @@ pcquant = (
         $mc
     ) 
 );
-NORMALIZED_PNO_SAMPLES = null;
 #(
 ```bell
 pno(
