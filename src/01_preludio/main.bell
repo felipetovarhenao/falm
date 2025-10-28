@@ -1,7 +1,16 @@
 $onset = 0;
+importaudio('./05_tolls/tolls.wav').transcribe(@onset $onset);
+$onset += read('./05_tolls/tolls.txt');
 $metadata = read('./01_strings/strings.txt');
-importaudio('./04_grains/grains.wav').transcribe(@gain 0.2);
+importaudio('./04_grains/grains.wav').transcribe(@onset $onset @gain 0.2);
 importaudio('./01_strings/strings.wav').process(
+    fade(
+        @fadein 35000
+        @fadeout 0
+        @fadeintype 2
+        @fadeincurve 0.125
+    ) 
+    ## ---
     normalize(3) 
     ## 
     arctan() 

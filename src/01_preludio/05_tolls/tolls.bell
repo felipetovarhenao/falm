@@ -1,0 +1,77 @@
+setseed(40);
+$meta = read('../01_strings/strings.txt');
+$totdur = $meta.getkey('totdur');
+$mc = d5;
+$octs = (-2...3) * 1200 r2c(3 6);
+$octs = $octs:[
+    argsort(abs($octs)) 
+];
+$numoctsbpf = [0 3 0] [1 length($octs) 0];
+$overdrivebpf = [0 2 0] [1 10 0.125];
+$velbpf = [0 30 0] [1 127 -0.125];
+$prefx = trim(@start 1 @threshold 0.001) gain([0 1 0] [1 0 0.25]);
+$onsets = arithmser(0, $totdur, null, 10);
+$minonset = 0;
+for $t in $onsets do (
+    $nt = $t / $totdur;
+    $numocts = round(samplebpf($numoctsbpf, $nt));
+    $overdrive = samplebpf($overdrivebpf, $nt);
+    $vel = round(samplebpf($velbpf, $nt));
+    $rev = bass(
+        @pitch $mc - 3600
+        @duration xrandom(500, 2000) 
+        @velocity $vel
+        @type 'stacc' 
+        @useseed 1
+    ).process(overdrive($overdrive) $prefx reverse()).analyze(envmaxtime());
+    $t += $rev.getkey('duration');
+    if $minonset == 0 then ($minonset = $t);
+    $rev.transcribe(
+        @onset $t - $rev.getkey('envmaxtime') 
+        @pan xrand() xrand() 
+        @gain 0.25
+    );
+    $bassdur = xrand(5000, 10000);
+    $basspeak = xrand(0.1, 1) ** 2 * (500 / $bassdur);
+    $bass = simplefm(
+        @frequency mc2f($mc) / 8
+        @duration $bassdur
+        @phase xrand() 
+        @harmonicity xrandom(1, 2) 
+        @modindex [0 0 0] [$basspeak xrand() ** 2 xrand(3/4, 1/2)] [1 0 -xrand(1/3, 3/4)] 
+    );
+    $bass.transcribe(
+        @onset $t - $bass.getkey('duration') * $basspeak
+        @pan xrand(-1, 1) * 0.05 + 0.5 xrand() 
+        @gain [0 0 0] [$basspeak scale($vel, 0, 127, 0.25, 0.707, 0.125) xrand(1/4, 2/3)] [1 0 -xrand(1/3, 3/4)] 
+    );
+    for $oct in $octs.left($numocts) do (
+        $pitch = $mc + $oct;
+        $b = ezsol(
+            @pitch $pitch
+            @velocity $vel + xrandom(-12, 12) 
+            @duration null
+            @names family('plucked') 
+            @types 'harm' 'harm-in-wood' 'pizz' if $nt > 0.5 then 'bartok' 
+            @useseed 1
+        ).process(
+            $prefx
+            ## ---
+            rubberband(
+                @stretching xrand(2, 4) @smoothing 1
+            ) 
+        );
+        $b.transcribe(
+            @onset $t @pan [0 xrand() 0] [1 xrand() xrand(-0.5, 0.5)] 
+        ) 
+    ) 
+);
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) normalize(-3) 
+);
+ezexport($minonset)
