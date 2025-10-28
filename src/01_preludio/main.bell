@@ -1,6 +1,6 @@
 $onset = 0;
 $metadata = read('./01_strings/strings.txt');
-importaudio('./04_grains/grains.wav').transcribe(@gain 0.25);
+importaudio('./04_grains/grains.wav').transcribe(@gain 0.2);
 importaudio('./01_strings/strings.wav').process(
     normalize(3) 
     ## 

@@ -3,12 +3,12 @@ granulatefx = (
         $bufdur = getkey($buffer, 'duration');
         $totdur = $bufdur * exp2(xrand(-1, 1));
         $t = 0;
-        $graindur = xrand(50, min($bufdur / 2, 1050));
+        $graindur = xrand(70, min($bufdur / 2, 1500));
         $minoffset = getkey($buffer, 'offset');
         $maxoffset = $minoffset + max(0, $bufdur - $graindur);
         $readbpf = [0 $minoffset 0] [1 $maxoffset xrand() ** 2 * -0.5];
         $overlap = xrand(0.5, 4);
-        $incr = $graindur / $overlap;
+        $incr = max(33.3, $graindur / $overlap);
         $detunings = $transpositions ||| 0;
         while $t < $totdur do (
             $nt = $t / $totdur;
@@ -20,12 +20,12 @@ granulatefx = (
             );
             $peak = abs(xrand(0.125) ** 2 - xrandom(0, 1));
             $env = [0 0 0] [
-                $peak xrand() ** 2 xrand(-0.25, 1) * 0.707
-            ] [1 0 xrand(-1, 0.25) * 0.707];
+                $peak xrand() ** 2 xrand(-0.25, 1) * 0.66
+            ] [1 0 xrand(-1, 0.25) * 0.66];
             if xrand() > 0.5 then $grain = $grain.process(reverse());
             $grain.transcribe(
                 @onset $t + $onset + $incr * xrand(-0.5, 0.5) 
-                @pan xrand() 
+                @pan xrand() xrand() 
                 @gain $env
                 @keepduration 0
                 @detune xchoose($detunings) 
@@ -43,7 +43,7 @@ $transpositions = r2c(1 1/2 2 3 4 6 1/4 8 5 12 10 7);
 $numtranspbpf = [0 1 0] [1 length($transpositions) -0.25];
 $waves = simplefm ezsol cycle tri rect saw;
 $numwavesbpf = [0 1 0] [1 length($waves) 0.125];
-$gainbpf = [0 0.5 0] [1 1 0.25];
+$gainbpf = [0 0.333333 0] [1 1 0.25];
 for $e in $events do (
     $onset = $e.getkey('onset');
     $nt = $onset / $totdur;
@@ -61,7 +61,7 @@ for $e in $events do (
     $numtransp = int(
         round(samplebpf($numtranspbpf, $nt)) 
     );
-    for $mc $mci in $chord do (
+    for $mc $mci in $chord + 1200 do (
         $envpeak = abs(xrand(0.25) ** 2 - xrandom(0, 1));
         $fn = xchoose(left($waves, $numwaves));
         $b = $fn(
@@ -69,7 +69,7 @@ for $e in $events do (
             @pitch $mc
             @velocity $velocity
             @names family('plucked') 
-            @types 'pizz' 'harm' 'ord' 
+            @types 'pizz' 'harm' 'ord' 'bisb' 'harm-in-wood' 
             @useseed 1
             @duration $duration * exp2(xrand(-2, 0)) 
             @harmonicity xrandom(1, 3) 
@@ -94,7 +94,9 @@ for $e in $events do (
 );
 $tail = 9000;
 render(
-    @play 1 @process (
+    @fade 10
+    @play 1
+    @process (
         ## ---
         normalize(0) 
         ## ---
