@@ -79,7 +79,7 @@ for $t in $onsets do (
         ) 
     ) 
 );
-$tail = 3000;
+$tail = 1000;
 render(
     @play 1 @process (
         freeverb(

@@ -92,7 +92,7 @@ for $e in $events do (
         ) 
     ) 
 );
-$tail = 9000;
+$tail = 4000;
 render(
     @fade 10
     @play 1
