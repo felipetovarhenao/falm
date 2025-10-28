@@ -59,6 +59,7 @@ $velvarbpf = [0 0 0] [1 7 1/4];
 $mixbpf = [0 0 0] [1 2 0.25];
 $timestepbpf = [0 5000 0] [1 1500 -1/4];
 $chordsizebpf = [0 1 0] [1 length($chord) 0.125];
+$revprobbpf = [0 0.5 0] [0.9 1 -0.125] [1 1 0];
 $numnamesbpf = [0 2 0] [1 length($instrumentnames) 1/8];
 $numtechniquesbpf = [0 1 0] [1 length($techniques) 1/5];
 ## --------------- LOOP ---------------
@@ -69,6 +70,7 @@ while $t < $totaldur do (
     $nt = $t / $totaldur;
     $pcid = samplebpf($pcidbpf, $nt);
     $mix = samplebpf($mixbpf, $nt);
+    $revprob = samplebpf($revprobbpf, $nt);
     $vel = samplebpf($velbpf, $nt);
     $velvar = samplebpf($velvarbpf, $nt);
     $numnames = samplebpf($numnamesbpf, $nt).round().int();
@@ -123,7 +125,7 @@ while $t < $totaldur do (
             @slope -0.05
         );
         $b.process(
-            gain($boost) if xrand() > 0.85 then reverse() 
+            gain($boost) if xrand() > $revprob then reverse() 
         ).transcribe(
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
