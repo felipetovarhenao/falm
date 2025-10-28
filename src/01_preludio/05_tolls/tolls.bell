@@ -2,34 +2,39 @@ setseed(40);
 $meta = read('../01_strings/strings.txt');
 $totdur = $meta.getkey('totdur');
 $mc = d5;
-$octs = (-2...3) * 1200 r2c(3 6);
+$octs = (-2...3) * 1200 r2c(3 6 12);
 $octs = $octs:[
     argsort(abs($octs)) 
 ];
-$numoctsbpf = [0 3 0] [1 length($octs) 0];
-$overdrivebpf = [0 2 0] [1 10 0.125];
-$velbpf = [0 30 0] [1 127 -0.125];
+$numoctsbpf = [0 5 0] [1 length($octs) 0];
+$overdrivebpf = [0 5 0] [1 25 0.25];
+$velbpf = [0 40 0] [1 127 -0.125];
 $prefx = trim(@start 1 @threshold 0.001) gain([0 1 0] [1 0 0.25]);
+$types = 'harm' 'harm-in-wood' 'pizz' 'ord' 'bartok';
+$numtypesbpf = [0 3 0] [1 length($types) 0];
 $onsets = arithmser(0, $totdur, null, 10);
 $minonset = 0;
+$markers = null;
 for $t in $onsets do (
     $nt = $t / $totdur;
     $numocts = round(samplebpf($numoctsbpf, $nt));
     $overdrive = samplebpf($overdrivebpf, $nt);
-    $vel = round(samplebpf($velbpf, $nt));
+    $vel = samplebpf($velbpf, $nt);
+    $numtypes = samplebpf($numtypesbpf, $nt);
     $rev = bass(
         @pitch $mc - 3600
-        @duration xrandom(500, 2000) 
+        @duration xrandom(1000, 3000) 
         @velocity $vel
         @type 'stacc' 
         @useseed 1
     ).process(overdrive($overdrive) $prefx reverse()).analyze(envmaxtime());
     $t += $rev.getkey('duration');
     if $minonset == 0 then ($minonset = $t);
+    $markers _= $t;
     $rev.transcribe(
         @onset $t - $rev.getkey('envmaxtime') 
         @pan xrand() xrand() 
-        @gain 0.25
+        @gain 0.125
     );
     $bassdur = xrand(5000, 10000);
     $basspeak = xrand(0.1, 1) ** 2 * (500 / $bassdur);
@@ -52,26 +57,34 @@ for $t in $onsets do (
             @velocity $vel + xrandom(-12, 12) 
             @duration null
             @names family('plucked') 
-            @types 'harm' 'harm-in-wood' 'pizz' if $nt > 0.5 then 'bartok' 
+            @types left($types, $numtypes) 
             @useseed 1
         ).process(
             $prefx
-            ## ---
+            ## ----
             rubberband(
-                @stretching xrand(2, 4) @smoothing 1
+                @stretching xrand(2, 4.5) @smoothing 1
             ) 
         );
+        $normgain = gainboost(
+            @buffer $b
+            @outmin dbtoa(-55) 
+            @outmax dbtoa(-6) 
+        );
+        $b = $b.process(gain($normgain));
         $b.transcribe(
-            @onset $t @pan [0 xrand() 0] [1 xrand() xrand(-0.5, 0.5)] 
+            @onset $t
+            @pan [0 xrand() 0] [1 xrand() xrand(-0.5, 0.5)] 
+            @gain 1.1 ** (1 - $numocts) 
         ) 
     ) 
 );
 render(
     @play 1 @process freeverb(
-        @roomsize 0.9
+        @roomsize 0.95
         @wet 0.0125
         @damp 1
         @width 1
     ) normalize(-3) 
 );
-ezexport(['onset' $minonset] ['markers' $onsets])
+ezexport(['onset' $minonset] ['markers' $markers])

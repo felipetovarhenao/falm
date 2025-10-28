@@ -122,7 +122,9 @@ while $t < $totaldur do (
             @rms 1
             @slope -0.05
         );
-        $b.process(gain($boost)).transcribe(
+        $b.process(
+            gain($boost) if xrand() > 0.85 then reverse() 
+        ).transcribe(
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
             @pan $pan

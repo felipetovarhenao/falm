@@ -1,5 +1,5 @@
 $onset = 0;
-importaudio('./05_tolls/tolls.wav').transcribe(@onset $onset);
+importaudio('./05_tolls/tolls.wav').process(dynamics(@ratio 4 @thresh -24) normalize(-3)).transcribe(@onset $onset);
 $metadata = read('./05_tolls/tolls.txt');
 $fadein = $metadata.'markers':2;
 $onset += $metadata.'onset';
