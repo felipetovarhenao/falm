@@ -72,6 +72,13 @@ for $t in $onsets do (
             @outmax dbtoa(-6) 
         );
         $b = $b.process(gain($normgain));
+        if $t + $b.getkey('duration') > $totdur + 10000 then (
+            $b = $b.setkey('duration', 10000).process(fade(
+                @fadein 0
+                @fadeout 2000
+                @fadeouttype 2
+            )) 
+        );
         $b.transcribe(
             @onset $t
             @pan [0 xrand() 0] [1 xrand() xrand(-0.5, 0.5)] 
