@@ -79,12 +79,24 @@ for $t in $onsets do (
         ) 
     ) 
 );
+$tail = 3000;
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.95
-        @wet 0.0125
-        @damp 1
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.95
+            @wet 0.0125
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeouttype 2
+        ) 
+        ## ---
+        normalize(-3) 
+    ) 
 );
 ezexport(['onset' $minonset] ['markers' $markers])
