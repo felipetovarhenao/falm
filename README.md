@@ -82,7 +82,7 @@ Finally, the following two files should be added to the _Default imports_ list i
 
 This step is important, as it ensures that _bellplay~_ automatically runs these scripts at launch, thus making the functions defined within available to any scripts subsequently run during the session.
 
-All scripts within [`/__lib__`](src/__lib__/) should be left unedited as they serve the backbone (mostly global functions and variables) of how the scripts in this repo work.
+All scripts within [`src/__lib__/`](src/__lib__/) should be left unedited as they serve the backbone (mostly global functions and variables) of how the scripts in this repo work.
 
 ## How to generate _Fully Automated Luxury Music_
 
