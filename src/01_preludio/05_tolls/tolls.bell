@@ -74,4 +74,4 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport($minonset)
+ezexport(['onset' $minonset] ['markers' $onsets])
