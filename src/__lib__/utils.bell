@@ -1,22 +1,16 @@
+#( 
+    =========
+    This script contains an assortment of utility functions frequently used throughout the codebase.
+    =========
+)#
 ## Modify "on-before" function in bellplay~ to clear piano cache for each script run
 if ON_BEFORE_FN_COPY == null then (
     ## keep copy of original function
     ON_BEFORE_FN_COPY = BP_FN_ON_BEFORE;
     ## Redefine function to automatically clear piano cache
-    BP_FN_ON_BEFORE = (-> (
+    BP_FN_ON_BEFORE = -> (
         ON_BEFORE_FN_COPY();
         NORMALIZED_PNO_SAMPLES = null
-    )) 
-);
-jispectrum = (
-    $harmonics = 1...32, $ratios = 1 5/4 3/2 5/3, $root = d2 -> (
-        $pcs = r2pc($ratios, mc2pc($root));
-        $chord = r2mc($harmonics, $root);
-        thin(
-            int(
-                round(for $mc in $chord collect $mc + pitchdiff($mc, $pcs)) 
-            ) 
-        ) 
     ) 
 );
 #(
@@ -149,38 +143,6 @@ maracas = (
 );
 #(
 ```bell
-ezinstrument(
-    @pitch ## required
-    @names 'guitar' 'harp'
-    @types 'ord'
-    @useseed 0
-    @tolerance 300
-)
-```
-
-Returns an SOL instrument with the following structure:
-
-```bell
-[
-    ['name' <instrument name>]
-    ['fn' <callback>]
-    ['types' <keymap_types>]
-    ['range' <pitch_range>]
-]
-```
-)#
-ezinstrument = (
-    $pitch, $names = 'guitar' 'harp', $types = 'ord', $useseed = 0, $tolerance = 300 -> (
-        BP_FN_CHECK_ARGS(
-            'ezinstrument', 'pitch', $pitch, 'names', $names
-        );
-        $choose = if $useseed == 1 then xchoose else choose;
-        $instruments = for $n in $names collect instrument($n, $types @join 0);
-        $instruments.pitchfilter($pitch @tolerance $tolerance).$choose() 
-    ) 
-);
-#(
-```bell
 ezsol(
     @pitch ## required
     @names 'guitar' 'harp'
@@ -202,7 +164,11 @@ ezsol = (
         );
         $choose = if $useseed == 1 then xchoose else choose;
         $instruments = for $n in $names collect instrument($n, $types @join 0);
-        $instrument = $instruments.pitchfilter($pitch @tolerance $tolerance).$choose();
+        $instrument = $choose(pitchfilter(
+            @instruments $instruments
+            @pitch $pitch
+            @tolerance $tolerance
+        ));
         $fn = $instrument.getkey('fn');
         $type = $instrument.getkey('types');
         $name = $instrument.getkey('name');
@@ -241,10 +207,33 @@ ezexport = (
         ) 
     ) 
 );
+#(
+```bell
+randwalk(
+    @length 10
+    @steps -1 1
+    @st 0
+    @useseed 1
+) -> llll
+```
+
+Generates a random walk of numeric values given some `@steps`, with optional `@weights`.
+
+---
+
+### Arguments
+
+- `@length`: Length of random walk.
+- `@steps`: Possible steps.
+- `@st`: Starting value
+- `@useseed`: Use random seed:
+    - `0`: off
+    - `1`: on
+)#
 randwalk = (
-    $length = 10, $steps = -1 1, $st = 0, $useseed = 0 -> (
+    $length = 10, $steps = -1 1, $st = 0, $weights = null, $useseed = 0 -> (
         $choose = if $useseed == 1 then xchoose else choose;
-        $dx = for $i in 1...max(0, $length - 1) collect $choose($steps);
+        $dx = for $i in 1...max(0, $length - 1) collect $choose(@choices $steps @weights $weights);
         ($dx &&& dx2x($dx, $st)) ||| $st
     ) 
 );
@@ -312,59 +301,42 @@ family = (
         $families = (
             [
                 'strings' 'violin' 'viola' 'cello' 'bass' 
-            ] [
+            ] 
+            ## ---
+            [
                 'woodwinds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 
-            ] [
+            ] 
+            ## ---
+            [
                 'winds' 'flute' 'oboe' 'clar' 'sax' 'bassoon' 'tpt' 'horn' 'tromb' 'tuba' 
-            ] [
+            ] 
+            ## ---
+            [
                 'brass' 'tpt' 'horn' 'tromb' 'tuba' 
-            ] [
+            ] 
+            ## ---
+            [
                 'plucked' 'harp' 'guitar' 
             ] 
         );
         $families.$name ||| BP_FN_ERROR('invalid family name:' $name) 
     ) 
 );
+#(
+```bell
+mc2pan(
+    @mc ## required
+    @spread 1.0
+)
+```
+
+Utility for mapping pitch to panning position, given some spread value.
+)#
 mc2pan = (
     $mc, $spread = 1.0 -> (
         $pan = mc2pc($mc) / 12.;
         $pan = ($pan - 0.5) * $spread + 0.5;
         $pan
-    ) 
-);
-ms2samps = (
-    $ms, $sr = 48000 -> int(($ms / 1000.) * $sr) 
-);
-samps2ms = (
-    $samps, $sr = 48000 -> (($samps / $sr) * 1000.) 
-);
-ezverb = (-> freeverb(
-    @roomsize 0.9
-    @wet 0.0125
-    @damp 1
-    @width 1
-));
-float2rat = (
-    $x, $denoms = 16 -> (
-        $x.map(
-            $float -^ $denoms -> (
-                $sign = sgn($float);
-                $float = abs($float);
-                $bestnum = 0;
-                $bestden = 1;
-                $besterror = abs($float);
-                for $den in $denoms do (
-                    $num = round($float * $den);
-                    $error = abs($float - ($num / $den));
-                    if $error < $besterror then (
-                        $bestnum = $num;
-                        $bestden = $den;
-                        $besterror = $error
-                    ) 
-                );
-                rat($bestnum / $bestden) * $sign
-            ) @maxdepth -1
-        ) 
     ) 
 );
 WAVESYNTH = (
@@ -497,56 +469,6 @@ sawwave = (
         @fn 'saw' 
     )) 
 );
-#(
-```bell
-partition(
-    @llll ## int/llll (required)
-    @mode 0
-    @distinct 0
-) -> llll
-```
-
-Computes the integer partition of the incoming non-negative number or the partition of the incoming set. 
-
-Integer partition are often displayed in Young diagrams. The integer partition algorithm is inspired by the iterative algorithm exposed in [Jerome Kelleher](http://jeromekelleher.net/generating-integer-partitions.html).
-)#
-partition = (
-    $llll = 5, $mode = 0, $distinct = 0 -> (
-        init $partition = {bach.partition};
-        $msgs = ['mode' $mode] ['distinct' $distinct];
-        for $msg in $msgs with @unwrap 1 do $partition($msg @out 'm');
-        $partition($llll) 
-    ) 
-);
-#( 
-```bell
-sigmoid(
-    @x ## int/float/llll (required)
-) -> llll
-```
-
-[Logistic curve](https://en.wikipedia.org/wiki/Sigmoid_function) function. Maps numeric values to the 0 to 1 range.
-)#
-sigmoid = (
-    $x -> 1.0 / (1.0 + exp(-$x)) 
-);
-#( 
-```bell
-randn(
-    @mean 0
-    @std 1
-) -> float
-```
-Samples a number from a normal distribution with a given mean and standard deviation.
-)#
-randn = (
-    $mean = 0, $std = 1 -> (
-        $u1 = rand();
-        $u2 = rand();
-        $z0 = sqrt(-2 * log($u1)) * cos(2 * pi * $u2);
-        $mean + $std * $z0
-    ) 
-);
 #( 
 ```bell
 clipnorm(
@@ -557,6 +479,7 @@ clipnorm(
     @rms 0
 ) -> float
 ```
+
 Normalizes a buffer only if it's peak amplitude is outside the `@minlevel` and `@maxlevel` range.
 )#
 clipnorm = (
@@ -664,8 +587,9 @@ interpolateratios(
     @ratios1 null
     @ratios2 null
 ) -> llll
-Utility for pitch class-based parsimonious voice-leading interpolation between two chords expressed as JI ratios.
 ```
+
+Utility for pitch class-based parsimonious voice-leading interpolation between two chords expressed as JI ratios.
 )#
 interpolateratios = (
     $ratios1, $ratios2 -> (

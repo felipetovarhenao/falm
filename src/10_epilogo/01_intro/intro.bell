@@ -2,12 +2,8 @@ setseed(125);
 $harmony = read('../00_harmony/harmony.txt');
 $ratios = $harmony.'ratios';
 $root = $harmony.'root';
-$chord = thin(
-    int(jispectrum(
-        @harmonics 1...64
-        @ratios $ratios
-        @root $root
-    )) 
+$chord = pcquant(
+    r2mc(1...64, $root), r2pc($ratios, mc2pc($root)) 
 );
 $t = 0;
 $names = thin(
