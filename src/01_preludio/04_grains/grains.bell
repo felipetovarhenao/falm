@@ -88,7 +88,7 @@ for $e in $events do (
         granulatefx(
             @buffer $b
             @onset $start + $duration / 2
-            @transpositions $transp
+            @transpositions left(xscramble($transp), 4) 
         ) 
     ) 
 );
