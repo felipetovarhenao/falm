@@ -9,7 +9,7 @@ importaudio('./01_strings/strings.wav').process(
     fade(
         @fadein $fadein
         @fadeout 0
-        @fadeintype 2
+        @fadeintype 3
         @fadeincurve 0.25
     ) 
     ## ---
