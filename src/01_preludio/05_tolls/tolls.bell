@@ -1,8 +1,8 @@
-setseed(40);
+setseed(60);
 $meta = read('../01_strings/strings.txt');
 $totdur = $meta.getkey('totdur');
 $mc = d5;
-$octs = (-2...3) * 1200 r2c(3 6 12);
+$octs = (-2...3) * 1200 r2c(3/2 3 6 12);
 $octs = $octs:[
     argsort(abs($octs)) 
 ];
@@ -16,6 +16,7 @@ $onsets = arithmser(0, $totdur, null, 10);
 $minonset = 0;
 $markers = null;
 for $t in $onsets do (
+    addmarker($t);
     $nt = $t / $totdur;
     $numocts = round(samplebpf($numoctsbpf, $nt));
     $overdrive = samplebpf($overdrivebpf, $nt);
@@ -87,6 +88,15 @@ for $t in $onsets do (
     ) 
 );
 $tail = 1000;
+$b = render(@reset 1);
+$segs = splitbuf(
+    @buffer $b
+    @split $onsets
+    @mode 2
+);
+for $seg in $segs, $onset in $onsets do process(
+    @buffer $seg @operations normalize(0) arctan() normalize(-3) 
+).transcribe(@onset $onset);
 render(
     @play 1 @process (
         freeverb(
