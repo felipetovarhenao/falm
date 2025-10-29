@@ -27,7 +27,7 @@ out = ""
 for f in sorted(os.listdir('./src/')):
     if f[0] != '0':
         continue
-    file = f + '/main.wav'
+    file = os.path.join('src', f, 'main.wav')
     if not os.path.exists(file):
         continue
 
