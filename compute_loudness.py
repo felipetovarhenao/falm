@@ -24,7 +24,7 @@ def true_peak_dbtp(file_path, oversample=4):
 
 
 out = ""
-for f in sorted(os.listdir('./')):
+for f in sorted(os.listdir('./src/')):
     if f[0] != '0':
         continue
     file = f + '/main.wav'
