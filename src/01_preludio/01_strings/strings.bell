@@ -59,7 +59,7 @@ $velvarbpf = [0 0 0] [1 7 1/4];
 $mixbpf = [0 0 0] [1 2 0.25];
 $timestepbpf = [0 5000 0] [1 1500 -1/4];
 $chordsizebpf = [0 1 0] [1 length($chord) 0.125];
-$revprobbpf = [0 0.5 0] [0.9 1 -0.125] [1 1 0];
+$revprobbpf = [0 0.5 0] [0.8 1 -0.125] [1 1 0];
 $numnamesbpf = [0 2 0] [1 length($instrumentnames) 1/8];
 $numtechniquesbpf = [0 1 0] [1 length($techniques) 1/5];
 ## --------------- LOOP ---------------
