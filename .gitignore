@@ -7,7 +7,6 @@
 **/*.wav
 **/_*.bell
 **/*.llll
-!__lib__.bell
 sol.bell
 !.placeholder
 !src/__samples__/*.wav

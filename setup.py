@@ -545,7 +545,7 @@ for instrument in instrument_dict.keys():
 
 BELL_CODE += ')'
 
-OUT_DIR = os.path.join(BASE_DIR, 'src/__lib__')
+OUT_DIR = os.path.join(BASE_DIR, 'src/__imports__')
 
 if not os.path.exists(OUT_DIR):
     os.mkdir(OUT_DIR)
