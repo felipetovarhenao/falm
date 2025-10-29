@@ -1,4 +1,4 @@
-$file = '../__samples__/ES_Maracas, Latin, Shake, Short - Epidemic Sound.wav';
+$file = '../__audio__/ES_Maracas, Latin, Shake, Short - Epidemic Sound.wav';
 $keymap = null;
 $velstep = 20;
 $b = importaudio($file).analyze(onsets());
@@ -21,7 +21,7 @@ $mcrange = $centroids.f2mc().minmax():[1 3];
 $segs = $segs.sortbykeys('spectralcentroid');
 for $s $i in $segs do (
     $id = tosymbol($i);
-    $path = '../__samples__/maracas/sample-' + $id + '.wav';
+    $path = '../__audio__/maracas/sample-' + $id + '.wav';
     $path = $path.parsepath();
     $path = $path.getkey('parent') + $path.getkey('name') + $path.getkey('extension');
     $s.transcribe(
@@ -54,4 +54,4 @@ for $s $i in $segs do (
     if $keymap.$mc.$vel == null then ($keymap.$mc _= [$vel] );
     $keymap.$mc.$vel _= $path
 );
-$keymap.write('../__keymaps__/maracas/ord.txt')
+$keymap.write('../__data__/maracas/ord.txt')

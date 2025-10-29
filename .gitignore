@@ -9,4 +9,4 @@
 **/*.llll
 sol.bell
 !.placeholder
-!src/__samples__/*.wav
+!src/__audio__/*.wav

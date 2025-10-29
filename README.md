@@ -53,7 +53,7 @@ From the top directory of the repo, run the following command:
 python3 ./keymap_generator.py <path to FullSOL dataset>
 ```
 
-This should generate a new folder called `src/__keymaps__/` with multiple subfolders, one for each instrument in _FullSOL_, each subfolder containing `.txt` files with the keymap specification for the different instrumental techniques available for that instrument. To learn more about keymaps in _bellplay~_, read [this](https://bellplay.net/docs/learning/tutorials/sampling).
+This should generate a new folder called `src/__data__/` with multiple subfolders, one for each instrument in _FullSOL_, each subfolder containing `.txt` files with the keymap specification for the different instrumental techniques available for that instrument. To learn more about keymaps in _bellplay~_, read [this](https://bellplay.net/docs/learning/tutorials/sampling).
 
 ### Additional keymaps
 

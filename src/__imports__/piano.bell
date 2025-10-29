@@ -32,6 +32,6 @@ for $f in $files do (
 );
 write(
     @data $keymap
-    @path '../__keymaps__/pno/ord.txt' 
+    @path '../__data__/pno/ord.txt' 
     @escape 2
 )
