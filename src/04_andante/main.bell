@@ -12,15 +12,22 @@ for $dur in $durs do (
     $t += $dur
 );
 $b.setkey('offset', $peak).transcribe($t);
+$gap = 2500;
 render(
     @play 1
     @fade 1
-    @process dynamics(
-        @attack 500
-        @release 1000
-        @knee 4
-        @ratio 10
-        @thresh -25
-    ) normalize(-3) 
+    @process (
+        dynamics(
+            @attack 500
+            @release 1000
+            @knee 4
+            @ratio 10
+            @thresh -25
+        ) 
+        ## ---
+        normalize(-3) 
+        ## ---
+        join(envelope(@duration $gap)) 
+    ) 
 );
 ezexport()
