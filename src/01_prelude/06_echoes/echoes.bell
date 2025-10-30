@@ -1,3 +1,4 @@
+setseed(1);
 $data = read('../01_strings/strings.txt');
 $marker = getkey($data, 'totdur');
 $b = importaudio('../01_strings/strings.wav').process(mixdown(@numchannels 1)).setkey('offset', $marker).process(trim(@threshold 0.0001 @start 0)).detach();
