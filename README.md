@@ -92,7 +92,7 @@ Once all audio tracks have been generated, they can be combined into a single on
 
 ## Credits & Acknowledgements
 
-**F.A.L.M** was realized using different audio data—primarily IRCAM's FullSOL dataset, and to a lesser extent the the _Grand Piano_ samples in _Ableton Live_, as well as a maracas samples available via _Epidemic Sound_.
+**F.A.L.M** was realized using different audio data—primarily [IRCAM](https://www.ircam.fr/)'s [FullSOL dataset](https://forum.ircam.fr/projects/detail/fullsol/), and to a lesser extent the the [_Grand Piano_](https://www.ableton.com/en/packs/grand-piano/) samples in [_Ableton Live_](https://www.ableton.com/en/), as well as a maracas samples available via [_Epidemic Sound_](https://www.epidemicsound.com/).
 
 ## License
 
