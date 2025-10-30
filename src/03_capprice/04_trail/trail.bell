@@ -5,7 +5,7 @@ $b = importaudio('../03_loops/loops.wav');
 $bardur = 2150.;
 $dur = 1/8 * $bardur;
 $end = read('../03_loops/loops.txt');
-$mcs = r2mc(1...32, Root).pcquant(r2pc(1 9/8 5/4 4/3 3/2 5/3 15/8, PcRoot));
+$mcs = r2mc(1...32, Root).pcquant(r2pc(1 9/8 5/4 7/5 3/2 5/3 15/8, PcRoot));
 $mcs = rev($mcs);
 $stnumnotes = 4;
 $mcs !_= $mcs:1 :* ($stnumnotes - 1);
@@ -19,6 +19,7 @@ for $i in 1...($N + 1) do (
             round(samplebpf($numnotesbpf, $nt)) 
         );
         $submcs = $mcs.left($numnotes);
+        $bal = 1.0125 ** (1 - length($submcs));
         for $mc in $submcs do (
             $resbpf = [0 1 0] [1 1/c2r(-50) xrand(2/3, 7/8)];
             $durfactor = integrate($resbpf):(-1 2);
@@ -32,7 +33,7 @@ for $i in 1...($N + 1) do (
             ).process(resample($resbpf)).transcribe(
                 @onset $t
                 @pan [0 mc2pan($mc) 0] [1 xrand() xrand(1/4, 4/5)] 
-                @gain [0 0 0] [1 1 0.5] 
+                @gain [0 0 0] [1 $bal xrand(1/3, 2/3)] 
             ) 
         );
         $t += $dur2
@@ -42,10 +43,10 @@ for $i in 1...($N + 1) do (
     );
     for $rep in 1...$i do (
         $incr = $dur / $subdiv;
-        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(66, $incr * 2)).transcribe(
+        $b.setkey('offset', $end - $dur).setkey('duration', if $rep == $i then 4000 else max(90, $incr * 2)).transcribe(
             @onset $t
             @pan xrand(-1, 1) * 0.25 + 0.5
-            @gain [0 1 0] [1 0 xrand(-1/2, 1/2)] 
+            @gain [0 0.707 0] [1 0 xrand(-1/2, 1/2)] 
         );
         $t += $incr * ($rep < $i) 
     ) 
@@ -58,7 +59,7 @@ $bass.process(
     gain([0 0 0] [1 0.5 0.5]) panning(
         [0 0 0] [0.7 1 0.25] [1 0.5 -0.125] 
     ) 
-).transcribe(@onset $t - $bassdur);
+).transcribe(@onset $t - $bassdur @gain 0.707);
 addmarker($t);
 render(
     @play 1 @process normalize(@level -18 @rms 1) arctan() normalize(-3) freeverb(
