@@ -90,6 +90,10 @@ The tree-like, hierarchical structure of the `src/` directory loosely mirrors th
 
 Once all audio tracks have been generated, they can be combined into a single one with the top-level [`main.bell`](src/main.bell) script.
 
+## Credits & Acknowledgements
+
+**F.A.L.M** was realized using different audio data—primarily IRCAM's FullSOL dataset, and to a lesser extent the the _Grand Piano_ samples in _Ableton Live_, as well as a maracas samples available via _Epidemic Sound_.
+
 ## License
 
 All content in this repository—including code, scripts, and generated audio—is licensed under [**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/).
