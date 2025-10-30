@@ -383,7 +383,6 @@ $i = 0;
 $units = (3/8 1/4 1/8) * $bardur;
 while $t < $totdur do (
     $dur = $units:($i % 3 + 1);
-    $dur *= 1;
     Thump($chord, $t, $dur);
     $t += $dur
 );
