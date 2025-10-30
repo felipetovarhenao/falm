@@ -10,18 +10,18 @@ This album serves primarily as a proof of concept for _open-source music_—a ra
 
 ### Track listing
 
-| #   | Title                            | Source Code                             |
-| --- | -------------------------------- | --------------------------------------- |
-| 1.  | Élegie (_in memoriam Malugo_)    | [`01_preludio/`](src/01_preludio)       |
-| 2.  | Sérénade                         | [`02_serenata/`](src/02_serenata)       |
-| 3.  | Caprice                          | [`03_caprice/`](src/03_caprice)         |
-| 4.  | Promenade                        | [`04_andante/`](src/04_andante)         |
-| 5.  | Chaconne                         | [`05_fantasia/`](src/05_fantasia)       |
-| 6.  | Valse                            | [`06_intermezzo/`](src/06_intermezzo)   |
-| 7.  | Rêverie                          | [`07_chorale/`](src/07_chorale)         |
-| 8.  | Nocturne                         | [`08_nocturno/`](src/08_nocturno)       |
-| 9.  | Rondò                            | [`09_passacaglia/`](src/09_passacaglia) |
-| 10. | Épilogue (_a Victoria E. Henao_) | [`10_epilogo/`](src/10_epilogo)         |
+| #   | Title                                 | Source code directory                |
+| --- | ------------------------------------- | ------------------------------------ |
+| 1.  | **prelude** (_in memoriam Malugo_)    | [`src/01_prelude`](src/01_prelude)   |
+| 2.  | **serenade**                          | [`src/02_serenade`](src/02_serenade) |
+| 3.  | **capprice**                          | [`src/03_capprice`](src/03_capprice) |
+| 4.  | **toccata**                           | [`src/04_toccata`](src/04_toccata)   |
+| 5.  | **chaconne**                          | [`src/05_chaconne`](src/05_chaconne) |
+| 6.  | **waltz**                             | [`src/06_waltz`](src/06_waltz)       |
+| 7.  | **reverie**                           | [`src/07_reverie`](src/07_reverie)   |
+| 8.  | **nocturne**                          | [`src/08_nocturne`](src/08_nocturne) |
+| 9.  | **rondo**                             | [`src/09_rondo`](src/09_rondo)       |
+| 10. | **postlude** (_to Victoria E. Henao_) | [`src/10_postlude`](src/10_postlude) |
 
 ## Requirements
 
