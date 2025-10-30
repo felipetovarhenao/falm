@@ -379,10 +379,8 @@ for $ratios in $prog with @unwrap 1 do (
 );
 $totdur = $t;
 $t = 0;
-$i = 0;
-$units = (3/8 1/4 1/8) * $bardur;
+$dur = 3/8 * $bardur;
 while $t < $totdur do (
-    $dur = $units:($i % 3 + 1);
     Thump($chord, $t, $dur);
     $t += $dur
 );
