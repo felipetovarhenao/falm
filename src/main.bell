@@ -11,25 +11,25 @@ TimeCode = (
     ) 
 );
 $folders = (
-    '01_preludio' 
+    '01_prelude' 
     ## ---
-    '02_serenata' 
+    '02_serenade' 
     ## ---
-    '03_scherzo' 
+    '03_capprice' 
     ## ---
-    '04_andante' 
+    '04_toccata' 
     ## ---
-    '05_fantasia' 
+    '05_chaconne' 
     ## ---
-    '06_intermezzo' 
+    '06_waltz' 
     ## ---
-    '07_chorale' 
+    '07_reverie' 
     ## ---
-    '08_nocturno' 
+    '08_nocturne' 
     ## ---
-    '09_passacaglia' 
+    '09_rondo' 
     ## ---
-    '10_epilogo' 
+    '10_postlude' 
 );
 $t = 0;
 $stats = null;
