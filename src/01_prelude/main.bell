@@ -4,7 +4,7 @@ $metadata = read('./05_tolls/tolls.txt');
 $fadein = $metadata.'markers':2;
 $onset += $metadata.'onset';
 importaudio('./06_echoes/echoes.wav').transcribe(
-    @onset $onset + read('./06_echoes/echoes.txt') @gain 0.25
+    @onset $onset + read('./06_echoes/echoes.txt') @gain 0.5
 );
 $metadata = read('./01_strings/strings.txt');
 importaudio('./04_grains/grains.wav').transcribe(@onset $onset @gain 0.2);

@@ -1,20 +1,26 @@
-setseed(1);
+setseed(2);
+$randwin = (
+    -> (
+        $x = scale(arithmser(0, 1, null, 30), 0, 1, 0, 1, xrand(-1/3, 1/3));
+        sin($x * pi) ** 2
+    ) 
+);
 $data = read('../01_strings/strings.txt');
 $marker = getkey($data, 'totdur');
-$b = importaudio('../01_strings/strings.wav').process(mixdown(@numchannels 1)).setkey('offset', $marker).process(trim(@threshold 0.0001 @start 0)).detach();
+$b = importaudio('../01_strings/strings.wav').process(mixdown(@numchannels 1)).setkey('offset', $marker).process(trim(@threshold 0.001 @start 0)).detach();
 $bufdur = $b.getkey('duration');
 $t = 0;
-$readbpf = [0 0 0] [1 1 -0.3];
+$readbpf = [0 0 0] [1 1 -0.5];
 $gainbpf = [0 0 0] [1/3 1 0.25] [1 1 0];
 $durmulbpf = [0 1 0] [1 0.25 0.25];
-$panspreadbpf = [0 0 0] [1 1 0.25];
+$panspreadbpf = [0 0 0] [1 1 -0.125];
 $jit = 0.25;
 $totdur = $bufdur * 2;
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gain = samplebpf($gainbpf, $nt);
     $panspread = samplebpf($panspreadbpf, $nt);
-    $graindur = xrand(90, 250);
+    $graindur = 200 * exp2(xrand(-1, 1));
     $incr = $graindur / 4;
     $read = samplebpf($readbpf, $nt);
     $maxoffset = $bufdur - $graindur;
@@ -29,9 +35,9 @@ while $t < $totdur do (
     $grain.transcribe(
         @onset $t + exp2(xrand(-$jit, $jit)) * $incr
         @pan 0.5 + $panspread * 0.5 * xrand(-1, 1) 
-        @gain hanning() * $gain
+        @gain $randwin() * $gain
     );
-    $t += max(100/6, $incr) 
+    $t += max(20, $incr) 
 );
 $tail = 3000;
 render(
