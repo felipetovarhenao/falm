@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~5.5 minutes
+**Duration:** ~3.5 minutes
 
 A spirited, accelerating perpetual motion piece built on a seven-tone modal rotation system. The track employs a rondo-like structure where a recurring rhythmic "riff" returns with increasing textural complexity across eight iterations, each lasting progressively shorter durations as the underlying harmonic collection rotates through modal transpositions. Built on a 7:10 frequency ratio (tritone) as its tonal center, the piece grows from sparse plucked arpeggios through layered polyrhythmic ostinatos, staccato brass punctuations, granular clouds, and cascading scalar runs before dissolving into granular fragments. The work demonstrates additive orchestration: each return of the riff accumulates new instrumental layers until reaching maximum density, then deconstructs through metric fragmentation.
 

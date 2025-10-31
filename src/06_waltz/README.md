@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~1.5 minutes
+**Duration:** ~2 minutes
 
 A playful, fragmented waltz in 3/4 time (60 BPM) that deconstructs traditional dance form through granular processing and stochastic transformations. Built on a 9:8 frequency ratio (major second) as its tonal center, the piece progresses through four harmonic stages: a sparse triad, a dense 11-note collection, another complex 10-note set, and finally a single unison—representing a journey from simplicity through complexity back to fundamental unity. Each phrase combines melodic gestures, chordal attacks, and arpeggios with extensive audio manipulation creating a shimmering, kaleidoscopic texture.
 

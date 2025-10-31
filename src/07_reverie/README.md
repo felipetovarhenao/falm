@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~4.5 minutes
+**Duration:** ~5 minutes
 
 A dreamlike meditation built on an 11:8 frequency ratio (augmented fourth) using an extended just-intonation lattice spanning 2, 3, 5, 7, 11, 13, and 17 limits. The piece unfolds in three phases: a slowly accumulating accordion/bass drone that's time-stretched 8×, a densely layered piano/plucked foreground with extensive granular processing, and a metrically driven section at 85 BPM that samples and recontextualizes the stretched material before returning to the ethereal opening texture.
 

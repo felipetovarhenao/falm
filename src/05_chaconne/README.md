@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~6 minutes
+**Duration:** ~4 minutes
 
 A continuously evolving passacaglia built on a cyclical harmonic progression that modulates through six chords. The piece begins sparsely with plucked textures, gradually accumulating layers of woodwind tremolos, melodic fragments, granular clouds, and frozen piano resonances before reaching a sustained climax at 70% through its duration. The second half fragments and stutters the accumulated material, creating a glitchy dissolution that's eventually reassembled through a gradual fade-in process overlaid with descending arpeggios.
 

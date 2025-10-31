@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~4.5 minutes
+**Duration:** ~4 minutes
 
 A nocturnal meditation unfolding in seven distinct sections that transition from sparse, breathy textures through rhythmic fragmentation to dense granular clouds before dissolving into silence. Built on a 5:6 frequency ratio (minor sixth) as its tonal center, the piece cycles through a modal progression that modulates root pitch classes while exploring complex septimal and undecimal harmonies. The work balances written-out gestural objects (key clicks, tremolos, swirls, arpeggios, rhythmic beats) with generative processes (granulation, spectral crackling), creating a narrative arc from whispered beginnings to shimmering climax to quiet dissolution.
 

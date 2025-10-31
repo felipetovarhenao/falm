@@ -2,7 +2,7 @@
 
 ## Musical Output
 
-**Duration:** ~3.5 minutes
+**Duration:** ~5.5 minutes
 
 A tender, contemplative conclusion built on a 10-note just-intonation collection emphasizing septimal and undecimal intervals. The piece unfolds in three overlapping layers: a delicate introductory texture that gradually accumulates pitch material with increasing density and wetness, a lyrical melodic solo exploring glissando connections between adjacent scale degrees, and a final climactic convergence where cascading arpeggios, sustained orchestral swells, and climactic percussion unite before fading. The work serves as both emotional catharsis and structural resolution to the album's journey.
 
