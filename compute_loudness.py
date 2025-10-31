@@ -25,7 +25,7 @@ def true_peak_dbtp(file_path, oversample=4):
 
 out = ""
 for f in sorted(os.listdir('./src/')):
-    if f[0] != '0':
+    if f[0] in ['0', '1']:
         continue
     file = os.path.join('src', f, 'main.wav')
     if not os.path.exists(file):
