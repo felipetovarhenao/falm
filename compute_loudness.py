@@ -50,6 +50,8 @@ for f in sorted(os.listdir('./src/')):
 
 mean_lufs = np.mean(lufs)
 mean_true_peak = np.mean(true_peaks)
-out = f"Mean loudness: {mean_lufs:.2f} LUFS\nMean true peak: {mean_true_peak:.2f} dBTP\n---\n\n" + out
+std_lufs = np.std(lufs)
+std_true_peak = np.std(true_peaks)
+out = f"Mean loudness: {mean_lufs:.2f} LUFS\nStdev loudness: {std_lufs:.2f} LUFS\nMean true peak: {mean_true_peak:.2f} dBTP\nStdev true peak: {std_true_peak:.2f} dBTP\n---\n\n" + out
 with open('./stats.txt', 'w') as f:
     f.write(out)
