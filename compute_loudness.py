@@ -24,6 +24,8 @@ def true_peak_dbtp(file_path, oversample=4):
 
 
 out = ""
+true_peaks = []
+lufs = []
 for f in sorted(os.listdir('./src/')):
     if f[0] not in ['0', '1']:
         continue
@@ -40,9 +42,14 @@ for f in sorted(os.listdir('./src/')):
     # Measure the integrated loudness in LUFS
     loudness = meter.integrated_loudness(data)
     true_peak = true_peak_dbtp(file)
+    true_peaks.append(true_peak)
+    lufs.append(loudness)
     txt = f"File: {f}\n\tIntegrated Loudness: {loudness:.2f} LUFS\n\tTrue peak: {true_peak:.2f} dBTP\n"
     out = out + txt
     print(txt)
 
+mean_lufs = np.mean(lufs)
+mean_true_peak = np.mean(true_peaks)
+out = f"Mean loudness: {mean_lufs:.2f} LUFS\nMean true peak: {mean_true_peak:.2f} dBTP\n---\n\n" + out
 with open('./stats.txt', 'w') as f:
     f.write(out)
