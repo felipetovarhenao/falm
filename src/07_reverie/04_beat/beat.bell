@@ -80,7 +80,7 @@ while $t < $totdur do (
     );
     $t += $unit
 );
-null render(
+render(
     @play 1 @process (
         dynamics(
             @thresh -30
