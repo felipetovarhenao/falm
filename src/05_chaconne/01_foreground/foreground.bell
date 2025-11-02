@@ -1,6 +1,3 @@
-## -------------------------
-## Global setup and variables
-## -------------------------
 setseed(824);
 $tempo = 100;
 $beatdur = 60000 / $tempo;
@@ -21,9 +18,6 @@ $units = rev(
     sort((1 1 1...$maxunitsize) / 16) 
 );
 $gapunits = thin($units).sort().right(-$maxunitsize + 3);
-## -------------------------
-## BPFs
-## -------------------------
 $gapbpf = [0 1 0] [$peak 0 -0.35] [1 0 0];
 $chordsizebpf = [0 7 0] [$peak length($fullchord) 0] [1 length($fullchord) 0];
 $maxunitsbpf = [0 4 0] [$peak 2 -0.125] [1 2 0];
@@ -41,9 +35,6 @@ Normalize = (
         $buffer = $buffer.process(gain($boost)) 
     ) 
 );
-## ----------------------
-## Helpers
-## ----------------------
 AmpMod = (
     $car, $mod, $minlevel = -60 , $maxlevel = -10 -> (
         $mod = process(
@@ -58,9 +49,6 @@ AmpMod = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Stutter
-## ----------------------
 Stutter = (
     $buffer, $onset = 0 -> (
         $duration = $buffer.getkey('duration');
@@ -90,9 +78,6 @@ Stutter = (
         ) 
     ) 
 );
-## ----------------------
-## Function: TremChord
-## ----------------------
 TremChord = (
     $onset = 0, $duration = 1000, $chord = null, $types = 'ord', $nt = 0, $minlevel = -60, $maxlevel = -10 -^ $peak -> (
         init $eqbpf = [0 0 0] [32 0.125 -0.25] [261 1 -0.25] [830 0.707 -0.25] [4186 0.05 0.25] [26579 0.0 0.25];
@@ -171,9 +156,6 @@ TremChord = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Gap
-## ----------------------
 PercGap = (
     $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $mcs = randomseq(
@@ -203,9 +185,6 @@ PercGap = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Arpeggi
-## ----------------------
 Arpeggi = (
     $onset = 0, $duration = 1000, $chord = null, $nt = null, $minlevel = -60, $maxlevel = -10 -^ $bardur, $peak -> (
         $unit = $bardur * xchoose(1/16 1/24 1/20);
@@ -253,9 +232,6 @@ Arpeggi = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Thump
-## ----------------------
 Thump = (
     $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $mc = xchoose($chord) % 2400 + 2100;
@@ -273,9 +249,6 @@ Thump = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Granulate
-## ----------------------
 Granulate = (
     $buffer, $onset = 0, $pitch = c5 -> (
         $shift = 0;
@@ -328,9 +301,6 @@ Granulate = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Melody
-## ----------------------
 Melody = (
     $onset, $duration, $chord, $minlevel = -60, $maxlevel = -10, $nt = 0 -> (
         $maxchordsize = round(
@@ -390,9 +360,6 @@ Melody = (
         ) 
     ) 
 );
-## ----------------------
-## Function: PianoRoll
-## ----------------------
 PianoRoll = (
     $onset = 0, $duration = 1000, $chord = null -> (
         $t = $onset;
@@ -415,9 +382,6 @@ PianoRoll = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Freeze
-## ----------------------
 Freeze = (
     $buffer, $onset = 0, $duration = null -> (
         $bufdur = $buffer.getkey('duration');
@@ -447,9 +411,6 @@ Freeze = (
         ) 
     ) 
 );
-## ----------------------
-## Function: GetHarmony
-## ----------------------
 GetHarmony = (
     $st = 1.0, $steps = 32/21 2/3 8/9 21/16 3/4 10/9, $chords = [1 6/5 3/2 9/8] [1 5/4 3/2 7/4] [1 6/5 3/2 4/3] [1 5/4 3/2 7/4] [1 5/4 3/2 15/8] [1 5/4 3/2 7/4] -> (
         init $r = $st;
@@ -468,9 +429,6 @@ GetHarmony = (
         ] 
     ) 
 );
-## ----------------------
-## Function: Pluck
-## ----------------------
 Pluck = (
     $onset = 0, $duration = 1000, $chord = null, $minlevel = -60, $maxlevel = -10 -> (
         $size = xrandom(1, 3);
@@ -512,9 +470,6 @@ Pluck = (
         ) 
     ) 
 );
-## ----------------------
-## Function: UpdateHarmony
-## ----------------------
 UpdateHarmony = (
     $delta = 0, $period = 6, $threshold = 2000 -> (
         init $time = 0;
@@ -530,9 +485,6 @@ UpdateHarmony = (
         $test
     ) 
 );
-## ----------------------
-## Main loop
-## ----------------------
 $objects = Arpeggi TremChord Melody Pluck;
 $stweights = float(2/9 0 5/9 2/9);
 $weightsbpf = (
@@ -622,9 +574,6 @@ while $finalmarker == null do (
         ) 
     ) 
 );
-## ----------------------
-## Rendering and export
-## ----------------------
 render(
     @play 1 @process normalize(-3) 
 );

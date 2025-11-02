@@ -74,7 +74,7 @@ SOL-based sampler. Returns a buffer with a piano sample that best matches `@pitc
 )#
 pno = (
     $pitch = 6000, $duration = 500, $velocity = 64, $useseed = 1, $usecache = 1, $resample = 1, $gain = 0.25, $norm = 0.707 -> (
-        ## -----
+        ## ---
         $b = sol(
             @name 'pno' 
             @pitch $pitch
@@ -341,15 +341,15 @@ mc2pan = (
 );
 WAVESYNTH = (
     $pitch = c5, 
-    ## ----
+    ## ---
     $duration = 1000, 
-    ## ----
+    ## ---
     $velocity = 64, 
-    ## ----
+    ## ---
     $envelope = [0 0.33 0] [1 0 -0.25], 
-    ## ----
+    ## ---
     $phase = 0.25, 
-    ## ----
+    ## ---
     $fn = 'cycle' -> (
         $map = ['cycle' cycle] ['tri' tri] ['rect' rect] ['saw' saw];
         $wave = $map.$fn;
@@ -384,7 +384,7 @@ Sampler-style wrapper function for `cycle`.
 )#
 sinewave = (
     $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
-    ## -----
+    ## ---
     WAVESYNTH(
         @pitch $pitch
         @duration $duration
@@ -409,7 +409,7 @@ Sampler-style wrapper function for `tri`.
 )#
 triwave = (
     $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
-    ## -----
+    ## ---
     WAVESYNTH(
         @pitch $pitch
         @duration $duration
@@ -434,7 +434,7 @@ Sampler-style wrapper function for `rect`.
 )#
 rectwave = (
     $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
-    ## -----
+    ## ---
     WAVESYNTH(
         @pitch $pitch
         @duration $duration
@@ -459,7 +459,7 @@ Sampler-style wrapper function for `saw`.
 )#
 sawwave = (
     $pitch = c5, $duration = 1000, $velocity = 64, $envelope = [0 0.33 0] [1 0 -0.25], $phase = 0.25 -> ( 
-    ## -----
+    ## ---
     WAVESYNTH(
         @pitch $pitch
         @duration $duration
@@ -490,14 +490,14 @@ clipnorm = (
             $maxlevel = dbtoa($maxlevel) 
         ) else ($maxabs = atodb($maxabs) );
         $process = null if $maxabs < $minlevel then (
-            ## 
+            ## ---
             $process = normalize(
                 @level $minlevel
                 @ampunit $ampunit
                 @rms $rms
             ) 
         ) else if $maxabs > $maxlevel then (
-            ## 
+            ## ---
             $process = normalize(
                 @level $maxlevel
                 @ampunit $ampunit

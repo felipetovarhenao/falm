@@ -37,15 +37,14 @@ $b = triangle(
     @phase $phasor @offset [0 0 0] [1 1 0.25] 
 );
 $bassop = (
-    ## --------
     gain([0 1 0] [1 20 0.5]) 
-    ## --------
+    ## ---
     pong() 
-    ## --------
+    ## ---
     onepole(300) 
-    ## --------
+    ## ---
     fade(5, 5) 
-    ## --------
+    ## ---
     gain([0 0 0] [1 1 0.5]) 
 );
 $b.process($bassop).transcribe(
@@ -58,9 +57,9 @@ render(
     @play 1
     @panmode 1
     @process (
-        ## --------
+        ## ---
         normalize(-3) 
-        ## --------
+        ## ---
         freeverb(
             @roomsize 0.9
             @wet [0 0 0] [1 0.0125 0.5] 

@@ -56,7 +56,7 @@ render(
         normalize(@level -22 @rms 1) 
         ## ---
         arctan() 
-        ## ----
+        ## ---
         normalize(-3) 
     ) 
 );

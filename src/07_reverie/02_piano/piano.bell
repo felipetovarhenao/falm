@@ -222,7 +222,7 @@ Transcribe = (
                 @nt $nt
             ) 
         ) else (
-            ## ----
+            ## ---
             transcribe(
                 @buffer $buffer
                 @onset $onset

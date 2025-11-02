@@ -35,7 +35,7 @@ $b = render(
         normalize(-3) 
         ## ---
         trim(@threshold 0.00125 @start 0) 
-        ##  ---
+        ## ---
         fade(
             @fadein 0
             @fadeout 2000

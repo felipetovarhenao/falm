@@ -62,7 +62,7 @@ for $t in $onsets do (
             @useseed 1
         ).process(
             $prefx
-            ## ----
+            ## ---
             rubberband(
                 @stretching xrand(2, 4.5) @smoothing 1
             ) 

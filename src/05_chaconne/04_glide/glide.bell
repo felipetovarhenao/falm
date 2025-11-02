@@ -139,9 +139,6 @@ Arpeggi = (
         ) 
     ) 
 );
-## ----------------------
-## Function: Freeze
-## ----------------------
 Freeze = (
     $buffer, $onset = 0, $duration = null -> (
         $bufdur = $buffer.getkey('duration');

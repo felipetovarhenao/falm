@@ -23,7 +23,7 @@ for $beatnum in $beatnums do (
     $delay = samplebpf($delaybpf, $nt);
     $vel = samplebpf($velbpf, $nt);
     $duration = samplebpf($durbpf, $nt);
-    ## ------------------------
+    ## ---
     $mcs = $event.getkey('chord');
     $size = int(
         round(samplebpf($sizebpf, $nt)) 

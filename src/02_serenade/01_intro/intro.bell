@@ -9,11 +9,10 @@ $spanbpf = [0 2000 0] [1 200 0.25];
 $maxincrbpf = [0 250 0] [1 300 0.25];
 $samplers = for $instrument in violin viola cello collect [$instrument 'pizz' 'pizz-secco'];
 $samplers _= (
-    ## 
     [
         harp 'harm' 'harm-in-wood' 'xylo' 'near-board' 'near-pegs' 
     ] 
-    ## 
+    ## ---
     [
         guitar 'harm' 'pizz' 
     ] 
@@ -45,15 +44,16 @@ while $t < $totdur do (
     $chordweightmix = samplebpf($chordweightmixbpf, $nt);
     $weights = (1 1 1 1) * (1 - $chordweightmix) + $chordweightmix * (0 1 0 0);
     $chord = xchoose(
-        ## 
-        [1/2 1 18/7 20/9 3/2 24/7 56/15] 
-        ## 
-        [1/2 1 5/2 9/4 3/2 5 15/4] 
-        ## 
-        [1/2 1 11/9 16/7 3/2 20/7 15/4] 
-        ## 
-        [1/2 5/6 4/3 20/9 5/3 2 7/2] 
-        ## 
+        @choices (
+            [1/2 1 18/7 20/9 3/2 24/7 56/15] 
+            ## ---
+            [1/2 1 5/2 9/4 3/2 5 15/4] 
+            ## ---
+            [1/2 1 11/9 16/7 3/2 20/7 15/4] 
+            ## ---
+            [1/2 5/6 4/3 20/9 5/3 2 7/2] 
+        ) 
+        ## ---
         @weights $weights
     )::1;
     $offset = 0;

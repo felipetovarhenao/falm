@@ -11,7 +11,7 @@ $groups = (
             'types' 'ord' 'harm' 
         ] 
     ] 
-    ## 
+    ## ---
     [
         ['names' family('strings')] ['types' 'pizz'] 
     ] 
@@ -36,7 +36,7 @@ for $mc in $chord.xscramble() do (
         @duration xrand(1000, 9000) 
         @velocity xrand(40, 127) 
     ).process(
-        ## ----
+        ## ---
         freqshift(
             @shift $vib @negative 1
         ) 

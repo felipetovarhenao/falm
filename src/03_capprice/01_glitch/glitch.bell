@@ -153,11 +153,11 @@ SustainedChord = (
         $process = fade(2, 2) repeat($reps);
         if xrand() > 0.5 then (
             $env = xchoose(
-                ## -----
+                ## ---
                 [[0 0 0] [1 1 0.5]] 
-                ## -----
+                ## ---
                 [[0 1 0] [1 0 -0.5]] 
-                ## -----
+                ## ---
                 [hanning()] 
             )::1;
             $process !_= gain($env) 
@@ -233,19 +233,18 @@ $unitranks = (
 $unitorder = argsort($unitranks);
 $units = $units:[$unitorder];
 $objects = (
-    ## ----
     FastArpeggio
-    ## ----
+    ## ---
     CrushedCresc
-    ## ----
+    ## ---
     Strum
-    ## ----
+    ## ---
     Rest
-    ## ----
+    ## ---
     SustainedChord
-    ## ----
+    ## ---
     HarmGliss
-    ## ----
+    ## ---
     SynthChord
 );
 $seeds = (1...8) + 10 + 1234;
@@ -296,16 +295,16 @@ for $seed $id in $seeds do (
             ##     @thresh -40
             ##     @release 200
             ## ) 
-            ## ## ----
+            ## ## ---
             ## normalize(-3) 
-            ## ----
+            ## ---
             freeverb(
                 @roomsize 0.75
                 @wet $wet
                 @damp 1
                 @width 1
             ) 
-            ## ----
+            ## ---
             ## normalize(-3) 
             
         ) 

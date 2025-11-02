@@ -1,17 +1,16 @@
 $objects = (
-    ## ----
     FastArpeggio
-    ## ----
+    ## ---
     CrushedCresc
-    ## ----
+    ## ---
     Strum
-    ## ----
+    ## ---
     Rest
-    ## ----
+    ## ---
     SustainedChord
-    ## ----
+    ## ---
     HarmGliss
-    ## ----
+    ## ---
     SynthChord
 );
 if $objects == null then BP_FN_ERROR(@details 'You need you run script containing gesture/object definitions first.');

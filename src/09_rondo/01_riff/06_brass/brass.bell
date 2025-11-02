@@ -10,14 +10,14 @@ $subdivsbpf = [0 1 0] [1 2 0];
 $numnotesbpf = [0 2 0] [1 5 -0.25];
 $numreps = 4;
 $postfx = (
-    ## ----
+    ## ---
     freeverb(
         @roomsize 0.75
         @wet 0.0125
         @width 1
         @damp 1
     ) 
-    ## ----
+    ## ---
     normalize(-4) 
 );
 for $id in $ids do (

@@ -125,7 +125,7 @@ render(
         ) 
         ## ---
         normalize(-3) 
-        ## ----
+        ## ---
         mix($bass) 
         ## ---
         normalize(-3) 

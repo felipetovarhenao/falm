@@ -132,13 +132,13 @@ render(
         @width 1
         @tail $tail
     ) 
-    ## ----
+    ## ---
     fade(
         @fadein 0
         @fadeout $tail
         @fadeoutcurve 2/3.
     ) 
-    ## ----
+    ## ---
     normalize(-3) 
 );
 ezexport(@data $globaldelay)
