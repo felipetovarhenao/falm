@@ -32,6 +32,20 @@ $pcfilter = (
         ) 
     ) 
 );
+Markers = null;
+Transcribe = (
+    $buffer = null, $onset = 0, $gain = null, $pan = null -> (
+        Markers _= [
+            ['onset' $onset] ['duration' getkey($buffer, 'duration')] 
+        ];
+        transcribe(
+            @buffer $buffer
+            @onset $onset
+            @pan $pan
+            @gain $gain
+        ) 
+    ) 
+);
 while $t < $totdur do (
     $nt = $t / $totdur;
     $gap = samplebpf($gapbpf, $nt) * exp2(xrand(-1/2, 1/2));
@@ -112,7 +126,7 @@ while $t < $totdur do (
                     resample($gliss) multiply(xchoose(-1 1)) dcfilter() gain($env) 
                 );
                 $dur = $b.getkey('duration');
-                $b.transcribe(
+                $b.Transcribe(
                     @onset $onset
                     @gain $balance
                     @pan fold(mc2pan($mc1, 0.125) + $pan) 
@@ -125,20 +139,8 @@ while $t < $totdur do (
 );
 $tail = 5000;
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.95
-        @wet 0.05
-        @damp 1
-        @width 1
-        @tail $tail
-    ) 
-    ## ---
-    fade(
-        @fadein 0
-        @fadeout $tail
-        @fadeoutcurve 2/3.
-    ) 
-    ## ---
-    normalize(-3) 
+    @play 1 @process normalize(-3) 
 );
-ezexport(@data $globaldelay)
+ezexport(
+    @data ['delay' $globaldelay] ['markers' Markers] 
+)

@@ -1,7 +1,7 @@
 $t = 0;
 importaudio('./01_intro/intro.wav').transcribe(@onset $t);
-$t += read('./02_solo/solo.txt');
-importaudio('./02_solo/solo.wav').transcribe(@onset $t);
+$t += read('./03_glitch/glitch.txt');
+importaudio('./03_glitch/glitch.wav').transcribe(@onset $t);
 $end = read('./01_intro/intro.txt').'markers':-1;
 $peak = read('./05_climax/climax.txt');
 importaudio('./03_arpeggi/arpeggi.wav').transcribe($end);

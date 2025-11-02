@@ -1,0 +1,101 @@
+setseed(8);
+$b = importaudio('../02_solo/solo.wav');
+$data = read('../02_solo/solo.txt');
+$markers = $data.'markers';
+$markeronsets = for $m in $markers collect getkey($m, 'onset');
+$onsets = scale(
+    arithmser(0, 1, null, 24), 0, 1, 0, getkey($markers:-1, 'onset'), -0.125
+);
+$onsets = thin(
+    int(for $onset in $onsets collect nearest($onset, $markeronsets)) 
+);
+Shuffle = (
+    $buffer = null, $onset = 0, $offset = 0, $duration = 100, $gain = 1 -> (
+        $sourceend = getkey($buffer, 'source_end');
+        $t = 0;
+        $totdur = scale(
+            @x exp2(xrand()) 
+            @inmin 1
+            @inmax 2
+            @outmin 500
+            @outmax min($duration, 6000) 
+        );
+        $pan = xrand();
+        $panspread = xrand(0.125, 0.707) ** 2;
+        $det = xchoose(
+            @choices 0...2 @weights exp2(0...2).rev() 
+        );
+        while $t < $totdur do (
+            $segdur = xrand(100, 300);
+            $maxoffset = $sourceend - $segdur;
+            $segoff = min(
+                $maxoffset, max(
+                    0, $offset + (xrand(-0.5, 0.5) * $totdur) 
+                ) 
+            );
+            if $seg == null || xrand() > 0.25 then (
+                $seg = setkey(
+                    setkey($buffer, 'offset', $segoff), 'duration', $segdur
+                ) 
+            );
+            $envpeak = abs(xrand(0.1, 1) ** 2 * 0.25 - xchoose(0 1));
+            $env = [0 0 0] [$envpeak xrand(0.125, 1) ** 0.5 * $gain xrand(-0.5, 0.5)] [1 0 xrand(-0.5, 0.5)];
+            if xrand() > 0.5 then ($seg = process($seg, reverse()));
+            $seg.transcribe(
+                @onset $t + $onset + xrand(-0.5, 0.5) * $totdur
+                @pan fold($pan + xrand(-1, 1) * $panspread) 
+                @gain $env
+                @detune xrandom(-1, 1) * $det * 1200
+                @keepduration 0
+            );
+            $t += $segdur * exp2(xrand(-2, 2)) 
+        ) 
+    ) 
+);
+$skipsize = 4;
+$t = $onsets:$skipsize;
+$onsets = $onsets.right($skipsize);
+$durs = x2dx($onsets);
+$gain = 0.5;
+for $onset in $onsets , $dur in $durs do (
+    Shuffle(
+        @buffer $b
+        @onset $t
+        @offset $onset
+        @duration $dur
+        @gain $gain
+    );
+    $t += $dur
+);
+$tail = 5000;
+$b.process(
+    freeverb(
+        @roomsize 0.95
+        @wet 0.05
+        @damp 1
+        @width 1
+        @tail $tail
+    ) 
+    ## ---
+    fade(
+        @fadein 0
+        @fadeout $tail
+        @fadeoutcurve 2/3.
+    ) 
+).transcribe();
+render(
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.98
+            @wet 0.0125
+            @damp 1
+            @width 1
+            @tail 0
+        ) 
+        ## ---
+        fade(@fadein 0 @fadeout 100) 
+        ## ---
+        normalize(-3) 
+    ) 
+);
+ezexport($data.'delay')
