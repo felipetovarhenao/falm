@@ -3,9 +3,8 @@ $b = importaudio('../02_solo/solo.wav');
 $data = read('../02_solo/solo.txt');
 $markers = $data.'markers';
 $markeronsets = for $m in $markers collect getkey($m, 'onset');
-$onsets = scale(
-    arithmser(0, 1, null, 24), 0, 1, 0, getkey($markers:-1, 'onset'), -0.125
-);
+$totdur = getkey($markers:-1, 'onset');
+$onsets = scale(arithmser(0, 1, null, 24), 0, 1, 0, $totdur, -0.125);
 $onsets = thin(
     int(for $onset in $onsets collect nearest($onset, $markeronsets)) 
 );
@@ -33,7 +32,7 @@ Shuffle = (
                     0, $offset + (xrand(-0.5, 0.5) * $totdur) 
                 ) 
             );
-            if $seg == null || xrand() > 0.25 then (
+            if $seg == null || xrand() > 0.2 then (
                 $seg = setkey(
                     setkey($buffer, 'offset', $segoff), 'duration', $segdur
                 ) 
@@ -56,8 +55,10 @@ $skipsize = 4;
 $t = $onsets:$skipsize;
 $onsets = $onsets.right($skipsize);
 $durs = x2dx($onsets);
-$gain = 0.5;
+$gainbpf = [0 0.25 0] [1 1 0.125];
 for $onset in $onsets , $dur in $durs do (
+    $nt = min(1, max(0, $onset / $totdur));
+    $gain = samplebpf($gainbpf, $nt);
     Shuffle(
         @buffer $b
         @onset $t
