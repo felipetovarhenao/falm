@@ -33,7 +33,7 @@ for $i in 1...($N + 1) do (
             ).process(resample($resbpf)).transcribe(
                 @onset $t
                 @pan [0 mc2pan($mc) 0] [1 xrand() xrand(1/4, 4/5)] 
-                @gain [0 0 0] [1 $bal xrand(1/3, 2/3)] 
+                @gain [0 0 0] [1 $bal xrand(1/2, 3/4)] 
             ) 
         );
         $t += $dur2
