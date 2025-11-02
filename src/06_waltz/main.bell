@@ -403,7 +403,7 @@ render(
     @play 1 @process freeverb(
         @roomsize 0.75
         @damp 1
-        @wet 0.0125
+        @wet 0.013
         @tail $tail
     ) fade(
         @fadein 0
