@@ -8,7 +8,7 @@ $onsets = scale(arithmser(0, 1, null, 24), 0, 1, 0, $totdur, -0.125);
 $onsets = thin(
     int(for $onset in $onsets collect nearest($onset, $markeronsets)) 
 );
-Shuffle = (
+Glitch = (
     $buffer = null, $onset = 0, $offset = 0, $duration = 100, $gain = 1 -> (
         $sourceend = getkey($buffer, 'source_end');
         $t = 0;
@@ -55,11 +55,11 @@ $skipsize = 4;
 $t = $onsets:$skipsize;
 $onsets = $onsets.right($skipsize);
 $durs = x2dx($onsets);
-$gainbpf = [0 0.25 0] [1 1 0.125];
+$gainbpf = [0 0.25 0] [1 1 0.25];
 for $onset in $onsets , $dur in $durs do (
     $nt = min(1, max(0, $onset / $totdur));
     $gain = samplebpf($gainbpf, $nt);
-    Shuffle(
+    Glitch(
         @buffer $b
         @onset $t
         @offset $onset
