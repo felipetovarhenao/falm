@@ -459,10 +459,13 @@ GetHarmony = (
         $id = ($i - 1) % length($steps) + 1;
         $step = $steps:$id;
         $harm = $harms:$id;
+        $stepcopy = $r;
         $chord = $r * $harm;
         keep $r *= $step;
         keep $i += 1;
-        [['ratios' $chord::1] ['index' $id]] 
+        [
+            ['step' $stepcopy] ['ratios' $chord::1] ['index' $id] 
+        ] 
     ) 
 );
 ## ----------------------
@@ -607,12 +610,16 @@ while $t < $totdur do (
 $markers _= [
     ['onset' $t] ['pcs' $pcs] ['index' $index] ['chord' $chord] 
 ];
-$finalchord = null;
-while $finalchord == null do (
+$finalmarker = null;
+while $finalmarker == null do (
     $cycle = GetHarmony();
     if getkey($cycle, 'index') == 1 then (
         $pcs = r2pc(getkey($cycle, 'ratios'), $pcroot);
-        $finalchord = pcquant($fullchord, $pcs) 
+        $finalmarker = $cycle.setkey(
+            @key 'chord' 
+            @val pcquant($fullchord, $pcs) 
+            @mode 1
+        ) 
     ) 
 );
 ## ----------------------
@@ -633,6 +640,6 @@ $metadata = (
     ## --- 
     ['markers' $markers] 
     ## --- 
-    ['final_chord' $finalchord] 
+    ['final_marker' $finalmarker] 
 );
 ezexport(@data $metadata)

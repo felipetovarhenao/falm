@@ -1,6 +1,6 @@
 $data = read('../08_premerge/premerge.txt');
 $data2 = read('../01_foreground/foreground.txt');
-$bassfq = $data2.'final_chord'.minimum().mc2f();
+$bassfq = getkey($data2.'final_marker', 'chord').minimum().mc2f();
 $gates = $data.'gates';
 if length($gates) % 2 == 1 then ($gates _= $gates:-1);
 $gates = group($gates, 2);

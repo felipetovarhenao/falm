@@ -174,22 +174,30 @@ Freeze = (
 setseed(507);
 $t = 0;
 $meta = read('../01_foreground/foreground.txt');
-$chord = $meta.'final_chord';
+$finalmarker = $meta.'final_marker';
+$chord = getkey($finalmarker, 'chord');
+$root = $meta.'root';
+$pcroot = r2pc(getkey($finalmarker, 'step'), mc2pc($root));
+$pcs = r2pc(1 8/7 5/4 21/16 3/2 5/3 15/8, $pcroot);
+$modbpf = [0 0 0] [1 1 -0.125];
 $chord = for $mc in $chord collect if $mc > 3600 && $mc < 8700 then $mc;
 $N = 13;
 for $i in 1...$N do (
+    $nt = scale($i, 1, $N, 0, 1);
+    $mod = samplebpf($modbpf, $nt);
     $dur = scale($i, 1, $N, 3000, 7000, 0.125);
     $tempo = scale($i, 1, $N, 150, 90, 0.125);
     $vel = scale($i, 1, $N, 127, 1, 0.125);
+    $mcs = for $mc in $chord collect $mc + pitchdiff($mc, $pcs) * $mod;
     PercGap(
         @onset $t
         @duration $dur
-        @chord $chord
+        @chord $mcs
         @velocity $vel
     );
     Arpeggi(
         @onset $t
-        @chord $chord
+        @chord $mcs
         @tempo $tempo
         @duration $dur
         @velocity $vel
