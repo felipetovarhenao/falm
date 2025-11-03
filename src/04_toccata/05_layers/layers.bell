@@ -37,7 +37,7 @@ while $t < $totdur do (
         @duration null
         @velocity 127
         @useseed 1
-    ).analyze(effectiveduration(@thresholdratio 0.00125) envmaxtime());
+    ).process(dcfilter()).analyze(effectiveduration(@thresholdratio 0.00125) envmaxtime());
     $b = $b.setkey('duration', $b.getkey('effectiveduration'));
     $delay = 0;
     if $t + $b.getkey('duration') >= $totdur then (
@@ -46,7 +46,7 @@ while $t < $totdur do (
             $delay += 50 + ($totdur - ($t + $peak)) 
         ) 
     );
-    $b.process(dcfilter()).transcribe(
+    $b.transcribe(
         @onset $t + $delay @pan mc2pan($mc, 0.25) 
     );
     $t += $incr
@@ -64,15 +64,16 @@ $bass.transcribe(
     @pan 0.5
     @gain [0 0 0] [$peak / $bass.getkey('duration') 1 0.25] [1 0 -0.125] 
 );
-$tail = 2000;
+$tail = 3000;
 render(
     @play 1 @process (
         ## ---
         freeverb(
-            @roomsize 0.9
-            @wet 0.05
+            @roomsize 0.95
+            @wet 0.0707
             @damp 1
             @width 1
+            @tail $tail
         ) 
         ## ---
         fade(
