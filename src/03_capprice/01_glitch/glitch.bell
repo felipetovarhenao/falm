@@ -289,14 +289,6 @@ for $seed $id in $seeds do (
         @play 1
         @reset 1
         @process (
-            ## dynamics(
-            ##     @knee 0.05
-            ##     @ratio 12
-            ##     @thresh -40
-            ##     @release 200
-            ## ) 
-            ## ## ---
-            ## normalize(-3) 
             ## ---
             freeverb(
                 @roomsize 0.75
@@ -304,9 +296,6 @@ for $seed $id in $seeds do (
                 @damp 1
                 @width 1
             ) 
-            ## ---
-            ## normalize(-3) 
-            
         ) 
     );
     ezexport($onset @id $id) 
