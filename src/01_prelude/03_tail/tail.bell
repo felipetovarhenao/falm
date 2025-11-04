@@ -20,6 +20,7 @@ for $mc in $chord do (
         @type $type
         @velocity 0
         @duration null
+        @useseed 1
     ).analyze(effectiveduration(@thresholdratio 0.01));
     $b = $b.setkey('duration', $b.getkey('effectiveduration')).process(fade(0, 2000));
     $durs _= $b.getkey('duration');
