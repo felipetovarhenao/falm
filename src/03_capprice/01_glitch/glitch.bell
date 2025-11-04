@@ -288,14 +288,11 @@ for $seed $id in $seeds do (
     render(
         @play 1
         @reset 1
-        @process (
-            ## ---
-            freeverb(
-                @roomsize 0.75
-                @wet $wet
-                @damp 1
-                @width 1
-            ) 
+        @process freeverb(
+            @roomsize 0.75
+            @wet $wet
+            @damp 1
+            @width 1
         ) 
     );
     ezexport($onset @id $id) 
