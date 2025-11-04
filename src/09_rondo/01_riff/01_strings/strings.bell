@@ -36,7 +36,7 @@ $combine = length($sectionids) == 1;
 $stutterbpf = [0 0 0] [1 0.2 -0.1];
 $stutterdivsbpf = [0 3 0] [1 12 0.25];
 $stutteroctdevbpf = [0 0 0] [1 1 -0.25];
-$seedoffset = 1;
+$seedoffset = 9;
 for $sectionid in $sectionids do (
     $section = $sections:$sectionid;
     $chords = $section.getkey('chords');
@@ -67,6 +67,7 @@ for $sectionid in $sectionids do (
                     @velocity $velocity
                     @names $name
                     @types $types
+                    @useseed 1
                 );
                 $buffer = $buffer.process(
                     normalize(-14 @rms 1) 

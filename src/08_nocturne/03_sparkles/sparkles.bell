@@ -8,9 +8,9 @@ for $mc in xscramble($mcs) do (
         @pitch $mc
         @names 'sax' 'flute' 'clar' 
         @types 'keys' 
-        @useseed 1
         @velocity 127
         @duration 500
+        @useseed 1
     )).transcribe(
         @onset $t
         @pan xrand() 

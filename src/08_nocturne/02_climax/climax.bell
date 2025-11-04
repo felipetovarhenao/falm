@@ -32,8 +32,8 @@ while $t < $totdur do (
                 @duration null
                 @names $names
                 @types $types
-                @useseed 1
                 @velocity 0
+                @useseed 1
             ) 
             ## ---
             @descriptors envmaxtime() 

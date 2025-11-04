@@ -34,8 +34,8 @@ for $dur in $durs do (
         @duration $dur * 4
         @names 'bass' 
         @types 'pizz' 'pizz-secco' 
-        @useseed 1
         @velocity 127
+        @useseed 1
     ));
     $basspan = mc2pan($mc, 0.12) + xrand(-0.05, 0.05);
     $bassbuf.setkey('duration', $dur).process(

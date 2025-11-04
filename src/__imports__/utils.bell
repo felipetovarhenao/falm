@@ -150,7 +150,7 @@ ezsol(
     @velocity 64
     @duration 1000
     @resample 1
-    @useseed 0
+    @useseed 1
     @tolerance 300
 ) -> ## buffer
 ```
@@ -158,7 +158,7 @@ ezsol(
 Returns a buffer given parametric constraints.
 )#
 ezsol = (
-    $pitch = 6000, $names = 'guitar' 'harp', $types = 'ord', $velocity = 64, $duration = 1000, $resample = 1, $useseed = 0, $tolerance = 300 -> (
+    $pitch = 6000, $names = 'guitar' 'harp', $types = 'ord', $velocity = 64, $duration = 1000, $resample = 1, $useseed = 1, $tolerance = 300 -> (
         BP_FN_CHECK_ARGS(
             'ezsol', 'pitch', $pitch, 'names', $names
         );
@@ -243,7 +243,7 @@ randomseq(
     @llll null
     @length 10
     @steps -1 1
-    @useseed 0
+    @useseed 1
 ```
 
 Generates a random pattern from a _llll_.
@@ -258,7 +258,7 @@ Generates a random pattern from a _llll_.
 - `@useseed`: Use seeded randomness. (_default_: `0`)
 )#
 randomseq = (
-    $llll = null, $length = 10, $steps = -1 1, $useseed = 0 -> (
+    $llll = null, $length = 10, $steps = -1 1, $useseed = 1 -> (
         BP_FN_CHECK_ARGS('randomseq', 'source', $llll);
         $size = length($llll);
         $N = ($size - 1);
