@@ -101,6 +101,7 @@ while $t < $totdur do (
                 @duration null
                 @velocity $vel
                 @type $type
+                @useseed 1
             ).clipnorm(@minlevel -60 @maxlevel $maxgain);
             $b.transcribe(
                 @onset $onset @pan xrand() 
