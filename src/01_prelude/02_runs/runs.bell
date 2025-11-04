@@ -60,6 +60,7 @@ for $e in $events do (
                 @names 'acc' 
                 @types 'sfz' 'ord' 'reg' 
                 @duty $phase
+                @useseed 1
             );
             if xrand() > 0.7 then (
                 $sgn = xchoose(-1 1);
