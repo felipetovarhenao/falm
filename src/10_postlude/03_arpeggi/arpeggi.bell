@@ -152,13 +152,25 @@ for $arp in $arpeggi do (
         $t += $notedur
     ) 
 );
+$tail = 5000;
 render(
-    @play 1 @process freeverb(
-        @roomsize 0.96
-        @wet 0.03
-        @damp 1
-        @width 1
-    ) normalize(-3) 
+    @play 1 @process (
+        freeverb(
+            @roomsize 0.96
+            @wet 0.03
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeintype 2
+        ) 
+        ## ---
+        normalize(-3) 
+    ) 
 );
 ezexport(
     @data ['total_duration' $globalduration] ['slope' $globalslope] ['numvoices' $numvoices] 
