@@ -174,8 +174,8 @@ PercGap = (
                 @names 'sax' 'flute' 'clar' family('strings') 'harp' 
                 @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 'exp-slap-pitch' 'harm-in-wood' 
                 @velocity xrandom(60, 127) 
-                @useseed 1
                 @duration $duration * 2
+                @useseed 1
             ).Normalize(@minlevel $minlevel - 6 @maxlevel $maxlevel - 6).transcribe(
                 @onset $onset
                 @pan mc2pan($mc, 0.5) 

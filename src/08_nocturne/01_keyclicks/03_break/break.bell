@@ -12,7 +12,7 @@ for $mc in $chord do (
         [[
             'names' 'flute' 'clar' 'sax' 
         ] [
-            'types' 'keys' 'pizz'
+            'types' 'keys' 'pizz' 
         ]] 
     );
     ezsol(
@@ -36,17 +36,25 @@ $t += Tremolo(
 );
 $tail = 2000;
 render(
-    @play 1 @process normalize(0) freeverb(
-        @roomsize 0.95
-        @wet [0 0.015 0] [1 0.25 0.125] 
-        @damp 1
-        @width 1
-        @tail $tail
-    ) fade(
-        @fadein 0
-        @fadeout $tail
-        @fadeoutcurve 0.8
-        @fadeouttype 2
-    ) normalize(-5) 
+    @play 1 @process (
+        normalize(0) 
+        ## ---
+        freeverb(
+            @roomsize 0.95
+            @wet [0 0.015 0] [1 0.25 0.125] 
+            @damp 1
+            @width 1
+            @tail $tail
+        ) 
+        ## ---
+        fade(
+            @fadein 0
+            @fadeout $tail
+            @fadeoutcurve 0.8
+            @fadeouttype 2
+        ) 
+        ## ---
+        normalize(-5) 
+    ) 
 );
 ezexport($t)

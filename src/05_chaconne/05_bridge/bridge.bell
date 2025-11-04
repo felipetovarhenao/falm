@@ -102,6 +102,7 @@ for $mc in $chord do (
         @velocity 127
         @names family('strings') family('plucked') 
         @types 'pizz' 'pizz-secco' 
+        @useseed 1
     );
     $b.clipnorm(@minlevel -19 @maxlevel -3).transcribe(
         @onset $start
@@ -126,6 +127,7 @@ for $o $oi in -2...0 do (
         @velocity 127
         @duration null
         @type xchoose('pizz' 'bartok') 
+        @useseed 1
     ).transcribe(
         @onset $t @pan xrand() 
     ) 

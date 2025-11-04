@@ -3,6 +3,7 @@ $b = Compress(perc(
     @type 'soft-brush' 
     @duration null
     @velocity 127
+    @useseed 1
 ).setkey('duration', 400)).process(
     reverse() gain([0 0 0] [1 1 2/3]) 
 );

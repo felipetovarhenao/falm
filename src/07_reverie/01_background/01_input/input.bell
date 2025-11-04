@@ -58,7 +58,6 @@ for $id in $ids, $st in $onsets do (
             @duration $totdur
             @velocity 127
             @useseed 1
-            @useseed 1
         ).process(reverse() normalize(-3));
         $cresc.transcribe(
             @onset $totdur - $cresc.getkey('duration') 

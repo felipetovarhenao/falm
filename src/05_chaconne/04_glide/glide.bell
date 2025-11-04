@@ -33,11 +33,11 @@ PianoRoll = (
                 @pitch $mc + xrandom(-1, 2) * 1200
                 @duration null
                 @velocity $vel
-                @useseed 1
                 @names family('plucked') 
                 @types 'ord' 'harm' 
                 @gain 0.125
                 @norm 0.25
+                @useseed 1
             );
             $boost = gainboost(
                 @buffer $b
@@ -71,8 +71,8 @@ PercGap = (
                 @names 'sax' 'flute' 'clar' family('strings') 'harp' 
                 @types 'pizz' 'keys' 'slap-pitch' 'pizz-secco' 'exp-slap-pitch' 'harm-in-wood' 
                 @velocity $velocity ||| xrandom(60, 127) 
-                @useseed 1
                 @duration $duration * 2
+                @useseed 1
             );
             $boost = gainboost(
                 @buffer $b
