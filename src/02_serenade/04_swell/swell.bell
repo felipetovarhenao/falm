@@ -53,11 +53,11 @@ for $i in 1...3 do (
     ezsol(
         @pitch xrandom(21, 108) * 100
         @names family('strings') 
-        @useseed 1
         @types 'nat-harm-gliss' 
         @duration null
         @resample 0
         @velocity 0
+        @useseed 1
     ).process(trim(
         @end 1
         @start 0
