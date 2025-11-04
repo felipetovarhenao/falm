@@ -1,3 +1,4 @@
+setseed(1);
 $mcroot = r2mc(7/8, d3);
 $pcroot = mc2pc($mcroot);
 $chord = r2mc(1...64, $mcroot).pcquant(r2pc(1 5/4 3/2 5/3 9/8, $pcroot));
@@ -9,6 +10,7 @@ $durs = for $mc in $chord collect (
         @velocity 127
         @duration null
         @usecache 1
+        @useseed 1
     ).process(trim(@threshold 0.005 @start 0));
     $b.transcribe(
         @onset $tail
