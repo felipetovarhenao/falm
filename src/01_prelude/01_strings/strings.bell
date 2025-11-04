@@ -62,7 +62,6 @@ $numtechniquesbpf = [0 1 0] [1 length($techniques) 1/5];
 $t = 0;
 $chordseq = null;
 while $t < $totaldur do (
-    ## --------------- BPF SAMPLING ---------------
     $nt = $t / $totaldur;
     $pcid = samplebpf($pcidbpf, $nt);
     $mix = samplebpf($mixbpf, $nt);
@@ -80,7 +79,7 @@ while $t < $totaldur do (
             round(samplebpf($numtechniquesbpf, $nt)) 
         ) 
     );
-    ## --------------- 
+    ## ---
     $pcmix = fmod($pcid, 1) ** $mix;
     $pcid = int($pcid);
     $pcs1 = $pcprog::$pcid;
