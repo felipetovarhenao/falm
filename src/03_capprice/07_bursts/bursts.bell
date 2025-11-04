@@ -36,9 +36,9 @@ while $t < $totdur do (
             @names family('strings') 
             @types 'stacc' 
             @velocity 127
-            @useseed 1
             @envelope [0 0.1 0] [1 0 -xrand(2/3, 5/6)] 
             @duration max(10, $incr) 
+            @useseed 1
         ).detach();
         $segs = $b.splitbuf(@split $split);
         $shift = 0;

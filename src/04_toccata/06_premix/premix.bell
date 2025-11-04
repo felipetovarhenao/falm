@@ -6,6 +6,7 @@ pno(
     @velocity 127
     @gain 0.125
     @norm 1
+    @useseed 1
 ).transcribe(
     @pan mc2pan($mc) 
 );

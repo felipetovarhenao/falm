@@ -210,7 +210,6 @@ while $t < $totdur do (
 $tail = 2000;
 render(
     @play 1 @process (
-        ## ---
         freeverb(
             @roomsize 0.9
             @wet 0.025

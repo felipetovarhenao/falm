@@ -65,7 +65,6 @@ for $beatnum in $beatnums do (
 $tail = 2000;
 render(
     @play 1 @process (
-        ## ---
         normalize(-3) 
         ## ---
         freeverb(
