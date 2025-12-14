@@ -11,3 +11,5 @@ sol.bell
 !.placeholder
 !src/__audio__/*.wav
 *.png
+*.tif
+*.jpg

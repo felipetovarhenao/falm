@@ -1,5 +1,7 @@
 # _Fully Automated Luxury Music_
 
+![artwork](https://d2cq0goacowtde.cloudfront.net/falm/artwork.jpg)
+
 ## About
 
 **Fully Automated Luxury Music** (**F.A.L.M**) is an open-source, [generative music](https://en.wikipedia.org/wiki/Generative_music) album. The music is entirely generated through [stochastic](https://en.wikipedia.org/wiki/Stochastic) algorithms—probabilistic, rule-based processes designed to produce finely structured yet potentially infinite variants of a musical output, in the form of audio files. All generative scripts in this repository are written in the [_bell_](https://felipe-tovar-henao.com/bell-tutorials) programming language and meant to be run in [_bellplay~_](https://bellplay.net), an offline algorithmic audio software and framework I started developing in 2024. The codebase is end-to-end (E2E), meaning it generates and assembles the entire album from scratch by running the scripts in the proper order, without need or expectation of any manual editing—in other words, it's a fully reproducible and parameterized work.
