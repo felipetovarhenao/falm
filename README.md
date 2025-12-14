@@ -6,7 +6,7 @@
 
 **Fully Automated Luxury Music** (**F.A.L.M**) is an open-source, [generative music](https://en.wikipedia.org/wiki/Generative_music) album. The music is entirely generated through [stochastic](https://en.wikipedia.org/wiki/Stochastic) algorithms—probabilistic, rule-based processes designed to produce finely structured yet potentially infinite variants of a musical output, in the form of audio files. All generative scripts in this repository are written in the [_bell_](https://felipe-tovar-henao.com/bell-tutorials) programming language and meant to be run in [_bellplay~_](https://bellplay.net), an offline algorithmic audio software and framework I started developing in 2024. The codebase is end-to-end (E2E), meaning it generates and assembles the entire album from scratch by running the scripts in the proper order, without need or expectation of any manual editing—in other words, it's a fully reproducible and parameterized work.
 
-This album serves primarily as a proof of concept for _open-source music_—a rather recent and unexplored compositional practice (see, for instance, Pierre Cusa AKA _Pure Code_'s [_Ambient Garden Album_](https://github.com/pac-dev/AmbientGardenAlbum))—and as a reflection on recent developments in AI automation, what they mean for the future of artistic practice, and how human expression can remain central to algorithmic design. The title is a wink and nod to Aaron Bastani's book [_Fully Automated Luxury Communism: A Manifesto_](https://en.wikipedia.org/wiki/Fully_Automated_Luxury_Communism), which similarly offers an optimistic, though increasingly unlikely, vision of automation's impacts on society.
+This album serves primarily as a proof of concept for _open-source music_—a still recent and underexplored compositional practice (see, for instance, Pierre Cusa AKA _Pure Code_'s [_Ambient Garden Album_](https://github.com/pac-dev/AmbientGardenAlbum))—and as a reflection on recent developments in AI automation, what they mean for the future of artistic practice, and how human expression can remain central to algorithmic design. The title is a wink and nod to Aaron Bastani's popular book [_Fully Automated Luxury Communism: A Manifesto_](https://en.wikipedia.org/wiki/Fully_Automated_Luxury_Communism), which offers a cautiously optimistic, though increasingly unlikely, utopian vision of technology's impacts on society.
 
 **Fully Automated Luxury Music** was written and developed between May and October of 2025, in Chicago, Cincinnati, and Gainesville, USA.
 
@@ -36,6 +36,7 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 - _Visual Studio Code_ [[download](https://code.visualstudio.com/)]: Used for editing the code.
   - _bellplay~ extension_ [[download](https://marketplace.visualstudio.com/items?itemName=tovarhenao.bellplay-plugin)]: Improves the user experience for working on _bellplay~_ scripts.
 - _Ableton Live 12 (Standard or Suite)_ [[download](https://www.ableton.com/en/live/)]: Used by _bellplay~_ to generate piano samples.
+- _TouchDesigner (build 2025.32050)_ [[download](https://derivative.ca/download)]: Only needed for generating the album [artwork](/artwork/).
 
 ### Data
 
@@ -56,6 +57,8 @@ python3 ./setup.py <path to FullSOL dataset>
 ```
 
 This should generate a new folder called `src/__data__/` with multiple subfolders, one for each instrument in _FullSOL_, each subfolder containing `.txt` files with the keymap specification for the different instrumental techniques available for that instrument. To learn more about keymaps in _bellplay~_, read [this](https://bellplay.net/docs/learning/tutorials/sampling).
+
+It will also download the [source image](/artwork/media/) required for generating the artwork.
 
 ### Additional keymaps
 
