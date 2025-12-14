@@ -7,6 +7,22 @@ from argparse import ArgumentParser
 from collections import defaultdict
 
 
+import urllib.request
+
+
+def download_img(path: str, url: str) -> None:
+    """
+    Ensure an image exists at `path`. If not, download it from `url`.
+    Raises URLError / OSError on failure.
+    """
+    if os.path.isfile(path):
+        return
+
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    print("Downloading source image for album artwork...")
+    urllib.request.urlretrieve(url, path)
+
+
 def file_id_to_pitch(file_id: int, num_files: int):
     center = 6000
     if num_files == 1:
@@ -558,3 +574,7 @@ with open(OUT_PATH, 'w') as f:
 for n in ['pno', 'maracas']:
     dir_name = os.path.join(keymap_dir, n)
     os.makedirs(dir_name, exist_ok=True)
+
+download_img(path=os.path.abspath('./artwork/media/img.png'),
+             url='https://d2cq0goacowtde.cloudfront.net/falm/img.png')
+print("DONE!")
