@@ -226,6 +226,7 @@ Generates a random walk of numeric values given some `@steps`, with optional `@w
 - `@length`: Length of random walk.
 - `@steps`: Possible steps.
 - `@st`: Starting value
+- `@weights`: step weights
 - `@useseed`: Use random seed:
     - `0`: off
     - `1`: on
