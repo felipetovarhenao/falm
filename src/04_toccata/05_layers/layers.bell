@@ -1,7 +1,7 @@
 setseed(17);
 $mcroot = r2mc(6/5, d2);
 $pcroot = mc2pc($mcroot);
-$tuning = 1/1 567/512 9/8 147/128 21/16 1323/1024 189/128 3/2 49/32 7/4 441/256 63/32;
+$tuning = read('../01_pulse/pulse.txt').'tuning';
 $pcs = r2pc($tuning, $pcroot);
 $mcs = r2mc(1...32, $mcroot).pcquant($pcs).xscramble();
 initurn(
@@ -26,7 +26,7 @@ $beat = (240000/$bpm) * $unit;
 addmarker($totdur);
 while $t < $totdur do (
     $nt = $t / $totdur;
-    $id = urn() + 1;
+    $id = urn();
     $mc = $mcs:($id);
     $incr = xrandom(1, 4) * $beat;
     $types = 'cresc' (if xrand() > 0.25 then 'stacc') (if $t + $incr < $totdur then 'cresc-to-dim') (if $t == 0 then 'dim');
