@@ -86,7 +86,7 @@ for $i in 1...16 do (
         $t xrand().scale(0, 1, 0.01, 1, -0.125) xrand(-0.125, 0.125) 
     ] 
 );
-$b = render(
+$b = ezrender(
     @reset 1 @process normalize(-3) 
 );
 $tail = 4000;
@@ -103,7 +103,7 @@ $b.process(
 $b.transcribe(
     @gain [0 1 0] [1 0.125 0.75] 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) fade(0, $tail) 
 );
 ezexport($t)

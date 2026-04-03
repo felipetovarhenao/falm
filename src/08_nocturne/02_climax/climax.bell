@@ -72,7 +72,7 @@ while $t < $totdur do (
     );
     $t += $span * 0.8
 );
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.9
         @wet 0.0125

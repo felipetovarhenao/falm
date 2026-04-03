@@ -76,7 +76,7 @@ while $t < $totdur do (
     $t += $incr
 );
 $tail = 5000;
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.98
         @wet [0 0.025 0] [1 0.05 0.25] 
