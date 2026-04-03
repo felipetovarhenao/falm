@@ -23,7 +23,7 @@ ezsol(
     @pan 0.5 0 1
     @gain [0 1 0] [1 0 0.125] 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport($t)

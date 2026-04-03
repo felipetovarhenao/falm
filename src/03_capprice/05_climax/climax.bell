@@ -28,7 +28,7 @@ for $mc in $mcs.xscramble() do (
     );
     $t += xrand(20) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.6
         @wet 0.09

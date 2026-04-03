@@ -61,7 +61,7 @@ $bass.process(
     ) 
 ).transcribe(@onset $t - $bassdur @gain 0.707);
 addmarker($t);
-render(
+ezrender(
     @play 1 @process (
         normalize(@level -18 @rms 1) 
         ## ---

@@ -49,7 +49,7 @@ $t += read('./06_scratch/scratch.txt');
 importaudio('./05_climax/climax.wav').transcribe($t @gain 0.707);
 $t += read('./05_climax/climax.txt');
 importaudio('./07_bursts/bursts.wav').transcribe($t @gain 0.5);
-render(
+ezrender(
     @play 1
     @fade 0
     @process (
