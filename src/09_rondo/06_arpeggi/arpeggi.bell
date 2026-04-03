@@ -42,7 +42,7 @@ Brass = (
                 @types 'stacc' 
                 @velocity 127
                 @useseed 1
-            ).process(normalize(-3) panning(xrand())) 
+            ).process(normalize(-3) ezpanning(xrand())) 
         );
         $brass = $brass.left(1).process(
             mix(right($brass, 1)) gain([0 1 0] [1 0 0.5]) freeverb(

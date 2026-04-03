@@ -99,7 +99,7 @@ $bass = cycle(
     @duration $totdur
     @phase xrand() 
 ).process(
-    multiply($mod) gain($bassenv) arctan() gain([0 1 0] [1 $amp2 0.9]) pong() dcfilter() normalize(-3) panning(
+    multiply($mod) gain($bassenv) arctan() gain([0 1 0] [1 $amp2 0.9]) pong() dcfilter() normalize(-3) ezpanning(
         [0 1 0] [0.5 0 -0.125] [1 0.5 0.125] 
     ) gain(0.2) 
 );

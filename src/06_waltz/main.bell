@@ -399,7 +399,7 @@ for $x in ['viola' 'harm-trem'] ['harp' 'harm'] with @unwrap 1 do (
     ) 
 );
 $tail = 2500;
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.75
         @damp 1

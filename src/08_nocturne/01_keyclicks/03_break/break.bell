@@ -35,7 +35,7 @@ $t += Tremolo(
     @ctrl 0
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process (
         normalize(0) 
         ## ---

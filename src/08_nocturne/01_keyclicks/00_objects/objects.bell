@@ -105,7 +105,7 @@ Beats = (
             @length $subdivs
             @slope xrand(-1/4, 1/4) 
         ) 0 do (
-            $panshift = samplebpf($panbpf, scale($durid, 1, $subdivs, 0, 1));
+            $panshift = samplebpf($panbpf, scale($durid, 1, $subdivs + 1, 0, 1));
             for $mc in $spectrum do (
                 $b = process(
                     @buffer Compress(
@@ -122,7 +122,7 @@ Beats = (
                 $b.transcribe(
                     @onset $onset
                     @gain [0 1 0] [0.1 xrand(0.1, 0.5) -0.125] [1 0 0.5] 
-                    @pan fold($pan + mc2pan($mc, 0.125) + $panshift) 
+                    @pan fold(mc2pan($mc, 0.125) + $panshift) 
                 ) 
             );
             $onset += $dur

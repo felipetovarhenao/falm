@@ -172,8 +172,8 @@ for $rampdur in arithmser(0, 1, null, 4).scale(0, 1, 500, 2000, 0.125), $headtim
         @types 'bartok' 
         @useseed 1
     ).process(
-        mix(@buffers $wave) gain(0.15) panning(
-            @position xrand(-1, 1) * 0.125 + 0.5 @numchannels 2
+        mix(@buffers $wave) gain(0.15) ezpanning(
+            @position xrand(-1, 1) * 0.125 + 0.5
         ) 
     );
     for $dur in $timeramp do (
