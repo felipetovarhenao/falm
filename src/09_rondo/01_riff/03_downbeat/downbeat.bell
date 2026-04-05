@@ -17,7 +17,7 @@ for $id in $ids do (
     cycle(
         @frequency mc2f($mc) / 2 @duration $b.getkey('effectiveduration') 
     ).transcribe(
-        @gain [0 0.707 0] [1 0 -0.5] 
+        @gain [0 0.707 0] [1 0 -0.5] @pan xrand() 
     );
     $b.setkey('duration', $b.getkey('effectiveduration')).transcribe(
         @pan mc2pan($mc, 0.25) @gain [0 1 0] [1 0 -0.5] 
