@@ -88,7 +88,7 @@ for $t in $onsets do (
     ) 
 );
 $tail = 1000;
-$b = render(@reset 1);
+$b = ezrender(@reset 1);
 $segs = splitbuf(
     @buffer $b
     @split $onsets
@@ -97,7 +97,7 @@ $segs = splitbuf(
 for $seg in $segs, $onset in $onsets do process(
     @buffer $seg @operations normalize(0) arctan() normalize(-3) 
 ).transcribe(@onset $onset);
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.95

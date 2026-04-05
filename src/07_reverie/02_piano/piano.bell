@@ -447,7 +447,7 @@ while $t < $totdur do (
     $t += $timestep / $overlap;
     if xrand() < $gapthresh then ($t += xrandom(1000, 6000) * $gapmul) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport()

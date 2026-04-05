@@ -44,7 +44,7 @@ for $folder $id in $folders do (
     $b.transcribe($t);
     $t += $bdur
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport(

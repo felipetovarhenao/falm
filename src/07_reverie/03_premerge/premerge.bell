@@ -1,6 +1,6 @@
 importaudio('../01_background/background.wav').process(trim(@threshold 0.01 @start 0)).transcribe(@gain 0.707);
 importaudio('../02_piano/piano.wav').process(trim(@threshold 0.01 @start 0) ).transcribe();
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.97

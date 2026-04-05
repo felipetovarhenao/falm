@@ -104,7 +104,7 @@ $bass = cycle(
     ) gain(0.2) 
 );
 $tail = 4000;
-render(
+ezrender(
     @play 1 @process (
         normalize(@level -18 @rms 1) 
         ## ---

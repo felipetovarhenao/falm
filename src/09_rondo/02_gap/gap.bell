@@ -34,7 +34,7 @@ for $mc in $mcs do (
     );
     $t += xrand(5) 
 );
-render(
+ezrender(
     @play 1
     @fade 2
     @process freeverb(

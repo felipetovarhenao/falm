@@ -42,12 +42,12 @@ for $id in $ids do (
         $x xrand(2, 12) xrand(0.1, 0.25) * xchoose(-1 1) 
     ];
     if $preview == 0 then (
-        render(
+        ezrender(
             @play 1 @process $postfx($freqshift) 
         );
         ezexport(@data $totdur @id $id) 
     ) 
 );
-if $preview == 1 then render(
+if $preview == 1 then ezrender(
     @play 1 @process $postfx($freqshift) 
 )

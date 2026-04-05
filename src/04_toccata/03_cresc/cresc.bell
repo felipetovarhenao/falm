@@ -53,7 +53,7 @@ $b.process($bassop).transcribe(
     @gain 0.25
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1
     @panmode 1
     @process (

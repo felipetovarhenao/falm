@@ -87,7 +87,7 @@ for $seg $segid in $segs do (
     $t += $unit * $speed
 );
 $gates _= [$t $reset];
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport(['totdur' $lastonset] ['gates' $gates])

@@ -40,7 +40,7 @@ while $t < $totdur do (
     $t += max(20, $incr) 
 );
 $tail = 3000;
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.9

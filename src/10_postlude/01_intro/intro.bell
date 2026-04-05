@@ -79,7 +79,7 @@ for $i in $sections do (
     $t += $gap;
     $markers _= $t
 );
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.97
         @wet [0 0.025 0] [1 0.1 0.25] 

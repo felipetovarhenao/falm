@@ -13,7 +13,7 @@ for $dur in $durs do (
 );
 $b.setkey('offset', $peak).transcribe($t);
 $gap = 2500;
-render(
+ezrender(
     @play 1
     @fade 1
     @process (

@@ -130,7 +130,7 @@ while $t < $totaldur do (
     $t += $timestep
 );
 $tail = 6000;
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.95
         @wet [0 0.005 0] [1 0.025 0.25] 

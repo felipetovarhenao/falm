@@ -22,7 +22,7 @@ for $id in $ids do (
     $b.setkey('duration', $b.getkey('effectiveduration')).transcribe(
         @pan mc2pan($mc, 0.25) @gain [0 1 0] [1 0 -0.5] 
     );
-    render(
+    ezrender(
         @reset 1 @process normalize(-5) 
     );
     ezexport(@id $id) 

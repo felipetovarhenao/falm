@@ -51,7 +51,7 @@ for $mc in $mcs do (
         $t += max(0, $b.getkey('effectiveduration') - 200) 
     ) 
 );
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.96
         @wet 0.05

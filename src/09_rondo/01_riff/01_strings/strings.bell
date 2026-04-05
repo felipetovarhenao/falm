@@ -99,14 +99,14 @@ for $sectionid in $sectionids do (
         ) 
     );
     if $combine == 0 then (
-        render(
+        ezrender(
             @reset 1 @process normalize(-3) 
         );
         ezexport(@data $t @id $sectionid) 
     ) 
 );
 if $combine == 1 then (
-    render(
+    ezrender(
         @play 1 @process normalize(-3) 
     );
     ezexport() 

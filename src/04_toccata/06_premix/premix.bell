@@ -18,7 +18,7 @@ $t += $markers:2;
 importaudio('../05_layers/layers.wav').transcribe(@onset $t);
 importaudio('../04_climax/climax.wav').transcribe(@onset $t);
 importaudio('../03_cresc/cresc.wav').transcribe(@onset $t - read('../03_cresc/cresc.txt'));
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport()

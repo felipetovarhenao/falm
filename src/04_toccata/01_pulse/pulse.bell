@@ -208,7 +208,7 @@ while $t < $totdur do (
     $t += $beat
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.9

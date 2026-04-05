@@ -63,7 +63,7 @@ for $beatnum in $beatnums do (
     ) 
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process (
         normalize(-3) 
         ## ---

@@ -89,14 +89,14 @@ for $i in $ids do (
         $t += $timestep
     );
     if $combine == 0 then (
-        render(
+        ezrender(
             @reset 1 @process $postfx gain($mix ** 0.5) 
         );
         ezexport(@id $id) 
     ) 
 );
 if $combine == 1 then (
-    render(
+    ezrender(
         @play 1 @process $postfx (
             if $preview == 1 then (
                 ## ---

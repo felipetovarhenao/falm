@@ -148,7 +148,7 @@ for $id in $ids do (
         @pitch minimum($mcs) 
     );
     if $preview == 0 then (
-        render(
+        ezrender(
             @reset 1 @process $postfx
         );
         ezexport(
@@ -156,4 +156,4 @@ for $id in $ids do (
         ) 
     ) 
 );
-if $preview == 1 then render(@play 1 @process $postfx)
+if $preview == 1 then ezrender(@play 1 @process $postfx)

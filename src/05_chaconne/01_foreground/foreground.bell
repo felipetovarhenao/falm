@@ -579,7 +579,7 @@ while $finalmarker == null do (
         ) 
     ) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 $metadata = (

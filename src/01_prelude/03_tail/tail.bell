@@ -27,7 +27,7 @@ for $mc in $chord do (
     $b.transcribe(@pan xrand()) 
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.9
         @wet 0.2

@@ -42,7 +42,7 @@ harp(
     @pan xrand() 
     @gain [0 1 0] [1 0 -0.5] 
 );
-render(
+ezrender(
     @play 1 @process (
         normalize(0) arctan() normalize(-3) 
     ) 

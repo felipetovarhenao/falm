@@ -51,7 +51,7 @@ for $id in $ids do (
             $t += $timestep
         ) 
     );
-    render(
+    ezrender(
         @reset 1 @process normalize(-3) 
     );
     ezexport(@id $id) 

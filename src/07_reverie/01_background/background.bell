@@ -1,6 +1,6 @@
 $stretch = 8;
 importaudio('./01_input/input.wav').transcribe();
-$b = render(
+$b = ezrender(
     @play 1 @process (
         normalize(-14 @rms 1) 
         ## 

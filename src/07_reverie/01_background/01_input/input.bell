@@ -73,7 +73,7 @@ for $id in $ids, $st in $onsets do (
         ).process(normalize(-3)).transcribe(@onset $totdur @pan 0.5) 
     ) 
 );
-$b = render(
+$b = ezrender(
     @play 1 @process normalize(-3) 
 );
 $peak = $totdur;

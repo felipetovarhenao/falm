@@ -4,7 +4,7 @@ $b.transcribe($t);
 $t += read('./09_tile/tile.txt');
 $b = importaudio('./09_tile/tile.wav');
 $b.transcribe($t);
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport()

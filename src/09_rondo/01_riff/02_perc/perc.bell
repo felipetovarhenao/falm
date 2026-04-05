@@ -55,7 +55,7 @@ for $id in $sectionids do (
         $t += $timestep
     );
     if $empty == 0 then (
-        render(
+        ezrender(
             @play 1
             @reset 1
             @process (
