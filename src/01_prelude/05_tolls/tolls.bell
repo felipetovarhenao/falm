@@ -32,9 +32,10 @@ for $t in $onsets do (
     $t += $cresc.getkey('duration');
     if $minonset == 0 then ($minonset = $t);
     $markers _= $t;
+    $pan = xrand(-0.5, 0.5) * $nt + 0.5;
     $cresc.transcribe(
         @onset $t - $cresc.getkey('envmaxtime') 
-        @pan [0 xrand(0.25, 0.75) 0] [1 xrand(0.25, 0.75) xrand(-0.25, 0.25)] 
+        @pan [0 $pan 0] [1 xrand(0.25, 0.75) xrand(-0.25, 0.25)] 
         @gain 0.33
     );
     $bassdur = xrand(5000, 10000);
