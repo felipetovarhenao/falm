@@ -16,7 +16,7 @@ This album serves primarily as a proof of concept for _open-source music_—a st
 | --- | ------------------------------------- | ------------------------------------ |
 | 1.  | **prelude** (_in memoriam Malugo_)    | [`src/01_prelude`](src/01_prelude)   |
 | 2.  | **serenade**                          | [`src/02_serenade`](src/02_serenade) |
-| 3.  | **capprice**                          | [`src/03_capprice`](src/03_capprice) |
+| 3.  | **caprice**                           | [`src/03_capprice`](src/03_capprice) |
 | 4.  | **toccata**                           | [`src/04_toccata`](src/04_toccata)   |
 | 5.  | **chaconne**                          | [`src/05_chaconne`](src/05_chaconne) |
 | 6.  | **waltz**                             | [`src/06_waltz`](src/06_waltz)       |
