@@ -106,6 +106,4 @@ for root, folders, files in os.walk(SRC_ROOT):
             continue
         SCRIPT_SEQUENCE.append(os.path.join(root, file))
 
-for f in sorted(SCRIPT_SEQUENCE):
-    print(f)
-# run_files(sorted(SCRIPT_SEQUENCE))
+run_files(sorted(SCRIPT_SEQUENCE))
