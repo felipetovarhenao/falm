@@ -26,6 +26,8 @@ DIR_TREE = OrderedDict()
 SCRIPT_SEQUENCE = []
 ALL_TRACKS = ['prelude',
               'serenade',
+              'caprice',
+              'toccata',
               'chaconne',
               'waltz',
               'reverie',
@@ -104,5 +106,6 @@ for root, folders, files in os.walk(SRC_ROOT):
             continue
         SCRIPT_SEQUENCE.append(os.path.join(root, file))
 
-
-run_files(sorted(SCRIPT_SEQUENCE))
+for f in sorted(SCRIPT_SEQUENCE):
+    print(f)
+# run_files(sorted(SCRIPT_SEQUENCE))
