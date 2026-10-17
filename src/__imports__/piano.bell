@@ -1,4 +1,6 @@
-$files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
+## change path below if it differs in your computer
+$pianopath = '/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano';
+$files = readfolder($pianopath);
 $keymap = null;
 $dynamics = (
     'ff' 'f' 'mf' 'mp' 'p' 

@@ -7,22 +7,6 @@ from argparse import ArgumentParser
 from collections import defaultdict
 
 
-import urllib.request
-
-
-def download_img(path: str, url: str) -> None:
-    """
-    Ensure an image exists at `path`. If not, download it from `url`.
-    Raises URLError / OSError on failure.
-    """
-    if os.path.isfile(path):
-        return
-
-    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    print("Downloading source image for album artwork...")
-    urllib.request.urlretrieve(url, path)
-
-
 def file_id_to_pitch(file_id: int, num_files: int):
     center = 6000
     if num_files == 1:
@@ -49,18 +33,19 @@ def dynamic_to_velocity(dynamic: str):
 
 
 def organize_wav_files(folder_path, output_file):
-    # Dictionary to hold pitch groups and dynamic levels
     pitch_data = defaultdict(lambda: defaultdict(list))
 
-    # Dynamic level mapping
-    dynamic_map = {"ff": 127, "f": 127, "mf": 64,
-                   "mp": 64, "p": 0, "pp": 0, "N": 64}
+    dynamic_map = {"ff": 127,
+                   "f": 127,
+                   "mf": 64,
+                   "mp": 64,
+                   "p": 0,
+                   "pp": 0,
+                   "N": 64}
 
-    # Regex to parse pitch, dynamic level, and other details
     pattern = re.compile(
         r"([A-G#bq]+\d+|N)-([\w+]+)-")
 
-    # Iterate over all files in the folder
     for root, _, files in os.walk(folder_path):
         n_count = 0
         files = list(filter(lambda f: f.endswith('.wav'), files))
@@ -73,6 +58,7 @@ def organize_wav_files(folder_path, output_file):
 
                 vel = dynamic_map[dynamic] if dynamic in dynamic_map else 64
                 vel = dynamic_to_velocity(dynamic)
+
                 if pitch != 'N':
                     # Adjust the pitch to an octave higher
                     pitch_letter = pitch[:-1]
@@ -91,10 +77,10 @@ def organize_wav_files(folder_path, output_file):
                 pitch_data[file_id_to_pitch(
                     i, num_files)][64].append(file_path)
                 n_count += 1
-    # return
+
     if not pitch_data:
         return
-    # Write the organized data to the output file
+
     with open(output_file, "w") as f:
         for pitch, dynamics in sorted(pitch_data.items()):
             f.write(f"[ {pitch}\n")
@@ -485,13 +471,14 @@ SOL-based sampler. Given a SOL keymap `@type`, returns a buffer with a {name} sa
 
 parser = ArgumentParser(prog='keymap generator',
                         usage=f'{os.path.basename(sys.executable)} {os.path.basename(__file__)} <path to FullSOL dataset>')
-parser.add_argument('path',
+parser.add_argument('paths',
                     action='store',
+                    nargs=2,
                     help="Path to IRCAM's FullSOL directory.",)
+
 
 args = parser.parse_args()
 
-indir = args.path
 
 BASE_DIR = os.path.dirname(__file__)
 keymap_dir = os.path.join(BASE_DIR, 'src/__data__')
@@ -500,37 +487,39 @@ instruments = []
 if os.path.exists(keymap_dir):
     shutil.rmtree(keymap_dir)
 instrument_dict = {}
-for root, dirs, files in os.walk(indir):
-    if not files:
-        continue
-    is_audio_folder = False
-    for f in files:
-        if os.path.splitext(f)[1] == '.wav':
-            is_audio_folder = True
-            break
-    if not is_audio_folder:
-        continue
 
-    filename = root.split('/')[-1]
-    filename = abbreviate(filename, True)
-    instrument = root.split("/")[-2].lower()
-    if "Percussion" in root:
-        instrument = 'perc'
-    extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
-    extra = '+' + abbreviate(extra[0], True) if len(extra) > 0 else ''
-    technique = filename
-    filename += extra
-    instrument = abbreviate(re.match(r'^[A-Za-z]+', instrument)[0])
-    if instrument not in instrument_dict:
-        instrument_dict[instrument] = []
-    instrument_dict[instrument].append(filename)
+for root_path in args.paths:
+    for root, dirs, files in os.walk(root_path):
+        if not files:
+            continue
+        is_audio_folder = False
+        for f in files:
+            if os.path.splitext(f)[1] == '.wav':
+                is_audio_folder = True
+                break
+        if not is_audio_folder:
+            continue
 
-    out_dir = os.path.join(keymap_dir, instrument)
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir, exist_ok=True)
+        filename = root.split('/')[-1]
+        filename = abbreviate(filename, True)
+        instrument = root.split("/")[-2].lower()
+        if "Percussion" in root:
+            instrument = 'perc'
+        extra = re.findall(r'(?<=\+)[A-Za-z_]*', instrument)
+        extra = '+' + abbreviate(extra[0], True) if len(extra) > 0 else ''
+        technique = filename
+        filename += extra
+        instrument = abbreviate(re.match(r'^[A-Za-z]+', instrument)[0])
+        if instrument not in instrument_dict:
+            instrument_dict[instrument] = []
+        instrument_dict[instrument].append(filename)
 
-    out_path = os.path.join(out_dir, filename + '.txt')
-    organize_wav_files(root, out_path)
+        out_dir = os.path.join(keymap_dir, instrument)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir, exist_ok=True)
+
+        out_path = os.path.join(out_dir, filename + '.txt')
+        organize_wav_files(root, out_path)
 
 
 for instrument in instrument_dict.keys():
@@ -575,6 +564,5 @@ for n in ['pno', 'maracas']:
     dir_name = os.path.join(keymap_dir, n)
     os.makedirs(dir_name, exist_ok=True)
 
-download_img(path=os.path.abspath('./artwork/media/img.png'),
-             url='https://d2cq0goacowtde.cloudfront.net/falm/img.png')
+
 print("DONE!")
