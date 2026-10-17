@@ -100,12 +100,4 @@ Once all audio tracks have been generated, they can be combined into a single on
 
 ## License
 
-All content in this repository—including code, scripts, and generated audio—is licensed under [**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**](https://creativecommons.org/licenses/by-nc-sa/4.0/).
-
-This means you are free to share and adapt this work, provided you:
-
-- Give appropriate credit
-- Do not use it for commercial purposes
-- Distribute any derivative works under the same license
-
-See the [LICENSE](LICENSE) file for full details.
+The code for **Fully Automated Luxury Music** is distributed under the terms of the GNU General Public License version 3 ([GPL-v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)).
