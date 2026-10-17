@@ -70,7 +70,7 @@ The first keymap is for Ableton Live's [_Grand Piano_](https://www.ableton.com/e
 > NOTE: You may need to may need to manually change the first line in [`piano.bell`](src/__imports__/piano.bell) to match path to the Ableton's _Grand Piano_ directory in your computer.
 
 ```py
-$files = readfolder('/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano');
+$pianopath = '/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Multisamples/Grand Piano';
 ```
 
 #### Maracas keymap
