@@ -49,7 +49,7 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 
 ### FullSOL integration with _bellplay~_
 
-The _bellplay~_ source code for _Fully Automated Luxury Music_ relies almost entirely on the IRCAM's _FullSOL_ dataset as the main audio source. As such, a [Python script](setup.py) is included which automatically generates files necessary for the scripts to run properly. This includes keymaps (`.txt` files used in _bellplay~_ for designing custom samplers) as well as `.bell` files with global _bell_ function definitions that are extensively used across different scripts for sampling from _FullSOL_.
+The _bellplay~_ source code for _Fully Automated Luxury Music_ relies almost entirely on the [IRCAM](https://www.ircam.fr/en)'s _FullSOL_ dataset as the main audio source. As such, a [Python script](setup.py) is included which automatically generates dependencies for the code to run properly. This includes keymaps (`.txt` files used in _bellplay~_ for designing custom samplers) as well as `.bell` files with global _bell_ function definitions that are extensively used across different scripts for sampling from _FullSOL_.
 
 From the top directory of the repo, run the following command:
 
