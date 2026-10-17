@@ -38,4 +38,5 @@ ezrender(
         @tail 4000
     ) fade(0, 4000) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

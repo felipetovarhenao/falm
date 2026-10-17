@@ -10,4 +10,5 @@ importaudio('./05_climax/climax.wav').transcribe($end - $peak);
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport();
+done()

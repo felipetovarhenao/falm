@@ -7,4 +7,5 @@ $b.transcribe($t);
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport();
+done()

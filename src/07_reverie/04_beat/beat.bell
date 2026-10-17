@@ -98,4 +98,5 @@ ezrender(
 );
 ezexport(
     ['offset' -$bardur] ['peak' $peak] ['totdur' $totdur] ['resume' $readend] 
-)
+);
+done()

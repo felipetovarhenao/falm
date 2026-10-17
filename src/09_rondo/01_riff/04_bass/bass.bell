@@ -55,4 +55,5 @@ for $id in $ids do (
         @reset 1 @process normalize(-3) 
     );
     ezexport(@id $id) 
-)
+);
+done()

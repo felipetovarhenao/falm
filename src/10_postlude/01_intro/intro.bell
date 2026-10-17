@@ -89,4 +89,5 @@ ezrender(
 );
 ezexport(
     @data ['total_duration' $totalduration] ['markers' $markers] 
-)
+);
+done()

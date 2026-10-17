@@ -88,4 +88,5 @@ for $id in $ids do (
 );
 if $combine == 1 then (ezrender(
     @play 1 @process $postfx
-) )
+) );
+done()

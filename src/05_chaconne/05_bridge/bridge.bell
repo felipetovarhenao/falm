@@ -201,4 +201,5 @@ cycle(
 ezrender(
     @play 1 @process normalize(@level -18 @rms 1) arctan() normalize(-3) 
 );
-ezexport($shift)
+ezexport($shift);
+done()

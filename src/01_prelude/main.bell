@@ -40,4 +40,5 @@ $onset += read('./03_tail/tail.txt') * 0.7;
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($onset)
+ezexport($onset);
+done()

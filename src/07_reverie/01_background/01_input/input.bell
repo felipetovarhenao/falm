@@ -80,4 +80,5 @@ $peak = $totdur;
 $totdur = getkey($b, 'duration');
 ezexport(
     ['peak' $peak] ['totdur' $totdur] 
-)
+);
+done()

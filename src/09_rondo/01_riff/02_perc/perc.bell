@@ -76,4 +76,5 @@ for $id in $sectionids do (
         );
         ezexport(@id $id) 
     ) 
-)
+);
+done()

@@ -135,4 +135,5 @@ ezexport(
     ['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord] [
         'next_chord' ($markers:-2).getkey('chord') 
     ] 
-)
+);
+done()

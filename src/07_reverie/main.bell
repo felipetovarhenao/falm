@@ -16,4 +16,5 @@ $gap = envelope(@duration 3000);
 ezrender(
     @play 1 @process normalize(-3) join($gap) 
 );
-ezexport()
+ezexport();
+done()

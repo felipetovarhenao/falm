@@ -31,4 +31,5 @@ for $b in $bufs do (
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($maxpeak)
+ezexport($maxpeak);
+done()

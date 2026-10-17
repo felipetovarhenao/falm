@@ -44,4 +44,5 @@ ezrender(
         @width 1
     ) normalize(-8) 
 );
-ezexport(@data $totdur @id $id)
+ezexport(@data $totdur @id $id);
+done()

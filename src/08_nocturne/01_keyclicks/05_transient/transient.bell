@@ -23,4 +23,5 @@ Compress(bass(
 ezrender(
     @play 1 @process normalize(-9) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

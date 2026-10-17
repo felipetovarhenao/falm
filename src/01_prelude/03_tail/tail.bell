@@ -41,4 +41,5 @@ ezrender(
         @fadeouttype 2
     ) 
 );
-ezexport(maximum($durs))
+ezexport(maximum($durs));
+done()

@@ -24,4 +24,5 @@ importaudio('./09_dissolve/dissolve.wav').transcribe($t);
 ezrender(
     @play 1 @process normalize(-3) join(envelope(@duration 2500)) 
 );
-ezexport()
+ezexport();
+done()

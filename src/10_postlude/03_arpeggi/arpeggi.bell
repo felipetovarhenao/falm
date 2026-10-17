@@ -174,4 +174,5 @@ ezrender(
 );
 ezexport(
     @data ['total_duration' $globalduration] ['slope' $globalslope] ['numvoices' $numvoices] 
-)
+);
+done()

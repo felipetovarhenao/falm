@@ -152,4 +152,5 @@ ezrender(
         normalize(@level -24 @rms 1) arctan() normalize(-3) 
     ) 
 );
-ezexport($peakmarker)
+ezexport($peakmarker);
+done()

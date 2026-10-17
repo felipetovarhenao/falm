@@ -49,4 +49,5 @@ for $id in $ids do (
 );
 if $preview == 1 then ezrender(
     @play 1 @process $postfx($freqshift) 
-)
+);
+done()

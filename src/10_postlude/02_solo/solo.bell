@@ -143,4 +143,5 @@ ezrender(
 );
 ezexport(
     @data ['delay' $globaldelay] ['markers' Markers] 
-)
+);
+done()

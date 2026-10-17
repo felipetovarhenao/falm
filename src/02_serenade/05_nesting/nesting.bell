@@ -263,4 +263,5 @@ ezrender(
 );
 ezexport(
     ['peak' $peaksize * $period] ['markers' thin(Markers)] 
-)
+);
+done()

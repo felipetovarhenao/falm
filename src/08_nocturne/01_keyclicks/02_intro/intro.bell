@@ -18,4 +18,5 @@ for $obj in $objseq do (
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($t)
+ezexport($t);
+done()

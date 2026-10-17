@@ -43,4 +43,5 @@ for $id in $ids do (
         ) normalize(-8) 
     );
     ezexport(@id $id @data $t) 
-)
+);
+done()

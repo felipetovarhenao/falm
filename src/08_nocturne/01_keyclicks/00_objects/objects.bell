@@ -521,4 +521,5 @@ $objseq = for $chord $idx in $progression collect (
 );
 write(
     @data ['sequence' $objseq] ['seed' $seed] @path './objects.txt' 
-)
+);
+done()

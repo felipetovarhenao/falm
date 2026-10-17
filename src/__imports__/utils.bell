@@ -683,4 +683,5 @@ ezpanning = ($position -> panning(
     @position $position
     @panmode 1
     @numchannels NUM_CHANNELS
-))
+));
+done = (-> print('***done***'))

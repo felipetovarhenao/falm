@@ -37,4 +37,5 @@ ezrender(
         @damp 1
     ) normalize(-3) 
 );
-ezexport($marker.getkey('onset'))
+ezexport($marker.getkey('onset'));
+done()

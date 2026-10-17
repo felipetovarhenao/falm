@@ -450,4 +450,5 @@ while $t < $totdur do (
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport();
+done()

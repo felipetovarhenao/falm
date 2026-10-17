@@ -110,4 +110,5 @@ if $combine == 1 then (
         @play 1 @process normalize(-3) 
     );
     ezexport() 
-)
+);
+done()

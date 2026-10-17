@@ -99,4 +99,5 @@ ezrender(
         normalize(-3) 
     ) 
 );
-ezexport($data.'delay')
+ezexport($data.'delay');
+done()

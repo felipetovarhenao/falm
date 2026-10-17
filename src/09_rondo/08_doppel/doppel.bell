@@ -89,4 +89,5 @@ for $id in $ids do (
         ezexport(@data $t @id $id) 
     ) 
 );
-if $preview == 1 then (ezrender(@play 1 @process $postfx))
+if $preview == 1 then (ezrender(@play 1 @process $postfx));
+done()

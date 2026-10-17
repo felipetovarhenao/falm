@@ -90,4 +90,5 @@ $gates _= [$t $reset];
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport(['totdur' $lastonset] ['gates' $gates])
+ezexport(['totdur' $lastonset] ['gates' $gates]);
+done()

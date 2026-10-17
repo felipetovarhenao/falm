@@ -34,4 +34,5 @@ $totdur = $b.getkey('duration');
 $midpt = $peak / $totdur;
 ezexport(
     ['stretch' $stretch] ['midpt' $midpt] ['peak' $peak] ['totdur' $totdur] 
-)
+);
+done()

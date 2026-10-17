@@ -145,4 +145,5 @@ ezrender(
     ) normalize(-3) 
 );
 $metadata = [['totdur' $totaldur] ['events' $chordseq]];
-ezexport($metadata)
+ezexport($metadata);
+done()

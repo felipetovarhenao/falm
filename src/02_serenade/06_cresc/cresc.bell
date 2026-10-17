@@ -45,4 +45,5 @@ $b = ezrender(
         reverse() 
     ) 
 );
-ezexport($b.getkey('duration'))
+ezexport($b.getkey('duration'));
+done()

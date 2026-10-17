@@ -106,4 +106,5 @@ $b.transcribe(
 ezrender(
     @play 1 @process normalize(-3) fade(0, $tail) 
 );
-ezexport($t)
+ezexport($t);
+done()

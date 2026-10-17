@@ -40,4 +40,5 @@ cycle(
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($duration)
+ezexport($duration);
+done()
