@@ -74,6 +74,8 @@ def run_files(paths,
     threading.Thread(target=server.serve_forever, daemon=True).start()
 
     start = time.time()
+    client.send_message(address='/load_file',
+                        value=os.path.join(SRC_ROOT, '__imports__/utils.bell'))
     try:
         for i, path in enumerate(paths):
             prog = int(round((i + 1) / len(paths) * 100))
