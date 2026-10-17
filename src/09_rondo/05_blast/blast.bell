@@ -4,7 +4,6 @@ $root = $sequence.'root';
 $maxid = length($sections);
 $minid = 7;
 $ids = $minid...$maxid;
-## $ids = 7;
 $preview = length($ids) == 1;
 $postfx = (
     $shift -> freeverb(
