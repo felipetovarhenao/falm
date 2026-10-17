@@ -11,7 +11,7 @@ import sys
 
 
 parser = ArgumentParser(prog='FALM',
-                        usage=f"{sys.executable} render.py [tracks]...",
+                        usage=f"{sys.executable} 01_render.py [tracks]...",
                         description="Automated rendered for Fully Automated Luxury Music in bellplay~")
 
 parser.add_argument('tracks',
@@ -104,6 +104,7 @@ for root, folders, files in os.walk(SRC_ROOT):
         file_name, file_ext = os.path.splitext(file)
         if file_ext != '.bell':
             continue
-        SCRIPT_SEQUENCE.append(os.path.join(root, file))
+        file_path = os.path.join(root, file)
+        SCRIPT_SEQUENCE.append(file_path)
 
 run_files(sorted(SCRIPT_SEQUENCE))

@@ -229,4 +229,5 @@ ezrender(
 );
 $metadata _= ['sections' (0 $climaxst $climaxend 1) * $totdur];
 $metadata _= ['tuning' $tuning];
-ezexport($metadata)
+ezexport($metadata);
+done()

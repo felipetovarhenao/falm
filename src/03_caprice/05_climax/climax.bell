@@ -36,4 +36,5 @@ ezrender(
         @damp 1
     ) normalize(-7) 
 );
-ezexport(-$t / 4)
+ezexport(-$t / 4);
+done()

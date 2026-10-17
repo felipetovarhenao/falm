@@ -21,4 +21,5 @@ importaudio('../03_cresc/cresc.wav').transcribe(@onset $t - read('../03_cresc/cr
 ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport();
+done()

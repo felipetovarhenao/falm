@@ -57,4 +57,5 @@ for $seed $id in $seeds do (
         ) 
     );
     ezexport($totdur @id $id) 
-)
+);
+done()

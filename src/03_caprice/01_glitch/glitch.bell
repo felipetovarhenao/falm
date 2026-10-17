@@ -296,4 +296,5 @@ for $seed $id in $seeds do (
         ) 
     );
     ezexport($onset @id $id) 
-)
+);
+done()

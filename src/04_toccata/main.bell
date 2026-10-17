@@ -30,4 +30,5 @@ ezrender(
         join(envelope(@duration $gap)) 
     ) 
 );
-ezexport()
+ezexport();
+done()
