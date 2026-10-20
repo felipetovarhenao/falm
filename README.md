@@ -32,7 +32,7 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 ### Software
 
 - _Python~_ v3.12.4 [[download](https://www.python.org/downloads/release/python-3124/)]: Used for setting up the working environment.
-- _bellplay~_ v0.2.8-beta [[download](https://github.com/felipetovarhenao/bellplay/releases/tag/v0.2.8-beta)]: Used for generating and modifying the actual music/audio output.
+- _bellplay~_ v0.3.0-beta [[download](https://github.com/felipetovarhenao/bellplay/releases/tag/v0.3.0-beta)]: Used for generating and modifying the actual music/audio output.
 - _Visual Studio Code_ [[download](https://code.visualstudio.com/)]: Used for editing the code.
   - _bellplay~ plugin extension_ [[download](https://marketplace.visualstudio.com/items?itemName=tovarhenao.bellplay-plugin)]: Improves the user experience for working on _bellplay~_ scripts.
 - _Ableton Live 12 (Standard or Suite)_ [[download](https://www.ableton.com/en/live/)]: Used specifically to create a _bellplay~_-friendly version of the _Grand Piano_ sampler.
