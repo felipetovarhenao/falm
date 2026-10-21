@@ -93,7 +93,7 @@ for $e in $events do (
     ) 
 );
 $tail = 4000;
-render(
+ezrender(
     @fade 10
     @play 1
     @process (
@@ -119,4 +119,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport()
+ezexport();
+done()

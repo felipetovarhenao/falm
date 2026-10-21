@@ -85,8 +85,9 @@ for $id in $ids do (
         $t += $beat
     );
     if $preview == 0 then (
-        render(@reset 1 @process $postfx);
+        ezrender(@reset 1 @process $postfx);
         ezexport(@data $t @id $id) 
     ) 
 );
-if $preview == 1 then (render(@play 1 @process $postfx))
+if $preview == 1 then (ezrender(@play 1 @process $postfx));
+done()

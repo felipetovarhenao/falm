@@ -47,7 +47,7 @@ for $mc in $chord.xscramble() do (
     );
     $t += xrand(20) 
 );
-render(
+ezrender(
     @play 1
     @panmode 1
     @process normalize(-3) dynamics(@knee 2 @ratio 3) freeverb(
@@ -57,4 +57,5 @@ render(
         @width 1
     ) 
 );
-ezexport()
+ezexport();
+done()

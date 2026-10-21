@@ -285,7 +285,7 @@ for $seed $id in $seeds do (
         $onset += $dur
     );
     if $gapgate == 1 then ($onset += maximum($durs));
-    render(
+    ezrender(
         @play 1
         @reset 1
         @process freeverb(
@@ -296,4 +296,5 @@ for $seed $id in $seeds do (
         ) 
     );
     ezexport($onset @id $id) 
-)
+);
+done()

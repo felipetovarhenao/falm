@@ -30,7 +30,8 @@ for $seed $seedid in (91 98 8) + 8934 do (
         ) 
     ) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($t)
+ezexport($t);
+done()

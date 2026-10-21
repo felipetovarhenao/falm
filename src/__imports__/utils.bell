@@ -1,3 +1,5 @@
+## Modify this variable and re-run script to render for a different number of channels
+NUM_CHANNELS = 2;
 #( 
     =========
     This script contains an assortment of utility functions frequently used throughout the codebase.
@@ -642,4 +644,44 @@ interpolateratios = (
         );
         $steps
     ) 
-)
+);
+#(
+```bell
+render(
+    @sr 48000
+    @normalize 0
+    @play 0
+    @spread 1
+    @fade 5
+    @reset 0
+    @process null
+) -> llll
+```
+)#
+ezrender = (
+    ## ---
+    $sr = 48000, $normalize = 0, $play = 0, $spread = 1, $fade = 5, $reset = 0, $process = null -> render(
+        @sr $sr
+        @normalize $normalize
+        @play $play
+        @spread $spread
+        @fade $fade
+        @reset $reset
+        @numchannels NUM_CHANNELS
+        @panmode NUM_CHANNELS > 2
+        @process $process
+    ) 
+);
+#(
+```bell
+panning(
+    @position 0.5
+) -> llll
+```
+)#
+ezpanning = ($position -> panning(
+    @position $position
+    @panmode 1
+    @numchannels NUM_CHANNELS
+));
+done = (-> print('***done***'))

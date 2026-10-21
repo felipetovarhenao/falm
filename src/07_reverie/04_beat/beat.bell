@@ -80,7 +80,7 @@ while $t < $totdur do (
     );
     $t += $unit
 );
-render(
+ezrender(
     @play 1 @process (
         dynamics(
             @thresh -30
@@ -98,4 +98,5 @@ render(
 );
 ezexport(
     ['offset' -$bardur] ['peak' $peak] ['totdur' $totdur] ['resume' $readend] 
-)
+);
+done()

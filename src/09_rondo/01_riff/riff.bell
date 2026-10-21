@@ -15,8 +15,9 @@ for $i in 1...$numsections do (
         ) 
     );
     $t += read('./01_strings/strings_' + $id + '.txt');
-    render(
+    ezrender(
         @reset 1 @process normalize(-3) 
     );
     ezexport(@data $t @id $i) 
-)
+);
+done()

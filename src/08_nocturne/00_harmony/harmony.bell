@@ -22,4 +22,5 @@ $cadence = [
 ] $progression:1;
 write(
     @data ['root' $mcroot] ['progression' $progression] ['cadence' $cadence] @path './harmony.txt' 
-)
+);
+done()

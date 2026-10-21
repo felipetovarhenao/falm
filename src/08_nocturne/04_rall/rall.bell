@@ -119,7 +119,7 @@ for $type in 'ord' 'mid' do (
     ) 
 );
 $tail = 500;
-render(
+ezrender(
     @play 1 @process (
         normalize(3) 
         ## ---
@@ -159,4 +159,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

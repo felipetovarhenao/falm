@@ -42,7 +42,7 @@ Brass = (
                 @types 'stacc' 
                 @velocity 127
                 @useseed 1
-            ).process(normalize(-3) panning(xrand())) 
+            ).process(normalize(-3) ezpanning(xrand())) 
         );
         $brass = $brass.left(1).process(
             mix(right($brass, 1)) gain([0 1 0] [1 0 0.5]) freeverb(
@@ -128,10 +128,11 @@ for $id in $ids do (
         ) 
     );
     if $preview == 0 then (
-        render(
+        ezrender(
             @reset 1 @process $postfx
         );
         ezexport(@data $totdur @id $id) 
     ) 
 );
-if $preview == 1 then render(@play 1 @process $postfx)
+if $preview == 1 then ezrender(@play 1 @process $postfx);
+done()

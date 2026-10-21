@@ -7,7 +7,8 @@ $peak = read('./05_climax/climax.txt');
 importaudio('./03_arpeggi/arpeggi.wav').transcribe($end);
 importaudio('./04_sustain/sustain.wav').transcribe($end);
 importaudio('./05_climax/climax.wav').transcribe($end - $peak);
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport()
+ezexport();
+done()

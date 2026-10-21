@@ -80,12 +80,13 @@ for $id in $ids do (
         $t += $timestep
     );
     if $combine == 0 then (
-        render(
+        ezrender(
             @reset 1 @process $postfx
         );
         ezexport(@id $id) 
     ) 
 );
-if $combine == 1 then (render(
+if $combine == 1 then (ezrender(
     @play 1 @process $postfx
-) )
+) );
+done()

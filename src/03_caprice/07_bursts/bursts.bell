@@ -57,7 +57,7 @@ while $t < $totdur do (
     $t += $incr
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.4
@@ -72,4 +72,5 @@ render(
         ) normalize(-3) 
     ) 
 );
-ezexport($t)
+ezexport($t);
+done()

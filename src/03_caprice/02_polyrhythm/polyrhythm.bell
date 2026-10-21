@@ -46,7 +46,7 @@ for $seed $id in $seeds do (
             $t += $notedur
         ) 
     );
-    render(
+    ezrender(
         @reset 1
         @fade 0
         @process freeverb(
@@ -57,4 +57,5 @@ for $seed $id in $seeds do (
         ) 
     );
     ezexport($totdur @id $id) 
-)
+);
+done()

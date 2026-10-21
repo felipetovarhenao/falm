@@ -83,10 +83,11 @@ for $id in $ids do (
     );
     $totdur = $t;
     if $preview == 0 then (
-        render(@reset 1 @process $postfx);
+        ezrender(@reset 1 @process $postfx);
         ezexport(@data $totdur @id $id) 
     ) 
 );
-if $preview == 1 then render(
+if $preview == 1 then ezrender(
     @play 1 @process $postfx
-)
+);
+done()

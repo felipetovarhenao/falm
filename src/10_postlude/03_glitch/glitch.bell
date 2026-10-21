@@ -84,7 +84,7 @@ $b.process(
         @fadeoutcurve 2/3.
     ) 
 ).transcribe();
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.98
@@ -99,4 +99,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport($data.'delay')
+ezexport($data.'delay');
+done()

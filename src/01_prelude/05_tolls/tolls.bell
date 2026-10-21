@@ -32,9 +32,10 @@ for $t in $onsets do (
     $t += $cresc.getkey('duration');
     if $minonset == 0 then ($minonset = $t);
     $markers _= $t;
+    $pan = xrand(-0.5, 0.5) * $nt + 0.5;
     $cresc.transcribe(
         @onset $t - $cresc.getkey('envmaxtime') 
-        @pan [0 xrand(0.25, 0.75) 0] [1 xrand(0.25, 0.75) xrand(-0.25, 0.25)] 
+        @pan [0 $pan 0] [1 xrand(0.25, 0.75) xrand(-0.25, 0.25)] 
         @gain 0.33
     );
     $bassdur = xrand(5000, 10000);
@@ -88,7 +89,7 @@ for $t in $onsets do (
     ) 
 );
 $tail = 1000;
-$b = render(@reset 1);
+$b = ezrender(@reset 1);
 $segs = splitbuf(
     @buffer $b
     @split $onsets
@@ -97,7 +98,7 @@ $segs = splitbuf(
 for $seg in $segs, $onset in $onsets do process(
     @buffer $seg @operations normalize(0) arctan() normalize(-3) 
 ).transcribe(@onset $onset);
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.95
@@ -116,4 +117,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport(['onset' $minonset] ['markers' $markers])
+ezexport(['onset' $minonset] ['markers' $markers]);
+done()

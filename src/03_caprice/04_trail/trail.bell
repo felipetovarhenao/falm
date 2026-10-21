@@ -56,12 +56,12 @@ $bass = cycle(
     @frequency mc2f(Root) @duration $bassdur
 );
 $bass.process(
-    gain([0 0 0] [1 0.5 0.5]) panning(
+    gain([0 0 0] [1 0.5 0.5]) ezpanning(
         [0 0 0] [0.7 1 0.25] [1 0.5 -0.125] 
     ) 
 ).transcribe(@onset $t - $bassdur @gain 0.707);
 addmarker($t);
-render(
+ezrender(
     @play 1 @process (
         normalize(@level -18 @rms 1) 
         ## ---
@@ -79,4 +79,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport($t)
+ezexport($t);
+done()

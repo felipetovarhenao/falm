@@ -17,7 +17,8 @@ for $file in $files with @unwrap 1 do (
     $snd.transcribe($t);
     $t += $txt
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($t)
+ezexport($t);
+done()

@@ -31,7 +31,8 @@ for $x $i in $pts do (
         $t += $dur
     ) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($t)
+ezexport($t);
+done()

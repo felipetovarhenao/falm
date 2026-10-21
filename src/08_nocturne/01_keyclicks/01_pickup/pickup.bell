@@ -37,7 +37,8 @@ cycle(
     @gain [0 0 0] [$peak 0.0125 0.25] [1 0 -0.125] 
     @pan [0 xrand() 0] [1 xrand() 0.25] 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($duration)
+ezexport($duration);
+done()

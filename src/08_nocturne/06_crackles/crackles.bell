@@ -42,7 +42,8 @@ while $t < $totdur do (
     );
     $t += $incr
 );
-render(
+ezrender(
     @play 1 @process normalize(0) dynamics(@thresh -20 @ratio 2) normalize(-9) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

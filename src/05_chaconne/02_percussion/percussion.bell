@@ -147,9 +147,10 @@ bass(
     @type 'bartok' 
     @useseed 1
 ).transcribe(@pan 0.707);
-render(
+ezrender(
     @play 1 @process (
         normalize(@level -24 @rms 1) arctan() normalize(-3) 
     ) 
 );
-ezexport($peakmarker)
+ezexport($peakmarker);
+done()

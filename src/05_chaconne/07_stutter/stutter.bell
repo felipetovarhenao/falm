@@ -29,7 +29,7 @@ for $mc in $chord do (
         $t += $split
     ) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.96
         @wet 0.05
@@ -37,4 +37,5 @@ render(
         @damp 1
     ) normalize(-3) 
 );
-ezexport($marker.getkey('onset'))
+ezexport($marker.getkey('onset'));
+done()

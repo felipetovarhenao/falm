@@ -97,7 +97,7 @@ while $t < $totaldur do (
         ['onset' $t] ['velocity' $vel] ['chord' $mcs] ['duration' $timestep] ['density' $chordsize] 
     ];
     $mcs = $mcs.left($chordsize);
-    for $mc in $mcs, $pan in left($panvals, $chordsize) with @scalarmode 0 do (
+    for $mc $mci in $mcs, $pan in left($panvals, $chordsize) with @scalarmode 0 do (
         $instruments = for $n in left($instrumentnames, $numnames) collect instrument(
             @name $n
             @types $techniques.left($numtechniques) 
@@ -124,13 +124,13 @@ while $t < $totaldur do (
         ).transcribe(
             @onset $t + $timestep * xrand(-0.5, 0.5) * $onsetvar
             @gain sqrt(1/length($mcs)) 
-            @pan $pan
+            @pan fold($pan + $nt * $mci) 
         ) 
     );
     $t += $timestep
 );
 $tail = 6000;
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.95
         @wet [0 0.005 0] [1 0.025 0.25] 
@@ -145,4 +145,5 @@ render(
     ) normalize(-3) 
 );
 $metadata = [['totdur' $totaldur] ['events' $chordseq]];
-ezexport($metadata)
+ezexport($metadata);
+done()

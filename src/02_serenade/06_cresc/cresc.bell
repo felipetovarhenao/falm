@@ -30,7 +30,7 @@ sawwave(@pitch $root @duration $maxdur).transcribe(
     @pan 0.5
     @gain [0 0.125 0] [1 0 -0.5] 
 );
-$b = render(
+$b = ezrender(
     @play 1 @process (
         normalize(-3) 
         ## ---
@@ -45,4 +45,5 @@ $b = render(
         reverse() 
     ) 
 );
-ezexport($b.getkey('duration'))
+ezexport($b.getkey('duration'));
+done()

@@ -15,7 +15,7 @@ $folders = (
     ## ---
     '02_serenade' 
     ## ---
-    '03_capprice' 
+    '03_caprice' 
     ## ---
     '04_toccata' 
     ## ---
@@ -44,9 +44,10 @@ for $folder $id in $folders do (
     $b.transcribe($t);
     $t += $bdur
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport(
     ['total_length' TimeCode($t)] ['tracks' $stats] 
-)
+);
+done()

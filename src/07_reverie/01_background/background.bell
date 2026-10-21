@@ -1,6 +1,6 @@
 $stretch = 8;
 importaudio('./01_input/input.wav').transcribe();
-$b = render(
+$b = ezrender(
     @play 1 @process (
         normalize(-14 @rms 1) 
         ## 
@@ -34,4 +34,5 @@ $totdur = $b.getkey('duration');
 $midpt = $peak / $totdur;
 ezexport(
     ['stretch' $stretch] ['midpt' $midpt] ['peak' $peak] ['totdur' $totdur] 
-)
+);
+done()

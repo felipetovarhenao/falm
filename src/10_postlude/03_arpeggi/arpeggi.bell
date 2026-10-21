@@ -153,7 +153,7 @@ for $arp in $arpeggi do (
     ) 
 );
 $tail = 5000;
-render(
+ezrender(
     @play 1 @process (
         freeverb(
             @roomsize 0.96
@@ -174,4 +174,5 @@ render(
 );
 ezexport(
     @data ['total_duration' $globalduration] ['slope' $globalslope] ['numvoices' $numvoices] 
-)
+);
+done()

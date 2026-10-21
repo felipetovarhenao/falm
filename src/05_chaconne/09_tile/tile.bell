@@ -39,7 +39,7 @@ for $g $gi in $gates with @unwrap 1 do (
 $c.setkey('offset', max(0, $start * $rate)).detach().clipnorm(@minlevel $minlevel @maxlevel $maxlevel).transcribe($start);
 $bass($start, $bassfq, $lastdur * 4);
 $tail = 1000;
-render(
+ezrender(
     @play 1
     @fade 3
     @process (
@@ -64,4 +64,5 @@ render(
         
     ) 
 );
-ezexport($offset)
+ezexport($offset);
+done()

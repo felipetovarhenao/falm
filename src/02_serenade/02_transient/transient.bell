@@ -29,7 +29,7 @@ sinewave(
     @gain [0 0 0] [$peak 0.25 0.25] [1 0 -0.125] 
 );
 $maxwet = 0.05;
-render(
+ezrender(
     @play 1 @process normalize(-3) reverse() freeverb(
         @roomsize 0.99
         @wet [0 0 0] [1 - $peak $maxwet 0.5] [1 $maxwet 0] 
@@ -38,4 +38,5 @@ render(
         @tail 4000
     ) fade(0, 4000) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

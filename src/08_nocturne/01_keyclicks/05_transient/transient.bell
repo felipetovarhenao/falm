@@ -20,7 +20,8 @@ Compress(bass(
 )).transcribe(
     @onset $totdur @pan mc2pan($mc, 0.25) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-9) 
 );
-ezexport($totdur)
+ezexport($totdur);
+done()

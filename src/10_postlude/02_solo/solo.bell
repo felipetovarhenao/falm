@@ -138,9 +138,10 @@ while $t < $totdur do (
     $t += $melspan + $gap
 );
 $tail = 5000;
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
 ezexport(
     @data ['delay' $globaldelay] ['markers' Markers] 
-)
+);
+done()

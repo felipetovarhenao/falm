@@ -37,7 +37,8 @@ $lastevent = $metadata.getkey('events'):-1;
 $onset += $lastevent.getkey('onset') + $lastevent.getkey('duration') * 2.3;
 importaudio('./03_tail/tail.wav').transcribe($onset);
 $onset += read('./03_tail/tail.txt') * 0.7;
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($onset)
+ezexport($onset);
+done()

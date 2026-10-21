@@ -68,7 +68,7 @@ while ($t < $totdur) || (
     $i = ($i + 1) % length($chord);
     $t += $incr * $incrjit
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) freeverb(
         @roomsize 0.9
         @wet 0.005
@@ -76,4 +76,5 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport($t + 150)
+ezexport($t + 150);
+done()

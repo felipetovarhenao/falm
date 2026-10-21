@@ -240,7 +240,7 @@ for $i $n in $levels do (
     if $n == $peaksize then ($t += $gap) 
 );
 $tail = 2000;
-render(
+ezrender(
     @play 1 @process (
         trim(@threshold 0.0005 @start 0) 
         ## ---
@@ -263,4 +263,5 @@ render(
 );
 ezexport(
     ['peak' $peaksize * $period] ['markers' thin(Markers)] 
-)
+);
+done()

@@ -34,7 +34,7 @@ for $mc in $mcs do (
     );
     $t += xrand(5) 
 );
-render(
+ezrender(
     @play 1
     @fade 2
     @process freeverb(
@@ -44,4 +44,5 @@ render(
         @width 1
     ) normalize(-8) 
 );
-ezexport(@data $totdur @id $id)
+ezexport(@data $totdur @id $id);
+done()

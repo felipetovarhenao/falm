@@ -65,7 +65,7 @@ $bass.transcribe(
     @gain [0 0 0] [$peak / $bass.getkey('duration') 1 0.25] [1 0 -0.125] 
 );
 $tail = 3000;
-render(
+ezrender(
     @play 1 @process (
         ## ---
         freeverb(
@@ -85,4 +85,5 @@ render(
         normalize(-3) 
     ) 
 );
-ezexport()
+ezexport();
+done()

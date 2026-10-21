@@ -47,7 +47,7 @@ for $type in 'mid' 'drawn' do (
         @gain [0 1 0] [1 0 0.25] 
     ) 
 );
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.95
         @wet 0.05
@@ -55,4 +55,5 @@ render(
         @width 1
     ) normalize(-3) 
 );
-ezexport($totdur + $delay)
+ezexport($totdur + $delay);
+done()

@@ -28,7 +28,8 @@ for $b in $bufs do (
         @gain $gain
     ) 
 );
-render(
+ezrender(
     @play 1 @process normalize(-3) 
 );
-ezexport($maxpeak)
+ezexport($maxpeak);
+done()

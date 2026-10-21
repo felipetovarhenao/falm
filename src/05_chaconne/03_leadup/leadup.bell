@@ -99,12 +99,12 @@ $bass = cycle(
     @duration $totdur
     @phase xrand() 
 ).process(
-    multiply($mod) gain($bassenv) arctan() gain([0 1 0] [1 $amp2 0.9]) pong() dcfilter() normalize(-3) panning(
+    multiply($mod) gain($bassenv) arctan() gain([0 1 0] [1 $amp2 0.9]) pong() dcfilter() normalize(-3) ezpanning(
         [0 1 0] [0.5 0 -0.125] [1 0.5 0.125] 
     ) gain(0.2) 
 );
 $tail = 4000;
-render(
+ezrender(
     @play 1 @process (
         normalize(@level -18 @rms 1) 
         ## ---
@@ -135,4 +135,5 @@ ezexport(
     ['duration' $totdur] ['onset' $peak - $totdur] ['chord' $chord] [
         'next_chord' ($markers:-2).getkey('chord') 
     ] 
-)
+);
+done()

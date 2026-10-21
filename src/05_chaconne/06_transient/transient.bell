@@ -42,7 +42,7 @@ ezsol(
     @onset $t @pan xrand() xrand() 
 );
 addmarker($t);
-render(
+ezrender(
     @play 1 @process freeverb(
         @roomsize 0.99
         @wet 0.0125
@@ -50,4 +50,5 @@ render(
         @width 1
     ) normalize(-6) 
 );
-ezexport($t)
+ezexport($t);
+done()
