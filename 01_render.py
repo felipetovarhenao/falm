@@ -8,6 +8,7 @@ from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
 from argparse import ArgumentParser
 import sys
+import random
 
 
 parser = ArgumentParser(prog='FALM',
@@ -18,8 +19,14 @@ parser.add_argument('tracks',
                     action='store',
                     nargs='*',
                     default='all')
-
+parser.add_argument('--seed', action='store', default=-1, type=int)
 args = parser.parse_args()
+
+SEED = (args.seed)
+if SEED == 0:
+    SEED = random.randint(1, 2 ** 16)
+elif SEED < 0:
+    SEED = 0
 
 SRC_ROOT = os.path.join(os.path.dirname(__file__), 'src')
 DIR_TREE = OrderedDict()
@@ -36,6 +43,7 @@ ALL_TRACKS = ['prelude',
               'postlude']
 
 SELECTED_TRACKS = args.tracks
+CODE_CACHE = {}
 
 
 if SELECTED_TRACKS == 'all':
@@ -53,6 +61,18 @@ def format_time(time):
     hours = mins // 60
     mins %= 60
     return f"{hours:2d}:{mins:2d}:{secs:2d}"
+
+
+def set_seed(path: str):
+    global CODE_CACHE
+    global SEED
+    with open(path, 'r') as f:
+        txt = f.read()
+    pat = r'(?<=\bsetseed\()([^;]+)(?=\);)'
+    CODE_CACHE[path] = txt
+    sub_txt = re.sub(pat, rf'(\g<1>) + {SEED}', txt, flags=re.DOTALL)
+    with open(path, 'w') as f:
+        f.write(sub_txt)
 
 
 def run_files(paths,
@@ -78,6 +98,7 @@ def run_files(paths,
                         value=os.path.join(SRC_ROOT, '__imports__/utils.bell'))
     try:
         for i, path in enumerate(paths):
+            set_seed(path)
             prog = int(round((i + 1) / len(paths) * 100))
             print(f"Running: {path}")
             done.clear()
@@ -88,6 +109,10 @@ def run_files(paths,
     finally:
         server.shutdown()
         server.server_close()
+        global CODE_CACHE
+        for (path, text) in zip(CODE_CACHE):
+            with open(path, 'w') as f:
+                f.write(text)
 
 
 def path_to_title(path):
