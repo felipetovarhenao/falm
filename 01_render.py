@@ -110,7 +110,7 @@ def run_files(paths,
         server.shutdown()
         server.server_close()
         global CODE_CACHE
-        for (path, text) in zip(CODE_CACHE):
+        for (path, text) in CODE_CACHE.items():
             with open(path, 'w') as f:
                 f.write(text)
 
