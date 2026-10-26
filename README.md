@@ -51,7 +51,7 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 
 2. Download [_Orchidea tam tam_](https://www.orch-idea.org/data/db/Orchidea_tam_tam_0.6.zip) dataset from Orchidea's website (free).
 
-## Environment setup
+## Setup
 
 1. Install Python dependencies:
 
