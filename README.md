@@ -89,6 +89,8 @@ In addition to some basic familiary with [_bell_ programming](https://felipe-tov
 
 ## Rendering
 
+### Option 1: Python
+
 The simplest way to render _F.A.L.M_ into audio is via the [`01_render.py`](01_render.py) Python script.
 
 > Before running this script, make sure to first open _bellplay~_
@@ -110,6 +112,8 @@ To generate variations of the album, you can provide a random seed. If seed is `
 ```py
 python 01_render.py rondo --seed 2
 ```
+
+### Option 2: bellplay~
 
 For more fine-grained modification, you can of course directly modify and run the _bellplay_ scripts, which can be found in [`src/`](src).
 
