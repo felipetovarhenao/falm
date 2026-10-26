@@ -13,3 +13,4 @@ sol.bell
 *.png
 *.tif
 *.jpg
+!requirements.txt
