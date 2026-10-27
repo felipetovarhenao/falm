@@ -489,6 +489,7 @@ if os.path.exists(keymap_dir):
 instrument_dict = {}
 
 for root_path in args.paths:
+    root_path = os.path.abspath(root_path)
     for root, dirs, files in os.walk(root_path):
         if not files:
             continue
