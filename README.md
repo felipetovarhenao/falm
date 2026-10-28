@@ -2,7 +2,7 @@
 
 ![artwork](https://d2cq0goacowtde.cloudfront.net/falm/artwork.jpg)
 
-[Listen/Purchase](https://deadlandrecords.bandcamp.com/album/fully-automated-luxury-music)
+[Listen/Purchase](https://deadlandrecords.bandcamp.com/album/fully-automated-luxury-music) | [Web Player](https://fullyautomatedluxurymusic.com)
 
 ## About
 
@@ -15,6 +15,8 @@ This album serves primarily as a proof of concept for _open-source music_—a st
 ### Listen
 
 You can listen to a mastered version of _Fully Automated Luxury Music_ [here](https://deadlandrecords.bandcamp.com/album/fully-automated-luxury-music).
+
+Alternatively, you can listen to different versions of the album at [fullyautomatedluxurymusic.com](https://fullyautomatedluxurymusic.com)
 
 ### Track listing
 
@@ -124,6 +126,8 @@ Once all audio tracks have been generated, they can be combined into a single on
 ## Credits & Acknowledgements
 
 **F.A.L.M** was realized using different audio data—primarily [IRCAM](https://www.ircam.fr/)'s [FullSOL dataset](https://forum.ircam.fr/projects/detail/fullsol/), and to a lesser extent the the [_Grand Piano_](https://www.ableton.com/en/packs/grand-piano/) samples in [_Ableton Live_](https://www.ableton.com/en/), as well as a maracas samples available via [_Epidemic Sound_](https://www.epidemicsound.com/).
+
+Thanks to [Deadland Records](https://deadlandrecords.bandcamp.com/) for distributing and the official album release.
 
 ## License
 
