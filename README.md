@@ -2,7 +2,8 @@
 
 ![artwork](https://d2cq0goacowtde.cloudfront.net/falm/artwork.jpg)
 
-[Listen/Purchase](https://deadlandrecords.bandcamp.com/album/fully-automated-luxury-music) | [Web Player](https://fullyautomatedluxurymusic.com)
+| [Bandcamp](https://deadlandrecords.bandcamp.com/album/fully-automated-luxury-music) | [Apple](https://music.apple.com/us/album/fully-automated-luxury-music/6828299829) | [Spotify](https://open.spotify.com/album/2stjjnOdPn81TYQRfUgoaj) | [Youtube](https://music.youtube.com/playlist?list=OLAK5uy_l-ZWvcC_5wLQdvAhdC7KuZ31ym-FGbNYA) | [Official Website](https://fullyautomatedluxurymusic.com) |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 
 ## About
 
